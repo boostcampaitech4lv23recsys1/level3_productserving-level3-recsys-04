@@ -1,0 +1,4 @@
+selenium
+tqdm
+pandas
+jupyter
