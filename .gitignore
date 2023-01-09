@@ -1,0 +1,7 @@
+.dist
+chromedriver.exe
+chromedriver
+chromedriver_linux64.zip
+google-chrome-stable_current_amd64.deb
+.ipynb_checkpoints
+yang_crawling_server.ipynb
