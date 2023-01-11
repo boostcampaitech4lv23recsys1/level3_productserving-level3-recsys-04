@@ -4,10 +4,21 @@ chromedriver
 chromedriver_linux64.zip
 google-chrome-stable_current_amd64.deb
 .ipynb_checkpoints
-
+area_csv
+user_csv
 
 # schini
 notsaved.txt
 Gangnam_1000_1499
 Yongsan
 crawling_rest_server_auto.ipynb
+
+# 개인화된 crawling 처리
+study
+crawling_user_review.ipynb
+crawling_rest_server.ipynb
+crawling_user_review_failed.ipynb
+crawling_user_review.py
+crwaling_concat.ipynb
+csv_concat.ipynb
+__pycache__

@@ -1,3 +1,15 @@
+'''
+돌리기 전에 다시 확인 꼭 하기!!
+'''
+## area : 지역
+## current_status, start : 같은 숫자가 와야함. 시작하는 인덱스
+## end : 끝나는 인덱스
+
+area = 'Gangnam'
+current_status = 100
+start = 100
+end = 500
+
 import selenium
 from selenium import webdriver
 from selenium.webdriver import ActionChains
@@ -9,27 +21,25 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.action_chains import ActionChains
 from bs4 import BeautifulSoup
 from tqdm import tqdm
+
 import time
 import pandas as pd
 from selenium.webdriver.chrome.options import Options
+
 chrome_options = Options()
 chrome_options.add_argument('--headless')
 chrome_options.add_argument('--no-sandbox')
 chrome_options.add_argument('--disable-dev-shm-usage')
 chrome_options.add_argument('window-size= 1920,1080')
 chrome_options.add_argument('--kiosk')
-# executable_path : /opt/ml/crawling/chromedriver
+
 driver = webdriver.Chrome(executable_path='/opt/ml/input/project/crawings/chromedriver', chrome_options=chrome_options)
-# ./area_csv/Gangnam/river_behind_concat.csv
 
-path = 'Gangnam' # 얘를 바꿔가자.
-
-data = pd.read_csv(f'./area_csv/{path}/river_behind_concat.csv')
+data = pd.read_csv(f'./area_csv/{area}/rest_concat.csv')
 url_list = list(data['url'].values)
 userlink = pd.DataFrame()
-#url_list = ["36528615", "31317229", "1269259731", "1779562085", "33040151", "1675801137", "1384361907", "1372982703", "1681990192", "1971062401"]
-current_status = 0
-for _url in tqdm(url_list[0:50]):
+
+for _url in tqdm(url_list[start:end]):
     try:
         driver = webdriver.Chrome(executable_path='/opt/ml/input/project/crawings/chromedriver', chrome_options=chrome_options)
         action = ActionChains(driver)
@@ -63,7 +73,7 @@ for _url in tqdm(url_list[0:50]):
             if count >= 60: flag = True; break
         print("click 2/2 complete")
         if flag:
-            with open(f"./user_csv/{path}/notsaved.txt", "a") as file:
+            with open(f"./user_csv/{area}/notsaved_{start}.txt", "a") as file:
                 file.write(f"{str(current_status)}\n")
                 file.close()
             current_status += 1
@@ -78,12 +88,12 @@ for _url in tqdm(url_list[0:50]):
         userlink2 = pd.DataFrame({'link' : link_list, 'user' : user_list}, dtype = str)
         userlink2['rest'] = _url
         userlink = pd.concat([userlink, userlink2], axis = 0, sort=False)
-        userlink.to_csv(f'./user_csv/{path}/river_behind{current_status}.csv', index=False)#river_behind500
-        with open(f"./user_csv/{path}/log.txt", "w") as file:
+        userlink.to_csv(f'./user_csv/{area}/user_{start}.csv', index=False)#river_behind500
+        with open(f"./user_csv/{area}/log.txt", "w") as file:
             file.writelines(str(current_status))
         current_status += 1
     except:
-        with open(f"./user_csv/{path}/notsaved.txt", "a") as file:
+        with open(f"./user_csv/{area}/notsaved_{start}.txt", "a") as file:
             file.write(f"{str(current_status)}\n")
             file.close()
         current_status += 1
