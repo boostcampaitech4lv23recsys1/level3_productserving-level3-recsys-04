@@ -22,3 +22,27 @@ crawling_user_review.py
 crwaling_concat.ipynb
 csv_concat.ipynb
 __pycache__
+
+# front_end
+
+# dependencies
+frontend/node_modules/
+frontend/.pnp
+.pnp.js
+
+# testing
+frontend/coverage
+
+# production
+frontend/build
+
+# misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
