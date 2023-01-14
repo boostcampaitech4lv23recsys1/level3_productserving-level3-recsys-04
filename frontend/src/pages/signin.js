@@ -33,9 +33,12 @@ function Copyright(props) {
 const theme = createTheme();
 
 export default function SignIn() {
+  let [link, setLink] = React.useState('');
+
   const navigate = useNavigate();
 
   const handleClick1 = (event) => {
+    window.localStorage.setItem('link', link);
     navigate('/album');
   };
   const handleClick2 = (event) => {
@@ -65,6 +68,9 @@ export default function SignIn() {
               label="네이버 My Place Link"
               name="link"
               autoFocus
+              onChange={(e) => {
+                setLink(e.target.value);
+              }}
             />
 
             <FormControlLabel

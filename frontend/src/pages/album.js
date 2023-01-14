@@ -77,7 +77,7 @@ export default function Album() {
               color="text.secondary"
               paragraph
             >
-              어쩌구 저쩌구
+              {window.localStorage.getItem('link')}님의 추천 목록
             </Typography>
             <Stack
               sx={{ pt: 4 }}
