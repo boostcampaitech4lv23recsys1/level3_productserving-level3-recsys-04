@@ -36,7 +36,7 @@ export default function SignIn() {
   const navigate = useNavigate();
 
   const handleClick1 = (event) => {
-    navigate('/main');
+    navigate('/album');
   };
   const handleClick2 = (event) => {
     navigate('/howuse');
