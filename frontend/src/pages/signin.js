@@ -45,7 +45,7 @@ export default function SignIn() {
       window.localStorage.setItem('link', ('00000000000000000000000000000' + link));
       navigate('/album');
     } else {
-      alert('네이버 플레이스 주소를 입력해주세요 (how to 참고)');
+      alert('네이버 플레이스 주소를 입력해주세요 (하단 "어떻게 사용하나요?" 참고)');
     }
     
   };
