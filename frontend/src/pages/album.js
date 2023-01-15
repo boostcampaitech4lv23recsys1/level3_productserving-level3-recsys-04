@@ -52,6 +52,7 @@ export default function Album() {
           </Typography>
         </Toolbar>
       </AppBar>
+
       <main>
         {/* Hero unit */}
         <Box
@@ -77,7 +78,7 @@ export default function Album() {
               color="text.secondary"
               paragraph
             >
-              {window.localStorage.getItem('link')}님의 추천 목록
+              {window.localStorage.getItem('link').substring(29,53)}님의 추천 목록
             </Typography>
             <Stack
               sx={{ pt: 4 }}
@@ -132,6 +133,7 @@ export default function Album() {
           </Grid>
         </Container>
       </main>
+
       {/* Footer */}
       <Box sx={{ bgcolor: 'background.paper', p: 6 }} component="footer">
         <Typography variant="h6" align="center" gutterBottom>
@@ -148,6 +150,7 @@ export default function Album() {
         <Copyright />
       </Box>
       {/* End footer */}
+      
     </ThemeProvider>
   );
 }

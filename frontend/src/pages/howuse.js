@@ -12,6 +12,9 @@ import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 
+
+
+
 export default function HowUse() {
   const navigate = useNavigate();
 
@@ -20,7 +23,20 @@ export default function HowUse() {
   };
   return (
     <Container component="main" maxWidth="xs">
-      How Use
+      <div>
+        <h1>렉카메추 사용 방법!</h1>
+        <h2>1.네이버 로그인 후</h2>
+        <h2>2.
+        <a href="https://m.place.naver.com/my/">네이버 마이플레이스</a>
+        - 클릭
+        </h2>
+        <h2>3.주소 복사</h2>
+        <img src= 'img/howto1.jpg' width ='800'/>
+      </div>
+      <div>
+        
+      </div>
+      
       <Grid container>
         <Grid item xs>
           <Link variant="body2" onClick={handleClick}>돌아가기</Link>

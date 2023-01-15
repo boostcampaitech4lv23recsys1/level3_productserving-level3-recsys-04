@@ -38,8 +38,16 @@ export default function SignIn() {
   const navigate = useNavigate();
 
   const handleClick1 = (event) => {
-    window.localStorage.setItem('link', link);
-    navigate('/album');
+    if (link.includes('place.naver.com/my')){
+      window.localStorage.setItem('link', link);
+      navigate('/album');
+    } else if (link.length === 24) {
+      window.localStorage.setItem('link', ('00000000000000000000000000000' + link));
+      navigate('/album');
+    } else {
+      alert('네이버 플레이스 주소를 입력해주세요 (how to 참고)');
+    }
+    
   };
   const handleClick2 = (event) => {
     navigate('/howuse');
