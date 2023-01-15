@@ -1,0 +1,12 @@
+1. node.js 설치 
+https://nodejs.org/ko/
+
+2. yarn 설치
+npm install -g yarn
+
+3. 시작
+
+3.1) yarn add global react-scripts
+
+3.2) yarn start
+
