@@ -50,7 +50,7 @@ export default function SignIn() {
       },
       body: JSON.stringify(userData),
     };
-    fetch('http://localhost:8001/', requestOptions)
+    fetch('http://localhost:8001/signin/', requestOptions)
       .then((response) => response.json())
       .then((json) => {
         setLoading(false);
@@ -63,7 +63,7 @@ export default function SignIn() {
     if (link.includes('place.naver.com/my')) {
       window.localStorage.setItem('link', link);
       signin({
-        link: link,
+        name: link,
       });
       //navigate('/album');
     } else if (link.length === 24) {
@@ -72,7 +72,7 @@ export default function SignIn() {
         '00000000000000000000000000000' + link
       );
       signin({
-        link: link,
+        name: link,
       });
       //navigate('/album'); //앨범으로 화면 이동하는 거
     } else {

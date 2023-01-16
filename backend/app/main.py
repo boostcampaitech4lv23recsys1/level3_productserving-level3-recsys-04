@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-
+from typing import Optional
 from pydantic import BaseModel
 
 from fastapi.middleware.cors import CORSMiddleware
@@ -15,15 +15,16 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )   
+class Item(BaseModel):
+    name: str
 
+    
 
 @app.get("/")
 def main_page():
     return {"message": "This is main page."}
 
-class User(BaseModel):
-    id: str
-    nickname: str
+
 
 data = [
     ["5c667add298eafd0547442d8", 1373442166],
@@ -44,9 +45,14 @@ def get_user_record(user_id: str):
 #         return {"message": "success"}
 #     else:
 #         return {"message": "not registerd"}
-@app.get('/signin/{user_id}')
+@app.post('/signin/{user_id}')
 def user_signin(user_id: str):
     if user_id in users:
         return {"message": "success"}
     else:
         return {"message": "not registerd"}
+
+@app.post('/signin/')
+def valid_signin(item: Item):
+    return {"message": item}
+    
