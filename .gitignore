@@ -22,3 +22,6 @@ crawling_user_review.py
 crwaling_concat.ipynb
 csv_concat.ipynb
 __pycache__
+
+#Database
+database/ssl
