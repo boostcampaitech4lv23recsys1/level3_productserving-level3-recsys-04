@@ -40,6 +40,7 @@ export default function SignIn() {
 
   const signin = (userData) => {
     setLoading(true);
+    console.log("SIGISNDFINSDF");
     const requestOptions = {
       method: "POST",
       headers: {
@@ -49,11 +50,11 @@ export default function SignIn() {
       },
       body: JSON.stringify(userData),
     };
-    fetch('/api/signin', requestOptions)
+    fetch('http://localhost:8001/', requestOptions)
       .then((response) => response.json())
       .then((json) => {
         setLoading(false);
-        navigate('/album');
+        //navigate('/album');
       })
       .catch((error) => console.log(error));
   };

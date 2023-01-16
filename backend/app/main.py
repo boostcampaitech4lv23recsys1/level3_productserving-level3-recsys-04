@@ -2,7 +2,20 @@ from fastapi import FastAPI
 
 from pydantic import BaseModel
 
+from fastapi.middleware.cors import CORSMiddleware
+
 app = FastAPI()
+
+origins = ["*"]
+ 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)   
+
 
 @app.get("/")
 def main_page():
@@ -25,6 +38,12 @@ def get_user_record(user_id: str):
     return [datum[1] for datum in data if datum[0] == user_id]
 
 
+# @app.get('/signin/{user_id}')
+# def user_signin(user_id: str):
+#     if user_id in users:
+#         return {"message": "success"}
+#     else:
+#         return {"message": "not registerd"}
 @app.get('/signin/{user_id}')
 def user_signin(user_id: str):
     if user_id in users:
