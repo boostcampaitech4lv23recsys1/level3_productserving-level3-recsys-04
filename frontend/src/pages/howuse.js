@@ -14,6 +14,9 @@ import { useNavigate } from 'react-router-dom';
 
 
 
+import Thumbnail from "react-webpage-thumbnail";
+
+
 
 export default function HowUse() {
   const navigate = useNavigate();
@@ -25,16 +28,18 @@ export default function HowUse() {
     <Container component="main" maxWidth="xs">
       <div>
         <h1>렉카메추 사용 방법!</h1>
-        <h2>1.네이버 로그인 후</h2>
+        <h2>1.
+        <a href="https://naver.com">네이버 </a>로그인 후</h2>
         <h2>2.
         <a href="https://m.place.naver.com/my/">네이버 마이플레이스</a>
         - 클릭
         </h2>
         <h2>3.주소 복사</h2>
         <img src= 'img/howto1.jpg' width ='800'/>
+        <Thumbnail url="https://pcmap.place.naver.com/restaurant/1439839632/menu"  width={850}  height={600} />
       </div>
       <div>
-        
+      
       </div>
       
       <Grid container>
