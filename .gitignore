@@ -6,6 +6,7 @@ google-chrome-stable_current_amd64.deb
 .ipynb_checkpoints
 area_csv
 user_csv
+*.pem
 
 # schini
 notsaved.txt

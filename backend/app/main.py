@@ -1,0 +1,33 @@
+from fastapi import FastAPI
+
+from pydantic import BaseModel
+
+app = FastAPI()
+
+@app.get("/")
+def main_page():
+    return {"message": "This is main page."}
+
+class User(BaseModel):
+    id: str
+    nickname: str
+
+data = [
+    ["5c667add298eafd0547442d8", 1373442166],
+    ["5c3737d3d764236c17947538", 1373442166],
+    ["5c667add298eafd0547442d8", 1889162643]
+]
+
+users = {'5c667add298eafd0547442d8', '5c667add298eafd0547442d8'}
+
+@app.get('/user/{user_id}')
+def get_user_record(user_id: str):
+    return [datum[1] for datum in data if datum[0] == user_id]
+
+
+@app.get('/signin/{user_id}')
+def user_signin(user_id: str):
+    if user_id in users:
+        return {"message": "success"}
+    else:
+        return {"message": "not registerd"}
