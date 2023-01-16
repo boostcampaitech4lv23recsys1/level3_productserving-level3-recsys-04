@@ -35,19 +35,50 @@ const theme = createTheme();
 export default function SignIn() {
   let [link, setLink] = React.useState('');
 
+  let [loading, setLoading] = React.useState(false);
   const navigate = useNavigate();
 
+  const signin = (userData) => {
+    setLoading(true);
+    const requestOptions = {
+      method: "POST",
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "*",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(userData),
+    };
+    fetch('/api/signin', requestOptions)
+      .then((response) => response.json())
+      .then((json) => {
+        setLoading(false);
+        navigate('/album');
+      })
+      .catch((error) => console.log(error));
+  };
+
   const handleClick1 = (event) => {
-    if (link.includes('place.naver.com/my')){
+    if (link.includes('place.naver.com/my')) {
       window.localStorage.setItem('link', link);
-      navigate('/album');
+      signin({
+        link: link,
+      });
+      //navigate('/album');
     } else if (link.length === 24) {
-      window.localStorage.setItem('link', ('00000000000000000000000000000' + link));
-      navigate('/album');
+      window.localStorage.setItem(
+        'link',
+        '00000000000000000000000000000' + link
+      );
+      signin({
+        link: link,
+      });
+      //navigate('/album'); //앨범으로 화면 이동하는 거
     } else {
-      alert('네이버 플레이스 주소를 입력해주세요 (하단 "어떻게 사용하나요?" 참고)');
+      alert(
+        '네이버 플레이스 주소를 입력해주세요 (하단 "어떻게 사용하나요?" 참고)'
+      );
     }
-    
   };
   const handleClick2 = (event) => {
     navigate('/howuse');
