@@ -2,8 +2,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from typing import List, Optional
+from starlette.responses import JSONResponse
 
-from .model import trash_model
+from model import trash_model
 
 # from app.routes import index, auth
 
@@ -14,7 +15,7 @@ import torch
 
 import mysql.connector
 from mysql.connector.constants import ClientFlag
-​
+
 
 app = FastAPI()
 
@@ -29,28 +30,39 @@ app.add_middleware(
 )
 
 
+################ mysql database 설정
 config = {
     'user': 'root',
     'password': 'wogud1028',
     'host': '34.64.202.234',
     'client_flags': [ClientFlag.SSL],
-    'ssl_ca': '/opt/ml/input/app/ssl/server-ca.pem',
-    'ssl_cert': '/opt/ml/input/app/ssl/client-cert.pem',
-    'ssl_key': '/opt/ml/input/app/ssl/client-key.pem'
+    # 아래 인증키 경로들은 각자 환경에 맞게 수정 (언제 한번 통일 ㄱㄱ)
+    'ssl_ca': '/opt/ml/input/project/db/ssl/server-ca.pem',
+    'ssl_cert': '/opt/ml/input/project/db/ssl/client-cert.pem',
+    'ssl_key': '/opt/ml/input/project/db/ssl/client-key.pem'
 }
 
-config['database'] = 'rest'  # add new database to config dict
+config['database'] = 'rest'  # add "rest" database to config dict
 cnxn = mysql.connector.connect(**config)
 cursor = cnxn.cursor()
-
-select_sql = "select * from rest"# where rating = 4.42"
-cursor.execute(select_sql)
-result = cursor.fetchall()
-
-_id, _x, _y,_cat,_name,_imgurl = zip(*result)
+################
 
 
-restaurants = result
+
+'''
+to-do list
+
+1. user 로그인
+    - 해당 user가 유저 테이블에 존재하는 user인지 검증
+2. user 로그인 후
+    - user의 x, y 좌표 가져오기
+    - user 방문 리스트 가져오기
+    - 방문 리스트와 좌표 기준으로 식당 걸러내기
+3. 식당 추천
+    - 걸러낸 식당 모델에 넣고 결과 받기
+    - Top 3 식당 데이터 반환
+'''
+
 
 
 @app.get("/")
@@ -62,6 +74,7 @@ class Restaurant(BaseModel):
     id: str
     x: int
     y: int
+    tag: str
     name: str
     img_url: str
 
@@ -72,43 +85,87 @@ class Restaurant(BaseModel):
 
 
 class User(BaseModel):
-    id: str
-    # nickname: str
-    restaurants : List[Restaurant] = Field(default_factory=list)
+    name: str
+    location: str
 
 
-    def add_restaurant(self, restaurant: Restaurant):
-        if restaurant.id in [existing_id for existing_id in self.restaurants]:
-            return self
-
-        self.restaurants.append(restaurant)
-        return self
+users = ['5c667add298eafd0547442d8', '5c3737d3d764236c17947538']
 
 
-data = [
-    ["5c667add298eafd0547442d8", 1373442166],
-    ["5c3737d3d764236c17947538", 1373442166],
-    ["5c667add298eafd0547442d8", 1889162643]
-]
+@app.post('/signin')
+def signin(user: User):
+    if user.name in users:
+        '''
+
+        user.location으로 쿼리 날려서 좌표 가져오는 코드
+        '''
+        _x = 134; _y = 156
+        
+        
+        '''
+        모델 추천 결과 가져오는 코드
+        '''
+        rec_result = ["1675303081", "1867823297", "38969614"]
+        restaurants = dict()
+        for i, rest_id in enumerate(rec_result):
+            select_sql = f"select * from rest where id = {rest_id}"
+            cursor.execute(select_sql)
+            result = cursor.fetchall()[0]
+            # result = result[:100]
+            # restaurants = {i: dict(Restaurant(id=_id, x=_x, y=_y, tag=_tag, name=_name, img_url=_imgurl)) for i, (_id, _x, _y,_tag,_name,_imgurl) in enumerate(result)}
+            _id, _x, _y,_tag,_name,_imgurl = result
+            restaurant = Restaurant(id=_id, x=_x, y=_y, tag=_tag, name=_name, img_url=_imgurl)
+            restaurants.update({i: dict(restaurant)})
+
+        return JSONResponse({"restaurants": restaurants, "max_length": len(restaurants)})
+    return JSONResponse({"message": "cold-start"})
 
 
-@app.get('/user/{user_id}')
-def get_user_record(user_id: str):
-    return [datum[1] for datum in data if datum[0] == user_id]
+# 특정 식당 정보 가져오는 API
+def get_restaurant(rest_id: str):
+    select_sql = f"select * from rest where id = {rest_id}"
+    cursor.execute(select_sql)
+    result = cursor.fetchall()
+    _id, _x, _y,_tag,_name,_imgurl = result[0]
+    rest_info = dict(Restaurant(id=_id, x=_x, y=_y, tag=_tag, name=_name, img_url=_imgurl))
+    rest_info['success'] = True
+    return JSONResponse(rest_info)
 
 
-@app.get('/restaurant/', description="식당 리스트를 가져옵니다")
+def ml_model(user_id):
+    """_summary_
+
+    Args:
+        user_id (_type_): 
+    """
+    return
+
+
+
+# 모든 식당 정보 가져오는 API
+'''
+@app.get('/restaurants/', description="모든 식당 리스트를 가져옵니다")
 async def get_restaurants() -> List:
+    select_sql = "select * from rest"# where rating = 4.42"
+    cursor.execute(select_sql)
+    result = cursor.fetchall()
+    # _id, _x, _y,_cat,_name,_imgurl = zip(*result)
+    restaurants = result
     return restaurants
+'''
+
+
+
+
+
+'''
+def get_restaurant_image_by_id(rest_id: str) -> Optional[Restaurant]:
+    rest = Restaurant(id=rest_id)
+    rest.show_image()
 
 
 def get_restaurant_by_id(user_id: str) -> Optional[User]:
     return next((restaurant for restaurant in restaurants if restaurant.id == user_id), None)
-
-
-def get_restaurant_image_by_id(rest_id: str) -> Optional[Restaurant]:
-    rest = Restaurant(id=rest_id)
-    rest.show_image()
 
 
 class RestaurantUpdate(BaseModel):
@@ -126,8 +183,10 @@ def update_restaurant_by_id(user_id: str, restaurant_update: RestaurantUpdate):
             updated_restaurant.add_restaurant(next_restaurant)
 
         return updated_restaurant
+'''
 
 
+'''
 @app.patch('/user/{user_id}', description="새로 리뷰를 등록한 식당을 업데이트합니다")
 async def update_restaurant(user_id: str, restaurant_update: RestaurantUpdate):
     updated_restaurant = update_restaurant_by_id(user_id=user_id, restaurant_update=restaurant_update)
@@ -140,8 +199,6 @@ async def update_restaurant(user_id: str, restaurant_update: RestaurantUpdate):
 
 class Prediction(User):
     name: str = 'predict_result'
-    result
-
 
 @app.get('/predict/{user_id}/{rest_id}', description="해당 유저의 정보를 모델에게 전달하고 예측 결과를 가져옵니다")
 async def make_prediction(user_id: str, rest_id: str, model=trash_model):
@@ -156,10 +213,4 @@ class Item(BaseModel):
 
 
 users = ['5c667add298eafd0547442d8', '5c3737d3d764236c17947538']
-
-@app.post('/signin/{user_id}')
-def user_signin(user_id: str):
-    if user_id in users:
-        return {"message": "success"}
-    else:
-        return {"message": "not registerd"}
+'''

@@ -34,12 +34,14 @@ const theme = createTheme();
 
 export default function SignIn() {
   let [link, setLink] = React.useState('');
+  let [location, setLocation] = React.useState('');
 
   let [loading, setLoading] = React.useState(false);
   const navigate = useNavigate();
-
+  const validate = (response) => {
+    window.localStorage.setItem('msg', response["message"]);
+  };
   const signin = (userData) => {
-    setLoading(true);
     console.log("SIGISNDFINSDF");
     const requestOptions = {
       method: "POST",
@@ -50,13 +52,15 @@ export default function SignIn() {
       },
       body: JSON.stringify(userData),
     };
-    fetch('http://localhost:8001/signin/', requestOptions)
+    fetch('http://localhost:8001/signin', requestOptions)
       .then((response) => response.json())
       .then((json) => {
-        setLoading(false);
-        //navigate('/album');
-      })
-      .catch((error) => console.log(error));
+        validate(json);
+        
+      });
+    
+    navigate('/album'); //앨범으로 화면 이동하는 거
+
   };
 
   const handleClick1 = (event) => {
@@ -64,8 +68,8 @@ export default function SignIn() {
       window.localStorage.setItem('link', link);
       signin({
         name: link,
+        location: location,
       });
-      //navigate('/album');
     } else if (link.length === 24) {
       window.localStorage.setItem(
         'link',
@@ -73,13 +77,13 @@ export default function SignIn() {
       );
       signin({
         name: link,
+        location: location,
       });
-      //navigate('/album'); //앨범으로 화면 이동하는 거
     } else {
       alert(
         '네이버 플레이스 주소를 입력해주세요 (하단 "어떻게 사용하나요?" 참고)'
       );
-    }
+    };
   };
   const handleClick2 = (event) => {
     navigate('/howuse');
@@ -110,6 +114,17 @@ export default function SignIn() {
               autoFocus
               onChange={(e) => {
                 setLink(e.target.value);
+              }}
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="location"
+              label="추천을 원하는 주소"
+              name="location"
+              onChange={(e) => {
+                setLocation(e.target.value);
               }}
             />
 
