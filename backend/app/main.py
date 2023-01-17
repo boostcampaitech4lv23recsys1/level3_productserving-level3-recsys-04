@@ -85,17 +85,8 @@ class Restaurant(BaseModel):
 
 
 class User(BaseModel):
-    user_id: str
+    name: str
     location: str
-    # restaurants : List[Restaurant] = Field(default_factory=list)
-
-
-    # def add_restaurant(self, restaurant: Restaurant):
-    #     if restaurant.id in [existing_id for existing_id in self.restaurants]:
-    #         return self
-
-    #     self.restaurants.append(restaurant)
-    #     return self
 
 
 users = ['5c667add298eafd0547442d8', '5c3737d3d764236c17947538']
@@ -103,20 +94,42 @@ users = ['5c667add298eafd0547442d8', '5c3737d3d764236c17947538']
 
 @app.post('/signin')
 def signin(user: User):
-    if user.user_id in users:
+    if user.name in users:
         '''
+
         user.location으로 쿼리 날려서 좌표 가져오는 코드
         '''
-        _x = _y = 0
-
-
-        '''
+        _x = 134; _y = 156
+        
         
         '''
+        모델 추천 결과 가져오는 코드
+        '''
+        rec_result = ["1675303081", "1867823297", "38969614"]
+        restaurants = dict()
+        for i, rest_id in enumerate(rec_result):
+            select_sql = f"select * from rest where id = {rest_id}"
+            cursor.execute(select_sql)
+            result = cursor.fetchall()[0]
+            # result = result[:100]
+            # restaurants = {i: dict(Restaurant(id=_id, x=_x, y=_y, tag=_tag, name=_name, img_url=_imgurl)) for i, (_id, _x, _y,_tag,_name,_imgurl) in enumerate(result)}
+            _id, _x, _y,_tag,_name,_imgurl = result
+            restaurant = Restaurant(id=_id, x=_x, y=_y, tag=_tag, name=_name, img_url=_imgurl)
+            restaurants.update({i: dict(restaurant)})
 
-        return JSONResponse({"message": "success"})
+        return JSONResponse({"restaurants": restaurants, "max_length": len(restaurants)})
     return JSONResponse({"message": "cold-start"})
 
+
+# 특정 식당 정보 가져오는 API
+def get_restaurant(rest_id: str):
+    select_sql = f"select * from rest where id = {rest_id}"
+    cursor.execute(select_sql)
+    result = cursor.fetchall()
+    _id, _x, _y,_tag,_name,_imgurl = result[0]
+    rest_info = dict(Restaurant(id=_id, x=_x, y=_y, tag=_tag, name=_name, img_url=_imgurl))
+    rest_info['success'] = True
+    return JSONResponse(rest_info)
 
 
 def ml_model(user_id):
@@ -142,16 +155,7 @@ async def get_restaurants() -> List:
 '''
 
 
-# 특정 식당 정보 가져오는 API
-@app.get('/restaurant/{rest_id}/')
-def get_restaurant(rest_id: str):
-    select_sql = f"select * from rest where id = {rest_id}"
-    cursor.execute(select_sql)
-    result = cursor.fetchall()
-    _id, _x, _y,_tag,_name,_imgurl = result[0]
-    rest_info = dict(Restaurant(id=_id, x=_x, y=_y, tag=_tag, name=_name, img_url=_imgurl))
-    rest_info['success'] = True
-    return JSONResponse(rest_info)
+
 
 
 '''
