@@ -37,9 +37,10 @@ export default function SignIn() {
 
   let [loading, setLoading] = React.useState(false);
   const navigate = useNavigate();
-
+  const validate = (response) => {
+    window.localStorage.setItem('msg', response["message"]);
+  };
   const signin = (userData) => {
-    setLoading(true);
     console.log("SIGISNDFINSDF");
     const requestOptions = {
       method: "POST",
@@ -50,13 +51,15 @@ export default function SignIn() {
       },
       body: JSON.stringify(userData),
     };
-    fetch('http://localhost:8001/signin/', requestOptions)
+    fetch('http://localhost:8001/signin', requestOptions)
       .then((response) => response.json())
       .then((json) => {
-        setLoading(false);
-        //navigate('/album');
-      })
-      .catch((error) => console.log(error));
+        validate(json);
+        
+      });
+    
+    navigate('/album'); //앨범으로 화면 이동하는 거
+
   };
 
   const handleClick1 = (event) => {
@@ -65,7 +68,6 @@ export default function SignIn() {
       signin({
         name: link,
       });
-      //navigate('/album');
     } else if (link.length === 24) {
       window.localStorage.setItem(
         'link',
@@ -74,12 +76,11 @@ export default function SignIn() {
       signin({
         name: link,
       });
-      //navigate('/album'); //앨범으로 화면 이동하는 거
     } else {
       alert(
         '네이버 플레이스 주소를 입력해주세요 (하단 "어떻게 사용하나요?" 참고)'
       );
-    }
+    };
   };
   const handleClick2 = (event) => {
     navigate('/howuse');
