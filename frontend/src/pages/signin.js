@@ -34,6 +34,7 @@ const theme = createTheme();
 
 export default function SignIn() {
   let [link, setLink] = React.useState('');
+  let [location, setLocation] = React.useState('');
 
   let [loading, setLoading] = React.useState(false);
   const navigate = useNavigate();
@@ -67,6 +68,7 @@ export default function SignIn() {
       window.localStorage.setItem('link', link);
       signin({
         name: link,
+        location: location,
       });
     } else if (link.length === 24) {
       window.localStorage.setItem(
@@ -75,6 +77,7 @@ export default function SignIn() {
       );
       signin({
         name: link,
+        location: location,
       });
     } else {
       alert(
@@ -111,6 +114,17 @@ export default function SignIn() {
               autoFocus
               onChange={(e) => {
                 setLink(e.target.value);
+              }}
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="location"
+              label="추천을 원하는 주소"
+              name="location"
+              onChange={(e) => {
+                setLocation(e.target.value);
               }}
             />
 

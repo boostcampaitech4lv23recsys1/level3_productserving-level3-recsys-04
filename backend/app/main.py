@@ -17,6 +17,7 @@ app.add_middleware(
 )   
 class Item(BaseModel):
     name: str
+    location: str
 
     
 
