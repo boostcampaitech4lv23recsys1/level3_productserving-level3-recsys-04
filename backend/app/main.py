@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from typing import List, Optional
 
-from .model import trash_model
+from model import trash_model
 
 # from app.routes import index, auth
 
@@ -14,7 +14,7 @@ import torch
 
 import mysql.connector
 from mysql.connector.constants import ClientFlag
-​
+
 
 app = FastAPI()
 
@@ -29,28 +29,39 @@ app.add_middleware(
 )
 
 
+################ mysql 설정
 config = {
     'user': 'root',
     'password': 'wogud1028',
     'host': '34.64.202.234',
     'client_flags': [ClientFlag.SSL],
-    'ssl_ca': '/opt/ml/input/app/ssl/server-ca.pem',
-    'ssl_cert': '/opt/ml/input/app/ssl/client-cert.pem',
-    'ssl_key': '/opt/ml/input/app/ssl/client-key.pem'
+    # 아래 인증키 경로들은 각자 환경에 맞게 수정
+    'ssl_ca': '/opt/ml/input/project/db/ssl/server-ca.pem',
+    'ssl_cert': '/opt/ml/input/project/db/ssl/client-cert.pem',
+    'ssl_key': '/opt/ml/input/project/db/ssl/client-key.pem'
 }
 
 config['database'] = 'rest'  # add new database to config dict
 cnxn = mysql.connector.connect(**config)
 cursor = cnxn.cursor()
-
-select_sql = "select * from rest"# where rating = 4.42"
-cursor.execute(select_sql)
-result = cursor.fetchall()
-
-_id, _x, _y,_cat,_name,_imgurl = zip(*result)
+################
 
 
-restaurants = result
+
+'''
+to-do list
+
+1. user 로그인
+    - 해당 user가 유저 테이블에 존재하는 user인지 검증
+2. user 로그인 후
+    - user의 x, y 좌표 가져오기
+    - user 방문 리스트 가져오기
+    - 방문 리스트와 좌표 기준으로 식당 걸러내기
+3. 식당 추천
+    - 걸러낸 식당 모델에 넣고 결과 받기
+    - Top 3 식당 데이터 반환
+'''
+
 
 
 @app.get("/")
@@ -62,6 +73,7 @@ class Restaurant(BaseModel):
     id: str
     x: int
     y: int
+    tag: str
     name: str
     img_url: str
 
@@ -72,8 +84,15 @@ class Restaurant(BaseModel):
 
 
 class User(BaseModel):
-    id: str
-    # nickname: str
+    rest_name: str
+    rest_tag: str
+    rest_id: str
+    review: str
+    rating: str
+    count: str
+    user_id: str
+
+    
     restaurants : List[Restaurant] = Field(default_factory=list)
 
 
@@ -85,30 +104,55 @@ class User(BaseModel):
         return self
 
 
-data = [
-    ["5c667add298eafd0547442d8", 1373442166],
-    ["5c3737d3d764236c17947538", 1373442166],
-    ["5c667add298eafd0547442d8", 1889162643]
-]
+
+@app.post('/signin/{user_id}')
+def user_signin(user_id: str):
+    if user_id in users:
+        return {"message": "success"}
+    else:
+        return {"message": "not registerd"}
 
 
-@app.get('/user/{user_id}')
-def get_user_record(user_id: str):
-    return [datum[1] for datum in data if datum[0] == user_id]
+# @app.get('/user/{user_id}')
+# def get_user_record(user_id: str):
+#     return [datum[1] for datum in data if datum[0] == user_id]
 
 
-@app.get('/restaurant/', description="식당 리스트를 가져옵니다")
+@app.get('/restaurants/', description="모든 식당 리스트를 가져옵니다")
 async def get_restaurants() -> List:
+    select_sql = "select * from rest"# where rating = 4.42"
+    cursor.execute(select_sql)
+    result = cursor.fetchall()
+    # _id, _x, _y,_cat,_name,_imgurl = zip(*result)
+    restaurants = result
     return restaurants
 
 
-def get_restaurant_by_id(user_id: str) -> Optional[User]:
-    return next((restaurant for restaurant in restaurants if restaurant.id == user_id), None)
+@app.get('/restaurant/{rest_id}/')
+def get_restaurant(rest_id: str):
+    select_sql = f"select * from rest where id = {rest_id}"
+    cursor.execute(select_sql)
+    result = cursor.fetchall()
+    # _id, _x, _y,_tag,_name,_imgurl = zip(*result)
+    _id, _x, _y,_tag,_name,_imgurl = result[0]
+    rest_info = Restaurant(id=_id, x=_x, y=_y, tag=_tag, name=_name, img_url=_imgurl)
+    return {"message": rest_info}
 
 
+'''
 def get_restaurant_image_by_id(rest_id: str) -> Optional[Restaurant]:
     rest = Restaurant(id=rest_id)
     rest.show_image()
+'''
+
+
+'''
+def get_restaurant_by_id(user_id: str) -> Optional[User]:
+    return next((restaurant for restaurant in restaurants if restaurant.id == user_id), None)
+'''
+
+
+
 
 
 class RestaurantUpdate(BaseModel):
@@ -140,14 +184,14 @@ async def update_restaurant(user_id: str, restaurant_update: RestaurantUpdate):
 
 class Prediction(User):
     name: str = 'predict_result'
-    result
 
-
+'''
 @app.get('/predict/{user_id}/{rest_id}', description="해당 유저의 정보를 모델에게 전달하고 예측 결과를 가져옵니다")
 async def make_prediction(user_id: str, rest_id: str, model=trash_model):
     predict_result = model()
     prediction = Prediction(result=predict_result)
     return prediction
+'''
 
 
 
@@ -157,9 +201,3 @@ class Item(BaseModel):
 
 users = ['5c667add298eafd0547442d8', '5c3737d3d764236c17947538']
 
-@app.post('/signin/{user_id}')
-def user_signin(user_id: str):
-    if user_id in users:
-        return {"message": "success"}
-    else:
-        return {"message": "not registerd"}
