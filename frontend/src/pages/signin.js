@@ -65,7 +65,7 @@ export default function SignIn() {
       signin({
         name: link,
       });
-      //navigate('/album');
+      navigate('/album');
     } else if (link.length === 24) {
       window.localStorage.setItem(
         'link',
@@ -74,7 +74,7 @@ export default function SignIn() {
       signin({
         name: link,
       });
-      //navigate('/album'); //앨범으로 화면 이동하는 거
+      navigate('/album'); //앨범으로 화면 이동하는 거
     } else {
       alert(
         '네이버 플레이스 주소를 입력해주세요 (하단 "어떻게 사용하나요?" 참고)'
