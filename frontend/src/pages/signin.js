@@ -12,6 +12,11 @@ import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 
+import Swal from 'sweetalert2';
+import { withRouter } from "react-router-dom";
+
+
+
 function Copyright(props) {
   return (
     <Typography
@@ -30,12 +35,19 @@ function Copyright(props) {
   );
 }
 
+
+
+
+
+
+
 const theme = createTheme();
+
 
 export default function SignIn() {
   let [link, setLink] = React.useState('');
   let [location, setLocation] = React.useState('');
-
+  
   let [loading, setLoading] = React.useState(false);
   const navigate = useNavigate();
   const validate = (response) => {
@@ -68,35 +80,85 @@ export default function SignIn() {
         
       });
     
-    navigate('/album',{ replace: true}); //앨범으로 화면 이동하는 거
+    
 
   };
 
+  let timeoutId;
+
+  const showAutoClose = () => {
+    const loading = Swal.fire({
+      title: 'Auto Close Alert',
+      text: 'This alert will close in 5 seconds.',
+      icon: 'info',
+      timer: 5000,
+      showConfirmButton : false,
+      showCancelButton: true,
+      cancelButtonText: 'Cancel',
+      onOpen: () => {
+        Swal.showLoading()
+        timeoutId = setTimeout(() => {
+          
+          loading.close();
+          
+          // Swal.fire({
+          //   title: 'Timeout',
+          //   text: 'Timeout reached',
+          //   icon: 'error',
+          // });
+        }, 5000);
+      },
+      onClose: () => {
+        clearTimeout(timeoutId);
+        console.log('Alert closed')
+        
+      }
+    }).then((result) => {
+      if (result.dismiss === Swal.DismissReason.cancel) {
+        clearTimeout(timeoutId);
+        console.log('Cancelled');
+        // window.location = '/signin'
+      } else {
+        window.location ='/album'
+      }
+    });
+  }
+
+
+
+
+
+
   const handleClick1 = (event) => {
+    
     if (link.includes('place.naver.com/my')) {
       window.localStorage.setItem('link', link);
       signin({
         name: link,
         location: location,
       });
-    } else if (link.length === 24) {
-      window.localStorage.setItem(
-        'link',
-        '00000000000000000000000000000' + link
-      );
-      signin({
-        name: link,
-        location: location,
-      });
+      showAutoClose()
+      // navigate('/album');
+      // window.location = '/album';
+
     } else {
-      alert(
-        '네이버 플레이스 주소를 입력해주세요 (하단 "어떻게 사용하나요?" 참고)'
-      );
+      Swal.fire({
+        title: '네이버 링크 오류',
+        text: "하단 '어떻게 사용하나요' 참고!",
+        icon: 'warning',
+
+      })
     };
   };
+
+
   const handleClick2 = (event) => {
+    showLoading()
     navigate('/howuse');
+    
   };
+
+
   return (
     <ThemeProvider theme={theme}>
       <Container component="main" maxWidth="xs">
@@ -141,15 +203,17 @@ export default function SignIn() {
               control={<Checkbox value="remember" color="primary" />}
               label="Remember me"
             />
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-              onClick={handleClick1}
-            >
-              추천
-            </Button>
+            <div>
+              <Button
+                // type="submit"
+                fullWidth
+                variant="contained"
+                sx={{ mt: 3, mb: 2 }}
+                onClick={handleClick1}
+              >
+                추천
+              </Button>
+            </div>
             <Grid container>
               <Grid item xs>
                 <Link variant="body2" onClick={handleClick2}>
