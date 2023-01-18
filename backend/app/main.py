@@ -4,7 +4,12 @@ from pydantic import BaseModel, Field
 from typing import List, Optional
 from starlette.responses import JSONResponse
 
+<<<<<<< HEAD
 from .model import trash_model
+=======
+from model import trash_model
+from type import *
+>>>>>>> 64493ff86e609ac4bbf9e9b77571d9d0fd3ede79
 
 # from app.routes import index, auth
 
@@ -31,6 +36,7 @@ app.add_middleware(
 
 
 ################ mysql database 설정
+<<<<<<< HEAD
 # config = {
 #     'user': 'root',
 #     'password': 'wogud1028',
@@ -45,6 +51,25 @@ app.add_middleware(
 # config['database'] = 'rest'  # add "rest" database to config dict
 # cnxn = mysql.connector.connect(**config)
 # cursor = cnxn.cursor()
+=======
+config = {
+    'user': 'root',
+    'password': 'wogud1028',
+    'host': '34.64.202.234',
+    'client_flags': [ClientFlag.SSL],
+    # 아래 인증키 경로들은 각자 환경에 맞게 수정 (언제 한번 통일 ㄱㄱ)
+    #'ssl_ca': '/Users/hwang/AI_Tech_Frontend/level3_productserving-level3-recsys-04/db/ssl/server-ca.pem',
+    #'ssl_cert': '/Users/hwang/AI_Tech_Frontend/level3_productserving-level3-recsys-04/db/ssl/client-cert.pem',
+    #'ssl_key': '/Users/hwang/AI_Tech_Frontend/level3_productserving-level3-recsys-04/db/ssl/client-key.pem'
+    'ssl_ca': r'C:\Users\bsj94\workspace\project\db\ssl\client-cert.pem',
+    'ssl_cert': r'C:\Users\bsj94\workspace\project\db\ssl\client-cert.pem',
+    'ssl_key': r'C:\Users\bsj94\workspace\project\db\ssl\client-key.pem'
+}
+
+config['database'] = 'rest'  # add "rest" database to config dict
+cnxn = mysql.connector.connect(**config)
+cursor = cnxn.cursor()
+>>>>>>> 64493ff86e609ac4bbf9e9b77571d9d0fd3ede79
 ################
 
 
@@ -70,30 +95,20 @@ def main_page():
     return {"message": "This is main page."}
 
 
-class Restaurant(BaseModel):
-    id: str
-    x: int
-    y: int
-    tag: str
-    name: str
-    img_url: str
 
 
-    def show_image(self):
-        img = Image.open(self.img_url)
-        img.show()
 
+def show_image(self):
+    img = Image.open(self.img_url)
+    img.show()
 
-class User(BaseModel):
-    name: str
-    location: str
 
 
 users = ['5c667add298eafd0547442d8', '5c3737d3d764236c17947538']
 
 
 @app.post('/signin')
-def signin(user: User):
+def signin(user: SignInRequest):
     if user.name in users:
         '''
 
@@ -106,7 +121,7 @@ def signin(user: User):
         모델 추천 결과 가져오는 코드
         '''
         rec_result = ["1675303081", "1867823297", "38969614"]
-        restaurants = dict()
+        restaurants = []
         for i, rest_id in enumerate(rec_result):
             select_sql = f"select * from rest where id = {rest_id}"
             cursor.execute(select_sql)
@@ -115,10 +130,14 @@ def signin(user: User):
             # restaurants = {i: dict(Restaurant(id=_id, x=_x, y=_y, tag=_tag, name=_name, img_url=_imgurl)) for i, (_id, _x, _y,_tag,_name,_imgurl) in enumerate(result)}
             _id, _x, _y,_tag,_name,_imgurl = result
             restaurant = Restaurant(id=_id, x=_x, y=_y, tag=_tag, name=_name, img_url=_imgurl)
-            restaurants.update({i: dict(restaurant)})
+            restaurants.append(restaurant)
 
-        return JSONResponse({"restaurants": restaurants, "max_length": len(restaurants)})
-    return JSONResponse({"message": "cold-start"})
+        return SignInResponse(
+                state='start',
+                detail=' not cold start',
+                restaurants = restaurants
+            )
+    return GeneralResponse(state='cold-start', detail='new user')
 
 
 # 특정 식당 정보 가져오는 API

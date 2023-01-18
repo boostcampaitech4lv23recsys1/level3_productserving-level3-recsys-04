@@ -31,31 +31,35 @@ function Copyright() {
   );
 }
 
-const cards = [1, 2, 3];
+const cards = [0, 1, 2];
 
 
 const theme = createTheme();
 
 export default function Album() {
   const navigate = useNavigate();
-
-  const handleClick1 = (event) => {
+ 
+  const restaurants = JSON.parse(window.localStorage.getItem("restaurants")); 
+  console.log(JSON.parse(window.localStorage.getItem('restaurants')))
+  
+const handleClick1 = (event) => {
     navigate('/signin');
   };
 
   const handleClick4 = (event) => {
     // 일단 유저에서 열리게 
     var user = window.localStorage.getItem('link').substring(29,53)
-    window.open('https://m.place.naver.com/my/' + user);
+    const card = event.target.id
+    const i = restaurants[card]['id']
+    const url = "https://m.place.naver.com/restaurant/"+i+"/review/visitor"
+    window.open(url, "_blank", "noopener, noreferrer");
     // window.open(url, "_blank", "noopener, noreferrer");
   };
 
   const handleClick5 = (event) => {
     // 결과 리셋하는 코드 쓱쓱
 
-  const images = ['https://pup-review-phinf.pstatic.net/MjAyMzAxMDhfOTgg/MDAxNjczMTQ0ODQzMDg0.hKVHmlLjK1fo3WIZoI_RV4cp_SDctcNR0wgBLrkhEYQg.GBB4z0kWW-BW6MIJ0Z-IwDyRuJEOSc6htdW4fd7NR9wg.JPEG/686DC762-B00B-4192-AA3A-E64A2E53A9D6.jpeg',
-'https://pup-review-phinf.pstatic.net/MjAyMjEyMTRfMjU4/MDAxNjcxMDIzMDkzNzUz.6dxwMw6jtNQbowDpOQPdnIu2_m2BWbfc_vkI11rjqZwg.oz6WOYaDHUtkrhMfb49SuMTE-KNM91f8kPTmYmjEcpgg.JPEG/D8328E47-1B80-4FE9-ADAB-89E4378E14C5.jpeg',
-'https://pup-review-phinf.pstatic.net/MjAyMzAxMDhfMjQ4/MDAxNjczMTg2MjA1MDA1.pzLovSIn4WUs8NjAiJUXjSbx6dkqMcG_l3_p0WGUhdYg.aKnd7EyVsmSA06qpgktyHGVZdrP6AwevuFCgciI3ULwg.JPEG/20220313_183340.jpg']
+  
   };
   return (
     <ThemeProvider theme={theme}>
@@ -129,20 +133,19 @@ export default function Album() {
                       // 16:9
                       pt: '56.25%',
                     }}
-                    image ='https://pup-review-phinf.pstatic.net/MjAyMzAxMDhfOTgg/MDAxNjczMTQ0ODQzMDg0.hKVHmlLjK1fo3WIZoI_RV4cp_SDctcNR0wgBLrkhEYQg.GBB4z0kWW-BW6MIJ0Z-IwDyRuJEOSc6htdW4fd7NR9wg.JPEG/686DC762-B00B-4192-AA3A-E64A2E53A9D6.jpeg'
-                    // image=image[{card}]
+                    image={restaurants[card]["img_url"]}
                     alt="random"
                   />
                   <CardContent sx={{ flexGrow: 1 }}>
                     <Typography gutterBottom variant="h5" component="h2">
-                      이름{card}
+                      이름 : {restaurants[card]["name"]}
                     </Typography>
                     <Typography>
-                      내용 {card}
+                      업종 : {restaurants[card]["tag"]}
                     </Typography>
                   </CardContent>
                   <CardActions>
-                    <Button type="submit" size="small" onClick= {handleClick4}>식당 링크 열기</Button>
+                    <Button id = {card} type="submit" size="small" onClick= {handleClick4}>식당 링크 열기</Button>
                     <Button type="submit" size="small" onClick= {handleClick5}>다른 결과 보기</Button>
                   </CardActions>
                 </Card>
