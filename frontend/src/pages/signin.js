@@ -39,7 +39,16 @@ export default function SignIn() {
   let [loading, setLoading] = React.useState(false);
   const navigate = useNavigate();
   const validate = (response) => {
-    window.localStorage.setItem('msg', response["message"]);
+    
+    if (response["state"] === "Approved") {
+      console.log(response["restaurants"]);
+
+    }
+    else if (response["detail"] === "wrong password"){
+
+    }
+    window.localStorage.setItem('restaurants', JSON.stringify(response["restaurants"]));
+    console.log(response["restaurants"]);
   };
   const signin = (userData) => {
     console.log("SIGISNDFINSDF");
@@ -54,12 +63,12 @@ export default function SignIn() {
     };
     fetch('http://localhost:8001/signin', requestOptions)
       .then((response) => response.json())
-      .then((json) => {
-        validate(json);
+      .then((response) => {
+        validate(response);
         
       });
     
-    navigate('/album'); //앨범으로 화면 이동하는 거
+    navigate('/album',{ replace: true}); //앨범으로 화면 이동하는 거
 
   };
 
