@@ -37,9 +37,9 @@ config = {
     'host': '34.64.202.234',
     'client_flags': [ClientFlag.SSL],
     # 아래 인증키 경로들은 각자 환경에 맞게 수정 (언제 한번 통일 ㄱㄱ)
-    'ssl_ca': '/opt/ml/input/project/db/ssl/server-ca.pem',
-    'ssl_cert': '/opt/ml/input/project/db/ssl/client-cert.pem',
-    'ssl_key': '/opt/ml/input/project/db/ssl/client-key.pem'
+    'ssl_ca': '/Users/hwang/AI_Tech_Frontend/level3_productserving-level3-recsys-04/db/ssl/server-ca.pem',
+    'ssl_cert': '/Users/hwang/AI_Tech_Frontend/level3_productserving-level3-recsys-04/db/ssl/client-cert.pem',
+    'ssl_key': '/Users/hwang/AI_Tech_Frontend/level3_productserving-level3-recsys-04/db/ssl/client-key.pem'
 }
 
 config['database'] = 'rest'  # add "rest" database to config dict
