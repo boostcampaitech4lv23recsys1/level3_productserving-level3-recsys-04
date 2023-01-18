@@ -4,11 +4,11 @@ from pydantic import BaseModel, Field
 from typing import List, Optional
 from starlette.responses import JSONResponse
 
-from model import trash_model
+from .model import trash_model
 
 # from app.routes import index, auth
 
-from dataclasses import asdict
+from fastapi.param_functions import Depends
 from PIL import Image
 import torch
 
@@ -31,20 +31,20 @@ app.add_middleware(
 
 
 ################ mysql database 설정
-config = {
-    'user': 'root',
-    'password': 'wogud1028',
-    'host': '34.64.202.234',
-    'client_flags': [ClientFlag.SSL],
-    # 아래 인증키 경로들은 각자 환경에 맞게 수정 (언제 한번 통일 ㄱㄱ)
-    'ssl_ca': '/opt/ml/input/project/db/ssl/server-ca.pem',
-    'ssl_cert': '/opt/ml/input/project/db/ssl/client-cert.pem',
-    'ssl_key': '/opt/ml/input/project/db/ssl/client-key.pem'
-}
+# config = {
+#     'user': 'root',
+#     'password': 'wogud1028',
+#     'host': '34.64.202.234',
+#     'client_flags': [ClientFlag.SSL],
+#     # 아래 인증키 경로들은 각자 환경에 맞게 수정 (언제 한번 통일 ㄱㄱ)
+#     'ssl_ca': 'app/ssl/server-ca.pem',
+#     'ssl_cert': 'app/ssl/client-cert.pem',
+#     'ssl_key': 'app/ssl/client-key.pem'
+# }
 
-config['database'] = 'rest'  # add "rest" database to config dict
-cnxn = mysql.connector.connect(**config)
-cursor = cnxn.cursor()
+# config['database'] = 'rest'  # add "rest" database to config dict
+# cnxn = mysql.connector.connect(**config)
+# cursor = cnxn.cursor()
 ################
 
 
@@ -140,6 +140,16 @@ def ml_model(user_id):
     """
     return
 
+
+class Prediction(BaseModel):
+    name: str = 'predict_result'
+    result: float
+
+@app.get('/predict/{user_id}/{rest_id}', description="해당 유저의 정보를 모델에게 전달하고 예측 결과를 가져옵니다")
+async def make_prediction(user_id: str, rest_id: str, model = trash_model()):
+     predict_result = model(user_id, rest_id)
+     prediction = Prediction(result=predict_result)
+     return prediction
 
 
 # 모든 식당 정보 가져오는 API
