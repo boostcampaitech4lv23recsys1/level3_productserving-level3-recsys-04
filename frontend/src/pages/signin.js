@@ -15,7 +15,7 @@ import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { withRouter } from "react-router-dom";
 
-
+//https://m.place.naver.com/my/5c667add298eafd0547442d8/feed
 
 function Copyright(props) {
   return (
@@ -61,6 +61,7 @@ export default function SignIn() {
     }
     window.localStorage.setItem('restaurants', JSON.stringify(response["restaurants"]));
     console.log(response["restaurants"]);
+    console.log(response);
   };
   const signin = (userData) => {
     console.log("SIGISNDFINSDF");
@@ -132,16 +133,19 @@ export default function SignIn() {
   const handleClick1 = (event) => {
     
     if (link.includes('place.naver.com/my')) {
+      
       window.localStorage.setItem('link', link);
       signin({
-        name: link,
+        name: link.substring(29,53),
         location: location,
       });
+
+
       showAutoClose()
       // navigate('/album');
       // window.location = '/album';
-
-    } else {
+    }
+    else {
       Swal.fire({
         title: '네이버 링크 오류',
         text: "하단 '어떻게 사용하나요' 참고!",
