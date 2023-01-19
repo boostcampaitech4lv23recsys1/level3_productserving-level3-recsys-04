@@ -33,7 +33,7 @@ class Restaurant(BaseModel):
 
 class SignInResponse(BaseModel):
     state: str
-    detail: str
+    detail: str  # cold-start or not
     restaurants : List[Restaurant]
 
 class User(BaseModel):

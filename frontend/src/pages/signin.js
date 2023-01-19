@@ -157,9 +157,8 @@ export default function SignIn() {
 
 
   const handleClick2 = (event) => {
-    showLoading()
+    //showLoading()
     navigate('/howuse');
-    
   };
 
 

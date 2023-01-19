@@ -18,16 +18,16 @@ from utils import (
 import mysql.connector
 from mysql.connector.constants import ClientFlag
 import pandas as pd
+
+import pickle
  
 
-def main():
+def inference(user_id: int):
     '''
     parser = argparse.ArgumentParser()
 
     # 데이터 경로와 네이밍 부분.
-    parser.add_argument("--data_dir", default="../data/train/", type=str)
     parser.add_argument("--output_dir", default="output/", type=str)
-    parser.add_argument("--data_name", default="Ml", type=str)
     parser.add_argument("--do_eval", action="store_true")
 
     # 모델 argument(하이퍼 파라미터)
@@ -111,35 +111,22 @@ def main():
     args.cuda_condition = torch.cuda.is_available() and not args.no_cuda
 
     # 데이터 파일 불러오는 경로 설정합니다.
+    # mysql에서 데이터 가져오는 함수 생성
     args.data_file = args.data_dir + "train_new.csv" # "train_ratings.csv"
-    item2attribute_file = args.data_dir + "item2attributes.json" # args.data_name + "_item2attributes.json"
 
     # user_seq : 유저마다 따로 아이템 리스트 저장. 2차원 배열, => [[1번 유저 item_id 리스트], [2번 유저 item_id 리스트] .. ]
     # max_item : 가장 큰 item_id, matrix 3개 : 유저-아이템 희소행렬
     # submission_rating_matrix : 유저-아이템 희소행렬, 유저마다 영화 시청기록은 빼지 않음.
     user_seq, max_item, _, submission_rating_matrix = get_user_seqs(args.data_file)
 
-    # item2attribute : dict(item_id : genre의 list), attribute_size : genre id의 가장 큰 값
-    item2attribute, attribute_size = get_item2attribute_json(item2attribute_file)
-
     # item, genre id의 가장 큰 값 저장합니다.
     args.item_size = max_item + 2
     args.mask_id = max_item + 1
-    args.attribute_size = attribute_size + 1
 
     # save model args, (model_name : Finetune_full, data_name : Ml)
-    args_str = f"{args.model_name}-{args.data_name}"
-
-    print(str(args))
-
-    args.item2attribute = item2attribute
-
     args.train_matrix = submission_rating_matrix
 
     # args_str : Finetune_full-Ml, args.output_dir : output
-    checkpoint = args_str + ".pt"
-    args.checkpoint_path = os.path.join(args.output_dir, checkpoint)
-
     submission_dataset = SASRecDataset(args, user_seq, data_type="submission")
     submission_sampler = SequentialSampler(submission_dataset)
     submission_dataloader = DataLoader(
@@ -152,8 +139,8 @@ def main():
 
     # 트레이너에 load 함수 사용해 모델 불러옵니다.
     # model.load_state_dict(torch.load(args.checkpoint_path))
-    trainer.load(args.checkpoint_path)
-    print(f"Load model from {args.checkpoint_path} for submission!")
+    trainer.load('./Finetune_full-ML.pt')
+    # print(f"Load model from {args.checkpoint_path} for submission!")
     # 모델에서 예측값 받아옵니다. 0은 0 epoch 의미합니다.
     # trainers.py 내 FinetuneTrainer 클래스 iteration(0, submission_dataloader, mode="submission")함수.
     preds = trainer.submission(0)
