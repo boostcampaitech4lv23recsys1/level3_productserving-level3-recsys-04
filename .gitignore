@@ -4,8 +4,6 @@ chromedriver
 chromedriver_linux64.zip
 google-chrome-stable_current_amd64.deb
 .ipynb_checkpoints
-area_csv
-user_csv
 *.pem
 __pycache__
 .vscode
@@ -48,5 +46,11 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-#Database
+# Database
 database/ssl
+
+# data
+area_csv
+user_csv
+G_train.csv
+G_test.csv
