@@ -7,7 +7,6 @@ from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
 from datasets import SASRecTrainDataset
 from models import S3RecModel
 from utils import (
-    EarlyStopping,
     check_path,
     get_user_seqs,
     get_test_list,
@@ -97,9 +96,6 @@ def main():
     args.device = torch.device("cuda" if args.cuda_condition else "cpu")
 
     # 데이터 파일 불러오는 경로 설정합니다.
-    args.data_file = args.data_dir + "G_train.csv" # "train_ratings.csv"
-    args.test_file = args.data_dir + "G_test.csv"
-
     path = '../data/'
 
     train = pd.read_csv(path + 'G_train.csv')    
@@ -111,11 +107,9 @@ def main():
         train, test
     )
 
-    # test 데이터 셋에 대해 해당 유저가 방문한 rest item 정보를 담는 것 제작
-    # test = get_test_list(test)
-
     # 음식점 종류를 저장합니다.
     args.item_list = train['item'].unique()
+
     # item id의 가장 큰 값 저장합니다.
     args.item_size = max_item + 2
     args.mask_id = max_item + 1
@@ -125,8 +119,8 @@ def main():
     args.log_file = os.path.join(args.output_dir, args_str + ".txt")
     print(str(args))
 
-    
-    args.train_matrix = train_matrix
+    # user * item 메트릭스.
+    args.train_matrix = train_matrix 
 
     # 모델 기록용 파일 경로 저장합니다.
     checkpoint = args_str + ".pt"
@@ -135,30 +129,26 @@ def main():
     
     # SASRecDataset 클래스를 불러옵니다. (datasets.py 내 존재)
     # user_seq : 유저마다 따로 아이템 리스트 저장. 2차원 배열, => [[1번 유저 item_id 리스트], [2번 유저 item_id 리스트] .. ]
+    # output : user_id(유저번호), input_ids(item), target_pos(item), target_neg(item), answer(test_item)
     train_dataset = SASRecTrainDataset(args, user_seq, test_user_seq)
-    # train_dataset = SASRecDataset(args, user_seq, data_type="train")
+
     # RandomSampler : 데이터 셋을 랜덤하게 섞어줍니다. 인덱스를 반환해줍니다.
     train_sampler = RandomSampler(train_dataset)
+
     # 모델 학습을 하기 위한 데이터 로더를 만듭니다. 랜덤으로 섞고 배치 단위(defalut : 256)로 출력합니다.
     train_dataloader = DataLoader(
         train_dataset, sampler=train_sampler, batch_size=args.batch_size
     )
 
-
     # S3RecModel 모델을 불러옵니다. (models.py 내 존재)
     model = S3RecModel(args=args)
+    # 모델을 GPU에 실어요.
     model = model.to(args.device)
 
-    # Finetune 트레이너 클래스를 불러옵니다. (trainers.py 내 존재)
-    # 트레이너에 모델, train, eval, test 데이터 로더 넣어줍니다. 
- 
-    # EarlyStopping 클래스를 불러옵니다. (utils.py 내 존재)
-    # valid를 생략하면 모델 학습 속도가 엄청 빨라집니다.
-    early_stopping = EarlyStopping(args.checkpoint_path, patience=10, verbose=True)
     for epoch in range(args.epochs):
-        iteration(args, args.epochs, train_dataloader, model)
+        iteration(args, epoch, train_dataloader, model)
         #if epoch % 3 == 2:
-        scores = test_score(args, test, model)
+        scores = test_score(args, epoch, train_dataloader, model)
         print("recall_k = ", scores)
 
     torch.save(model.state_dict(), args.checkpoint_path)

@@ -78,37 +78,31 @@ def iteration(args, epoch, dataloader, model):
     if (epoch + 1) % args.log_freq == 0:
         print(str(post_fix))
 
-# def funs(args, model, user_id):
-#     user_ids = np.full(args.item_size, user_id)
-#     output = model(user_ids, args.item_list)
-#     idx = np.argpartition(output, -3)[-3:]
-#     pred_u = args.item_list[idx]
-#     return pred_u
-
-
-# def test_score(args, test, model):
-
-#     test_score = test.copy()
-
-#     test_score['pred'] = test_score['user'].apply(lambda x : funs(args,model,x))
-#     test_score['recall'] = test_score.apply(lambda x : recallk(x['rest'], x['pred']), axis = 1)
-
-#     return test_score['recall'].mean()
-
 
 def test_score(args, epoch, dataloader, model):
-    model.eval()
+    # tqdm을 통해 iter를 만듭니다.
+    # 핵심은 enumerate(dataloader) 이 것만 기억하셔도 문제 없습니다.
+    # 나머지 코드는 tqdm 출력을 이쁘게 도와주는 도구입니다.
     rec_data_iter = tqdm(
-            enumerate(dataloader),
-            desc="Recommendation EP:%d" % (epoch),
-            total=len(dataloader),
-            bar_format="{l_bar}{r_bar}",
+        enumerate(dataloader),
+        desc="Recommendation EP:%d" % (epoch),
+        total=len(dataloader),
+        bar_format="{l_bar}{r_bar}",
     )
 
-    def predict_full(self, seq_out):
-        # [item_num hidden_size]
-        test_item_emb = self.model.item_embeddings.weight
-        # [batch hidden_size ]
+    model.eval()
+
+    def predict_full(seq_out, model):
+        """_summary_
+        Args:
+            seq_out ([batch, hidden_size]): 추천 결과물
+            model : model 파일
+        Returns:
+            rating_pred ([batch, item_num(2872)]): 유저들(batch)에 대한 모든 아이템 score
+        """        
+        # [item_num, hidden_size]
+        test_item_emb = model.item_embeddings.weight
+        # [batch, hidden_size]
         rating_pred = torch.matmul(seq_out, test_item_emb.transpose(0, 1))
         return rating_pred  # [B item_num]
 
@@ -116,35 +110,40 @@ def test_score(args, epoch, dataloader, model):
 
         batch = tuple(t.to(args.device) for t in batch)
         user_ids, input_ids, _, target_neg, answers = batch
-        recommend_output = model.finetune(input_ids)  # [B L H]
+        recommend_output = model.finetune(input_ids)  # [B, L, H]
 
-        recommend_output = recommend_output[:, -1, :]  # [B H]
+        recommend_output = recommend_output[:, -1, :]  # [B, H]
 
-        rating_pred = predict_full(recommend_output)  # [B item_num]
+        rating_pred = predict_full(recommend_output, model)  # [B, item_num]
 
         rating_pred = rating_pred.cpu().data.numpy().copy()
         batch_user_index = user_ids.cpu().numpy()
 
-        # 해당 User가 시청한 영화 제외
-        #rating_pred[args.train_matrix[batch_user_index].toarray() > 0] = -np.inf
-        # mask_id 제외
-        #rating_pred[:, -1] = -np.inf
+        # 해당 User가 이미 방문한 음식점 제외(마스킹)
+        rating_pred[args.train_matrix[batch_user_index].toarray() > 0] = -np.inf
+
+        # mask_id 제외(마스킹)
+        rating_pred[:, -1] = -np.inf
 
         # TOP 3 index 추출
         ind = np.argpartition(rating_pred, -3)[:, -3:]
-        arr_ind = rating_pred[np.arange(len(rating_pred))[:, None], ind]
 
-        batch_pred_list = ind[
-            np.arange(len(rating_pred))[:, None], arr_ind
-        ]
-
+        # pred_list : 예측 음식점 3개, (user 개수 * 3) 
+        # answer_list : 정답(test) 음식점들, (user 개수 * n(유저의 test 개수마다 바뀜))
         if i == 0:
-            pred_list = batch_pred_list
-            answer_list = answers
+            pred_list = ind
+            answer_list = answers.cpu().data.numpy()
         else:
-            pred_list = np.append(pred_list, batch_pred_list, axis=0)
+            pred_list = np.append(pred_list, ind, axis=0)
             answer_list = np.append(
-                answer_list, answers, axis=0
+                answer_list, answers.cpu().data.numpy(), axis=0
             )
 
-    breakpoint()
+    # _recall : 유저마다 recall 개산하는 리스트.
+    _recall = []
+
+    for _list in zip(answer_list, pred_list):
+        _recall.append(recallk(_list))
+
+    # 모든 유저의 recall 평균 값 반환
+    return sum(_recall) / len(_recall)

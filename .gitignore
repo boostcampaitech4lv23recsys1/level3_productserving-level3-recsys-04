@@ -54,3 +54,6 @@ area_csv
 user_csv
 G_train.csv
 G_test.csv
+
+# model
+output/

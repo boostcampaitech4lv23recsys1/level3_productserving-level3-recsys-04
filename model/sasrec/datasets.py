@@ -17,6 +17,14 @@ class SASRecTrainDataset(Dataset):
 
 
     def __getitem__(self, index):
+        """_summary_
+        Returns:
+            user_id : 유저 번호(정렬 되있음 = index와 같음)
+            input_ids : 해당 유저의 test 음식점[:-1]
+            target_pos : 해당 유저의 train 음식점[1:] 정답지.
+            target_neg : 네거티브 샘플링
+            answer : 해당 유저의 test 음식점 정답지.
+        """        
         # sequence : part_sequence의 해당 index에 저장된 sequence
         sequence = self.user_seq[index]  # pos_items
         input_ids = sequence[:-1]
@@ -46,7 +54,7 @@ class SASRecTrainDataset(Dataset):
         assert len(target_pos) == self.max_len
         assert len(target_neg) == self.max_len
         
-        user_id = 0 # 아무값이나 넣음. 어짜피 안써서
+        user_id = index
         answer = self.test_user_seq[index] # test
         # to tensor
         cur_tensors = (
@@ -54,11 +62,11 @@ class SASRecTrainDataset(Dataset):
             torch.tensor(input_ids, dtype=torch.long),
             torch.tensor(target_pos, dtype=torch.long), # input_ids 대비 하나씩 밀림.
             torch.tensor(target_neg, dtype=torch.long), # input_ids 길이만큼 네거티브 샘플링.
-            answer
+            torch.tensor(answer, dtype=torch.long)
         )
 
         return cur_tensors
 
     def __len__(self):
         # user 수 반환
-        return len(self.part_sequence)
+        return len(self.user_seq)
