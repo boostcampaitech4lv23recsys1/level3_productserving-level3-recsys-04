@@ -10,5 +10,3 @@ jobs:
         with:
           options: "--verbose"
           src: "."
-          jupyter: true
-          version: "21.5b1"
