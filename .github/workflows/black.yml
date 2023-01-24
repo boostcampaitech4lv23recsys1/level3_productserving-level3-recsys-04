@@ -8,5 +8,8 @@ jobs:
     name: Python Black
     runs-on: ubuntu-latest
     steps:
-      - name: Black Code Formatter
-        uses: lgeiger/black-action@v1.0.1
+      - uses: psf/black@stable
+        with:
+          options: ""
+          jupyter: true
+          version: "21.5b1"
