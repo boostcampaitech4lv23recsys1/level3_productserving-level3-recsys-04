@@ -8,5 +8,7 @@ jobs:
     name: Python Black
     runs-on: ubuntu-latest
     steps:
-      - name: Black Check
-        uses: jpetrucciani/black-check@22.12.0
+      - uses: piotrpawlaczek/python-blacken@release/stable
+        with:
+          sanity-check: 'safe'
+          only-check: 'no'
