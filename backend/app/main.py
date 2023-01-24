@@ -4,12 +4,8 @@ from pydantic import BaseModel, Field
 from typing import List, Optional
 from starlette.responses import JSONResponse
 
-<<<<<<< HEAD
-from .model import trash_model
-=======
 from model import trash_model
 from type import *
->>>>>>> 64493ff86e609ac4bbf9e9b77571d9d0fd3ede79
 
 # from app.routes import index, auth
 
@@ -36,22 +32,6 @@ app.add_middleware(
 
 
 ################ mysql database 설정
-<<<<<<< HEAD
-# config = {
-#     'user': 'root',
-#     'password': 'wogud1028',
-#     'host': '34.64.202.234',
-#     'client_flags': [ClientFlag.SSL],
-#     # 아래 인증키 경로들은 각자 환경에 맞게 수정 (언제 한번 통일 ㄱㄱ)
-#     'ssl_ca': 'app/ssl/server-ca.pem',
-#     'ssl_cert': 'app/ssl/client-cert.pem',
-#     'ssl_key': 'app/ssl/client-key.pem'
-# }
-
-# config['database'] = 'rest'  # add "rest" database to config dict
-# cnxn = mysql.connector.connect(**config)
-# cursor = cnxn.cursor()
-=======
 config = {
     'user': 'root',
     'password': 'wogud1028',
@@ -69,7 +49,6 @@ config = {
 config['database'] = 'rest'  # add "rest" database to config dict
 cnxn = mysql.connector.connect(**config)
 cursor = cnxn.cursor()
->>>>>>> 64493ff86e609ac4bbf9e9b77571d9d0fd3ede79
 ################
 
 
@@ -111,7 +90,6 @@ users = ['5c667add298eafd0547442d8', '5c3737d3d764236c17947538']
 def signin(user: SignInRequest):
     if user.name in users:
         '''
-
         user.location으로 쿼리 날려서 좌표 가져오는 코드
         '''
         _x = 134; _y = 156
@@ -120,22 +98,31 @@ def signin(user: SignInRequest):
         '''
         모델 추천 결과 가져오는 코드
         '''
-        rec_result = ["1675303081", "1867823297", "38969614"]
-        restaurants = []
+        rec_result = ["1675303081", "1867823297", "38969614", "1867823297", "1675303081"]
+        cat1 = []; cat2 = []; cat3 = []
         for i, rest_id in enumerate(rec_result):
-            select_sql = f"select * from rest where id = {rest_id}"
-            cursor.execute(select_sql)
-            result = cursor.fetchall()[0]
+            # select_sql = f"select * from rest where id = {rest_id}"
+            # cursor.execute(select_sql)
+            # result = cursor.fetchall()[0]
             # result = result[:100]
             # restaurants = {i: dict(Restaurant(id=_id, x=_x, y=_y, tag=_tag, name=_name, img_url=_imgurl)) for i, (_id, _x, _y,_tag,_name,_imgurl) in enumerate(result)}
-            _id, _x, _y,_tag,_name,_imgurl = result
-            restaurant = Restaurant(id=_id, x=_x, y=_y, tag=_tag, name=_name, img_url=_imgurl)
-            restaurants.append(restaurant)
+            # _id, _x, _y,_tag,_name,_imgurl = result
+            # restaurant = Restaurant(id=_id, x=_x, y=_y, tag=_tag, name=_name, img_url=_imgurl)
+            # restaurants.append(restaurant)
+            restaurant_1 = Restaurant(id=i, x=_x, y=_y, tag='restaurant-tag', name='restaurant-name', img_url='imgurl')
+            restaurant_2 = Restaurant(id=i+10, x=_x, y=_y, tag='restaurant-tag', name='restaurant-name', img_url='imgurl')
+            restaurant_3 = Restaurant(id=i+20, x=_x, y=_y, tag='restaurant-tag', name='restaurant-name', img_url='imgurl')
+            cat1.append(restaurant_1)
+            cat2.append(restaurant_2)
+            cat3.append(restaurant_3)
+            
 
         return SignInResponse(
                 state='start',
                 detail=' not cold start',
-                restaurants = restaurants
+                cat1 = cat1,
+                cat2 = cat2,
+                cat3 = cat3
             )
     return GeneralResponse(state='cold-start', detail='new user')
 
