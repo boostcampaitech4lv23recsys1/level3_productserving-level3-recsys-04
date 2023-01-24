@@ -59,8 +59,10 @@ export default function SignIn() {
     else if (response["detail"] === "wrong password"){
 
     }
-    window.localStorage.setItem('restaurants', JSON.stringify(response["restaurants"]));
-    console.log(response["restaurants"]);
+    window.localStorage.setItem('cat1', JSON.stringify(response["cat1"]));
+    window.localStorage.setItem('cat2', JSON.stringify(response["cat2"]));
+    window.localStorage.setItem('cat3', JSON.stringify(response["cat3"]));
+    console.log(response["cat3"]);
     console.log(response);
   };
   const signin = (userData) => {
@@ -79,8 +81,9 @@ export default function SignIn() {
       .then((response) => {
         validate(response);
         
-      });
-    
+      })
+      .catch(error => alert(error.message));
+
     
 
   };
@@ -96,24 +99,21 @@ export default function SignIn() {
       showConfirmButton : false,
       showCancelButton: true,
       cancelButtonText: 'Cancel',
-      onOpen: () => {
-        Swal.showLoading()
-        timeoutId = setTimeout(() => {
+
+      // onOpen: () => {
+      //   Swal.showLoading()
+      //   timeoutId = setTimeout(() => {
           
-          loading.close();
+      //     loading.close();
           
-          // Swal.fire({
-          //   title: 'Timeout',
-          //   text: 'Timeout reached',
-          //   icon: 'error',
-          // });
-        }, 5000);
-      },
-      onClose: () => {
-        clearTimeout(timeoutId);
-        console.log('Alert closed')
+      //   }, 5000);
+      // },
+      // onClose: () => {
+      //   clearTimeout(timeoutId);
+      //   console.log('Alert closed')
         
-      }
+      // }
+
     }).then((result) => {
       if (result.dismiss === Swal.DismissReason.cancel) {
         clearTimeout(timeoutId);
