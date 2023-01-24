@@ -8,8 +8,5 @@ jobs:
     name: Python Black
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Python Black
-        uses: cytopia/docker-black@0.8
-        with:
-          path: 'src/'
+      - name: Black Check
+        uses: jpetrucciani/black-check@22.12.0
