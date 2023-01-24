@@ -74,13 +74,9 @@ def main_page():
     return {"message": "This is main page."}
 
 
-
-
-
 def show_image(self):
     img = Image.open(self.img_url)
     img.show()
-
 
 
 users = ['5c667add298eafd0547442d8', '5c3737d3d764236c17947538']
@@ -118,13 +114,19 @@ def signin(user: SignInRequest):
             
 
         return SignInResponse(
-                state='start',
-                detail=' not cold start',
-                cat1 = cat1,
-                cat2 = cat2,
-                cat3 = cat3
-            )
-    return GeneralResponse(state='cold-start', detail='new user')
+            state='start',
+            detail='not cold start',
+            cat1 = cat1,
+            cat2 = cat2,
+            cat3 = cat3
+        )
+    return SignInResponse(
+        state='start',
+        detail='cold start',
+        cat1 = cat1,
+        cat2 = cat2,
+        cat3 = cat3
+    )
 
 
 # 특정 식당 정보 가져오는 API
