@@ -8,7 +8,6 @@ jobs:
     name: Python Black
     runs-on: ubuntu-latest
     steps:
-      - uses: piotrpawlaczek/python-blacken@release/stable
-        with:
-          sanity-check: 'safe'
-          only-check: 'no'
+      - uses: actions/checkout@v3
+      - name: Python Black
+        uses: cytopia/docker-black@0.8
