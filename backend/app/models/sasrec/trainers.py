@@ -53,3 +53,47 @@ def test_score(args, epoch, dataloader, model):
         ind = np.argpartition(rating_pred, -3)[:, -3:]
 
         return ind
+
+
+def trainers(args, _input, model):
+    def predict_full(seq_out, model):
+        """_summary_
+        Args:
+            seq_out ([batch, hidden_size]): 추천 결과물
+            model : model 파일
+        Returns:
+            rating_pred ([batch, item_num(2872)]): 유저들(batch)에 대한 모든 아이템 score
+        """        
+        # [item_num, hidden_size]
+        test_item_emb = model.item_embeddings.weight
+        # [batch, hidden_size]
+        rating_pred = torch.matmul(seq_out, test_item_emb.transpose(0, 1))
+        return rating_pred  # [B item_num]
+
+    model.eval()
+
+    pad_len = args.max_seq_length - len(_input)
+    _input_model = [0] * pad_len + _input
+    _input_model = _input_model[-args.max_seq_length:]
+    _input_model = torch.tensor(_input_model, dtype=torch.long)
+    _input_model = _input_model.to(args.device)
+    
+    recommend_output = model.finetune(_input_model.unsqueeze(0))
+    recommend_output = recommend_output[:, -1, :]
+    rating_pred = predict_full(recommend_output, model)
+    rating_pred = rating_pred.squeeze()
+
+    rating_pred = rating_pred.cpu().data.numpy()
+
+    # 해당 User가 이미 방문한 음식점 제외(마스킹)
+    rating_pred[_input] = -np.inf
+
+    # mask_id 제외(마스킹)
+    rating_pred[-1] = -np.inf
+
+    # TOP 3 index 추출
+    ind = np.argpartition(rating_pred, -3)[-3:]
+
+    return ind
+
+    

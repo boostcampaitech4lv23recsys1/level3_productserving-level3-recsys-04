@@ -9,7 +9,7 @@ from torch.utils.data import DataLoader, SequentialSampler
 from datasets import SASRecDataset
 from models import S3RecModel
 from utils import set_seed
-from trainers import test_score
+from trainers import trainers
  
 
 def main():
@@ -91,18 +91,13 @@ def main():
     '''
     # args.mask_id = max_item + 1
 
-    submission_dataset = SASRecDataset(args, user_seq)
-    submission_sampler = SequentialSampler(submission_dataset)
-    submission_dataloader = DataLoader(
-        submission_dataset, sampler=submission_sampler, batch_size=args.batch_size
-    )
-
     model = S3RecModel(args=args)
     model = model.to(args.device)
     # 트레이너에 load 함수 사용해 모델 불러옵니다.
     model.load_state_dict(torch.load('../data/SASRec-0124.pt'))
 
-    pred = test_score(args, 1, submission_dataloader, model)  # epoch 1로 넣음
+    pred = trainers(args, user_seq, model)  # epoch 1로 넣음
+    print(pred)
     
 
 if __name__ == "__main__":
