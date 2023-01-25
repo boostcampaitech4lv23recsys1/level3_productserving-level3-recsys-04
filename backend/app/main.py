@@ -77,6 +77,21 @@ def show_image(self):
 
 users = ["5c667add298eafd0547442d8", "5c3737d3d764236c17947538"]
 
+@app.post("/album")
+def album(data: AlbumRequest):
+    if data.is_positive == False:
+
+        return AlbumResponse(
+            user_id= data.user_id,
+            rest_id= data.rest_id,
+            is_positive = data.is_positive
+        )
+    else :
+        return AlbumResponse(
+            user_id= data.user_id,
+            rest_id= data.rest_id,
+            is_positive = data.is_positive
+        )
 
 @app.post("/signin")
 def signin(user: SignInRequest):
