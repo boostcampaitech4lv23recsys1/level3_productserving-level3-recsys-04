@@ -52,21 +52,20 @@ export default function SignIn() {
   const navigate = useNavigate();
   const validate = (response) => {
     
-    if (response["state"] === "Approved") {
-      console.log(response["restaurants"]);
+    // if (response["state"] === "Approved") {
+    //   console.log(response["restaurants"]);
 
-    }
-    else if (response["detail"] === "wrong password"){
+    // }
+    // else if (response["detail"] === "wrong password"){
 
-    }
-    window.localStorage.setItem('cat1', JSON.stringify(response["cat1"]));
-    window.localStorage.setItem('cat2', JSON.stringify(response["cat2"]));
-    window.localStorage.setItem('cat3', JSON.stringify(response["cat3"]));
-    console.log(response["cat3"]);
+    // }
+    window.localStorage.setItem('restaurants1', JSON.stringify(response["restaurants1"]));
+    window.localStorage.setItem('restaurants2', JSON.stringify(response["restaurants2"]));
+    window.localStorage.setItem('restaurants3', JSON.stringify(response["restaurants3"]));
+
     console.log(response);
   };
   const signin = (userData) => {
-    console.log("SIGISNDFINSDF");
     const requestOptions = {
       method: "POST",
       headers: {
