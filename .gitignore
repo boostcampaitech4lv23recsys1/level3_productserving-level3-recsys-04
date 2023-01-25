@@ -62,3 +62,6 @@ output/
 # poetry
 *.toml
 poetry*
+
+# DB
+*.db

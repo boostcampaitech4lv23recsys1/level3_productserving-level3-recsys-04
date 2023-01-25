@@ -33,7 +33,9 @@ function Copyright() {
 
 const cards = [0, 1, 2];
 
-
+let initialCounters = [
+  0, 0, 0
+];
 const theme = createTheme();
 
 export default function Album() {
@@ -43,11 +45,25 @@ export default function Album() {
   const restaurants2 = JSON.parse(window.localStorage.getItem("restaurants2")); 
   const restaurants3 = JSON.parse(window.localStorage.getItem("restaurants3")); 
   const restaurants = [restaurants1,restaurants2,restaurants3]
-
-  const idx = [0,0,0]
-  
+  // let idx = [0,0,0]
+  let [idx, setIdx] = React.useState(initialCounters);
+ 
   console.log(restaurants)
+  console.log(idx)
+  console.log(idx[0])
   
+  function handleIncrementClick(index) {
+    const nextIdx = idx.map((c, i) => {
+      if (i === index) {
+        // Increment the clicked counter
+        return c + 1;
+      } else {
+        // The rest haven't changed
+        return c;
+      }
+    });
+    setIdx(nextIdx);
+  }
   const handleClick1 = (event) => {
       navigate('/signin');
     };
@@ -65,7 +81,18 @@ export default function Album() {
   const handleClick5 = (event) => {
     // 결과 리셋하는 코드 쓱쓱
     const card = event.target.id
-    idx[card] = idx[card] +1
+
+    if (card ==0) {
+      idx = [idx[0]+1,idx[1],idx[2]]
+    }
+    else if (card ==1) {
+      idx = [idx[0],idx[1]+1,idx[2]]
+    }
+    else if (card ==2) {
+      idx = [idx[0],idx[1],idx[2]+1]
+    }
+    console.log(idx)
+    console.log(card)
   };
   
   return (
@@ -153,7 +180,9 @@ export default function Album() {
                   </CardContent>
                   <CardActions>
                     <Button id = {card} type="submit" size="small" onClick= {handleClick4}>식당 링크 열기</Button>
-                    <Button id = {card} type="submit" size="small" onClick= {handleClick5}>다른 결과 보기</Button>
+                    <Button id = {card} type="submit" size="small" onClick= {() => {
+                        handleIncrementClick(card);
+                      }}>다른 결과 보기</Button>
                   </CardActions>
                 </Card>
               </Grid>
