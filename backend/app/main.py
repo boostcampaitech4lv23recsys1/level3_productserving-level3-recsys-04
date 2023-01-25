@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field
 from typing import List, Optional
 from starlette.responses import JSONResponse
 
-from model import trash_model
+# from model import trash_model
 from type import *
 
 # from app.routes import index, auth
@@ -32,23 +32,26 @@ app.add_middleware(
 
 
 ################ mysql database 설정
-config = {
-    'user': 'root',
-    'password': 'wogud1028',
-    'host': '34.64.202.234',
-    'client_flags': [ClientFlag.SSL],
-    # 아래 인증키 경로들은 각자 환경에 맞게 수정 (언제 한번 통일 ㄱㄱ)
-    #'ssl_ca': '/Users/hwang/AI_Tech_Frontend/level3_productserving-level3-recsys-04/db/ssl/server-ca.pem',
-    #'ssl_cert': '/Users/hwang/AI_Tech_Frontend/level3_productserving-level3-recsys-04/db/ssl/client-cert.pem',
-    #'ssl_key': '/Users/hwang/AI_Tech_Frontend/level3_productserving-level3-recsys-04/db/ssl/client-key.pem'
-    'ssl_ca': r'C:\Users\bsj94\workspace\project\db\ssl\client-cert.pem',
-    'ssl_cert': r'C:\Users\bsj94\workspace\project\db\ssl\client-cert.pem',
-    'ssl_key': r'C:\Users\bsj94\workspace\project\db\ssl\client-key.pem'
-}
+# config = {
+#     'user': 'root',
+#     'password': 'wogud1028',
+#     'host': '34.64.202.234',
+#     'client_flags': [ClientFlag.SSL],
+#     # 아래 인증키 경로들은 각자 환경에 맞게 수정 (언제 한번 통일 ㄱㄱ)
+#     #'ssl_ca': '/Users/hwang/AI_Tech_Frontend/level3_productserving-level3-recsys-04/db/ssl/server-ca.pem',
+#     #'ssl_cert': '/Users/hwang/AI_Tech_Frontend/level3_productserving-level3-recsys-04/db/ssl/client-cert.pem',
+#     #'ssl_key': '/Users/hwang/AI_Tech_Frontend/level3_productserving-level3-recsys-04/db/ssl/client-key.pem'
+#     # 'ssl_ca': r'C:\Users\bsj94\workspace\project\db\ssl\client-cert.pem',
+#     # 'ssl_cert': r'C:\Users\bsj94\workspace\project\db\ssl\client-cert.pem',
+#     # 'ssl_key': r'C:\Users\bsj94\workspace\project\db\ssl\client-key.pem'
+#     'ssl_ca': '../../db/ssl/client-cert.pem',
+#     'ssl_cert': '../../db/ssl/client-cert.pem',
+#     'ssl_key': '../../db/ssl/client-key.pem'
+# }
 
-config['database'] = 'rest'  # add "rest" database to config dict
-cnxn = mysql.connector.connect(**config)
-cursor = cnxn.cursor()
+# config['database'] = 'rest'  # add "rest" database to config dict
+# cnxn = mysql.connector.connect(**config)
+# cursor = cnxn.cursor()
 ################
 
 
@@ -90,7 +93,7 @@ def signin(user: SignInRequest):
         '''
         _x = 134; _y = 156
         
-        
+
         '''
         모델 추천 결과 가져오는 코드
         '''
@@ -153,11 +156,11 @@ class Prediction(BaseModel):
     name: str = 'predict_result'
     result: float
 
-@app.get('/predict/{user_id}/{rest_id}', description="해당 유저의 정보를 모델에게 전달하고 예측 결과를 가져옵니다")
-async def make_prediction(user_id: str, rest_id: str, model = trash_model()):
-     predict_result = model(user_id, rest_id)
-     prediction = Prediction(result=predict_result)
-     return prediction
+# @app.get('/predict/{user_id}/{rest_id}', description="해당 유저의 정보를 모델에게 전달하고 예측 결과를 가져옵니다")
+# async def make_prediction(user_id: str, rest_id: str, model = trash_model()):
+#      predict_result = model(user_id, rest_id)
+#      prediction = Prediction(result=predict_result)
+#      return prediction
 
 
 # 모든 식당 정보 가져오는 API
