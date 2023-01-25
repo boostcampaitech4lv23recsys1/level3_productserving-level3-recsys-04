@@ -34,7 +34,9 @@ class Restaurant(BaseModel):
 class SignInResponse(BaseModel):
     state: str
     detail: str  # cold-start or not
-    restaurants : List[Restaurant]
+    restaurants1 : List[Restaurant]
+    restaurants2 : List[Restaurant]
+    restaurants3 : List[Restaurant]
 
 class User(BaseModel):
     name: str
