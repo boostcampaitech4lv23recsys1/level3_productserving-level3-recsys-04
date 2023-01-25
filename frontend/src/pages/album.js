@@ -14,7 +14,7 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Link from '@mui/material/Link';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { useNavigate } from 'react-router-dom';
+import { renderMatches, useNavigate } from 'react-router-dom';
 
 
 
@@ -39,12 +39,18 @@ const theme = createTheme();
 export default function Album() {
   const navigate = useNavigate();
  
-  const restaurants = JSON.parse(window.localStorage.getItem("restaurants")); 
-  console.log(JSON.parse(window.localStorage.getItem('restaurants')))
+  const restaurants1 = JSON.parse(window.localStorage.getItem("restaurants1")); 
+  const restaurants2 = JSON.parse(window.localStorage.getItem("restaurants2")); 
+  const restaurants3 = JSON.parse(window.localStorage.getItem("restaurants3")); 
+  const restaurants = [restaurants1,restaurants2,restaurants3]
+
+  const idx = [0,0,0]
   
-const handleClick1 = (event) => {
-    navigate('/signin');
-  };
+  console.log(restaurants)
+  
+  const handleClick1 = (event) => {
+      navigate('/signin');
+    };
 
   const handleClick4 = (event) => {
     // 일단 유저에서 열리게 
@@ -55,12 +61,13 @@ const handleClick1 = (event) => {
     window.open(url, "_blank", "noopener, noreferrer");
     // window.open(url, "_blank", "noopener, noreferrer");
   };
-
+  
   const handleClick5 = (event) => {
     // 결과 리셋하는 코드 쓱쓱
-
-  
+    const card = event.target.id
+    idx[card] = idx[card] +1
   };
+  
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -133,20 +140,20 @@ const handleClick1 = (event) => {
                       // 16:9
                       pt: '56.25%',
                     }}
-                    image={restaurants[card]["img_url"]}
+                    image={restaurants[card][idx[card]]["img_url"]}
                     alt="random"
                   />
                   <CardContent sx={{ flexGrow: 1 }}>
                     <Typography gutterBottom variant="h5" component="h2">
-                      이름 : {restaurants[card]["name"]}
+                      이름 : {restaurants[card][idx[card]]["id"]}
                     </Typography>
                     <Typography>
-                      업종 : {restaurants[card]["tag"]}
+                      업종 : {restaurants[card][idx[card]]["tag"]}
                     </Typography>
                   </CardContent>
                   <CardActions>
                     <Button id = {card} type="submit" size="small" onClick= {handleClick4}>식당 링크 열기</Button>
-                    <Button type="submit" size="small" onClick= {handleClick5}>다른 결과 보기</Button>
+                    <Button id = {card} type="submit" size="small" onClick= {handleClick5}>다른 결과 보기</Button>
                   </CardActions>
                 </Card>
               </Grid>
