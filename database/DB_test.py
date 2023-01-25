@@ -1,22 +1,9 @@
-import pymysql
+import pandas as pd
+import sqlite3
 
-cnxn = pymysql.connect(
-    host="1.238.57.88",
-    user="newuser",
-    password="ghdwogud1028",
-    charset="utf8",
-    port=9876,
-)
-# cnxn = pymysql.connect(host='1.238.57.88', user='newuser', password='ghdwogud1028', db='newproj', charset='utf8', port = 9876)
+cnxn = sqlite3.connect("a.db")
 cursor = cnxn.cursor()
-dirty = [
-    0,
-    1,
-    2,
-    3,
-    4,
-    5,
-    6,
-    7,
-    8,
-]
+select_sql = "select * from test1"  # where rating = 4.42"
+cursor.execute(select_sql)
+result = cursor.fetchall()
+print(result)
