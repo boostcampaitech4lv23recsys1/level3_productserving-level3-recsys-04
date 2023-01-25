@@ -24,10 +24,10 @@ def main():
     # 데이터 경로와 네이밍 부분.
     parser.add_argument("--data_dir", default="../data/", type=str)
     parser.add_argument("--output_dir", default="output/", type=str)
-    parser.add_argument("--data_name", default="Ml", type=str)
+    parser.add_argument("--data_name", default="0124", type=str)
 
     # 모델 argument(하이퍼 파라미터)
-    parser.add_argument("--model_name", default="Finetune_full", type=str)
+    parser.add_argument("--model_name", default="SASRec", type=str)
     parser.add_argument(
         "--hidden_size", type=int, default=256, help="hidden size of transformer model"
     )
@@ -61,7 +61,7 @@ def main():
     parser.add_argument(
         "--batch_size", type=int, default=256, help="number of batch_size"
     )
-    parser.add_argument("--epochs", type=int, default=1, help="number of epochs") # 200
+    parser.add_argument("--epochs", type=int, default=10, help="number of epochs") # 200
     parser.add_argument("--no_cuda", action="store_true")
     parser.add_argument("--log_freq", type=int, default=1, help="per epoch print res")
     parser.add_argument("--seed", default=42, type=int)
@@ -98,8 +98,8 @@ def main():
     # 데이터 파일 불러오는 경로 설정합니다.
     path = '../data/'
 
-    train = pd.read_csv(path + 'G_train.csv')    
-    test = pd.read_csv(path + 'G_test.csv')
+    train = pd.read_csv(path + 'G_train2.csv')    
+    test = pd.read_csv(path + 'G_test2.csv')
    
     
     # 자세한건 get_user_seqs 함수(utils.py) 내에 써놨습니다.
@@ -108,7 +108,7 @@ def main():
     )
 
     # 음식점 종류를 저장합니다.
-    args.item_list = train['item'].unique()
+    args.item_list = train['rest_code'].unique()
 
     # item id의 가장 큰 값 저장합니다.
     args.item_size = max_item + 2
