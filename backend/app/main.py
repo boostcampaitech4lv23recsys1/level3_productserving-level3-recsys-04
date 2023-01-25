@@ -62,31 +62,16 @@ def signin(user: SignInRequest):
     """
     모델 추천 결과 가져오는 코드
     """
-    rec_result = [
-        "1675303081",
-        "1867823297",
-        "38969614",
-        "1867823297",
-        "1675303081",
-    ]
     cat1 = []
     cat2 = []
     cat3 = []
-    for i, rest_id in enumerate(rec_result):
-        # select_sql = f"select * from rest where id = {rest_id}"
-        # cursor.execute(select_sql)
-        # result = cursor.fetchall()[0]
-        # result = result[:100]
-        # restaurants = {i: dict(Restaurant(id=_id, x=_x, y=_y, tag=_tag, name=_name, img_url=_imgurl)) for i, (_id, _x, _y,_tag,_name,_imgurl) in enumerate(result)}
-        # _id, _x, _y,_tag,_name,_imgurl = result
-        # restaurant = Restaurant(id=_id, x=_x, y=_y, tag=_tag, name=_name, img_url=_imgurl)
-        # restaurants.append(restaurant)
+    for i, rest_id in enumerate(top_k):
         restaurant_1 = Restaurant(
             id=i,
             x=_x,
             y=_y,
             tag="restaurant-tag",
-            name="restaurant-name",
+            name=str(rest_id),
             img_url="imgurl",
         )
         restaurant_2 = Restaurant(
@@ -109,47 +94,13 @@ def signin(user: SignInRequest):
         cat2.append(restaurant_2)
         cat3.append(restaurant_3)
 
-        return SignInResponse(
-            state='start',
-            detail='not cold start',
-            restaurants1 = cat1,
-            restaurants2 = cat2,
-            restaurants3 = cat3
-        )
-    else:
-        '''
-        user.location으로 쿼리 날려서 좌표 가져오는 코드
-        '''
-        _x = 134; _y = 156
-        
-        
-        '''
-        모델 추천 결과 가져오는 코드
-        '''
-        rec_result = ["1675303081", "1867823297", "38969614", "1867823297", "1675303081"]
-        cat1 = []; cat2 = []; cat3 = []
-        for i, rest_id in enumerate(rec_result):
-            # select_sql = f"select * from rest where id = {rest_id}"
-            # cursor.execute(select_sql)
-            # result = cursor.fetchall()[0]
-            # result = result[:100]
-            # restaurants = {i: dict(Restaurant(id=_id, x=_x, y=_y, tag=_tag, name=_name, img_url=_imgurl)) for i, (_id, _x, _y,_tag,_name,_imgurl) in enumerate(result)}
-            # _id, _x, _y,_tag,_name,_imgurl = result
-            # restaurant = Restaurant(id=_id, x=_x, y=_y, tag=_tag, name=_name, img_url=_imgurl)
-            # restaurants.append(restaurant)
-            restaurant_1 = Restaurant(id=i, x=_x, y=_y, tag='restaurant-tag', name='restaurant-name', img_url='imgurl')
-            restaurant_2 = Restaurant(id=i+10, x=_x, y=_y, tag='restaurant-tag', name='restaurant-name', img_url='imgurl')
-            restaurant_3 = Restaurant(id=i+20, x=_x, y=_y, tag='restaurant-tag', name='restaurant-name', img_url='imgurl')
-            cat1.append(restaurant_1)
-            cat2.append(restaurant_2)
-            cat3.append(restaurant_3)
-        return SignInResponse(
-            state='start',
-            detail='cold start',
-            restaurants1 = cat1,
-            restaurants2 = cat2,
-            restaurants3 = cat3
-        )
+    return SignInResponse(
+        state='start',
+        detail='not cold start',
+        restaurants1 = cat1,
+        restaurants2 = cat2,
+        restaurants3 = cat3
+    )
 
 
 # 특정 식당 정보 가져오는 API
