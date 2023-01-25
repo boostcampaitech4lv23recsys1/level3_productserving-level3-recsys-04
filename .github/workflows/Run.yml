@@ -1,0 +1,14 @@
+name: Release Management
+on: 
+  schedule:
+   - cron: "*/5 * * * *"
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: Database
+      - name: Run main.py
+        run: |
+          python database/DB_test.py
