@@ -6,9 +6,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-        with:
+      - with:
           ref: 'Database'
       - name: Run main.py
-        run: |
+        run:
           python database/DB_test.py
