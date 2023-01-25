@@ -4,12 +4,8 @@ from pydantic import BaseModel, Field
 from typing import List, Optional
 from starlette.responses import JSONResponse
 
-<<<<<<< HEAD
-from .model import trash_model
-=======
 from model import trash_model
 from type import *
->>>>>>> 64493ff86e609ac4bbf9e9b77571d9d0fd3ede79
 
 # from app.routes import index, auth
 
@@ -36,40 +32,23 @@ app.add_middleware(
 
 
 ################ mysql database 설정
-<<<<<<< HEAD
 # config = {
 #     'user': 'root',
 #     'password': 'wogud1028',
 #     'host': '34.64.202.234',
 #     'client_flags': [ClientFlag.SSL],
 #     # 아래 인증키 경로들은 각자 환경에 맞게 수정 (언제 한번 통일 ㄱㄱ)
-#     'ssl_ca': 'app/ssl/server-ca.pem',
-#     'ssl_cert': 'app/ssl/client-cert.pem',
-#     'ssl_key': 'app/ssl/client-key.pem'
+#     #'ssl_ca': '/Users/hwang/AI_Tech_Frontend/level3_productserving-level3-recsys-04/db/ssl/server-ca.pem',
+#     #'ssl_cert': '/Users/hwang/AI_Tech_Frontend/level3_productserving-level3-recsys-04/db/ssl/client-cert.pem',
+#     #'ssl_key': '/Users/hwang/AI_Tech_Frontend/level3_productserving-level3-recsys-04/db/ssl/client-key.pem'
+#     'ssl_ca': r'C:\Users\bsj94\workspace\project\db\ssl\client-cert.pem',
+#     'ssl_cert': r'C:\Users\bsj94\workspace\project\db\ssl\client-cert.pem',
+#     'ssl_key': r'C:\Users\bsj94\workspace\project\db\ssl\client-key.pem'
 # }
 
 # config['database'] = 'rest'  # add "rest" database to config dict
 # cnxn = mysql.connector.connect(**config)
 # cursor = cnxn.cursor()
-=======
-config = {
-    'user': 'root',
-    'password': 'wogud1028',
-    'host': '34.64.202.234',
-    'client_flags': [ClientFlag.SSL],
-    # 아래 인증키 경로들은 각자 환경에 맞게 수정 (언제 한번 통일 ㄱㄱ)
-    #'ssl_ca': '/Users/hwang/AI_Tech_Frontend/level3_productserving-level3-recsys-04/db/ssl/server-ca.pem',
-    #'ssl_cert': '/Users/hwang/AI_Tech_Frontend/level3_productserving-level3-recsys-04/db/ssl/client-cert.pem',
-    #'ssl_key': '/Users/hwang/AI_Tech_Frontend/level3_productserving-level3-recsys-04/db/ssl/client-key.pem'
-    'ssl_ca': r'C:\Users\bsj94\workspace\project\db\ssl\client-cert.pem',
-    'ssl_cert': r'C:\Users\bsj94\workspace\project\db\ssl\client-cert.pem',
-    'ssl_key': r'C:\Users\bsj94\workspace\project\db\ssl\client-key.pem'
-}
-
-config['database'] = 'rest'  # add "rest" database to config dict
-cnxn = mysql.connector.connect(**config)
-cursor = cnxn.cursor()
->>>>>>> 64493ff86e609ac4bbf9e9b77571d9d0fd3ede79
 ################
 
 
