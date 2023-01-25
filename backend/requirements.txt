@@ -1,5 +1,20 @@
-fastapi
-uvicorn
-torch
-mysql-connector
-pillow
+anyio==3.6.2 ; python_version >= "3.8" and python_version < "4.0"
+click==8.1.3 ; python_version >= "3.8" and python_version < "4.0"
+colorama==0.4.6 ; python_version >= "3.8" and python_version < "4.0" and platform_system == "Windows"
+fastapi==0.89.1 ; python_version >= "3.8" and python_version < "4.0"
+h11==0.14.0 ; python_version >= "3.8" and python_version < "4.0"
+idna==3.4 ; python_version >= "3.8" and python_version < "4.0"
+mysql-connector==2.2.9 ; python_version >= "3.8" and python_version < "4.0"
+nvidia-cublas-cu11==11.10.3.66 ; python_version >= "3.8" and python_version < "4.0" and platform_system == "Linux"
+nvidia-cuda-nvrtc-cu11==11.7.99 ; python_version >= "3.8" and python_version < "4.0" and platform_system == "Linux"
+nvidia-cuda-runtime-cu11==11.7.99 ; python_version >= "3.8" and python_version < "4.0" and platform_system == "Linux"
+nvidia-cudnn-cu11==8.5.0.96 ; python_version >= "3.8" and python_version < "4.0" and platform_system == "Linux"
+pillow==9.4.0 ; python_version >= "3.8" and python_version < "4.0"
+pydantic==1.10.4 ; python_version >= "3.8" and python_version < "4.0"
+setuptools==66.1.1 ; python_version >= "3.8" and python_version < "4.0" and platform_system == "Linux"
+sniffio==1.3.0 ; python_version >= "3.8" and python_version < "4.0"
+starlette==0.22.0 ; python_version >= "3.8" and python_version < "4.0"
+torch==1.13.1 ; python_version >= "3.8" and python_version < "4.0"
+typing-extensions==4.4.0 ; python_version >= "3.8" and python_version < "4.0"
+uvicorn==0.20.0 ; python_version >= "3.8" and python_version < "4.0"
+wheel==0.38.4 ; python_version >= "3.8" and python_version < "4.0" and platform_system == "Linux"
