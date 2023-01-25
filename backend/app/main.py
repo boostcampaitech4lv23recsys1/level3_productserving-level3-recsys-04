@@ -10,15 +10,10 @@ from fastapi.param_functions import Depends
 from PIL import Image
 import torch
 
-<<<<<<< HEAD
-
-import sqlite3
-=======
 import sqlite3
 
 from models.sasrec.inference import recommend
 
->>>>>>> cb055dd61fe18c9028332ee3640553ed9b60741a
 
 app = FastAPI()
 
