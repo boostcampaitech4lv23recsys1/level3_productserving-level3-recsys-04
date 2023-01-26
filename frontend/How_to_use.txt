@@ -3,6 +3,7 @@ https://nodejs.org/ko/
 
 2. yarn 설치
 npm install -g yarn
+npm install sweetalert2
 
 3. 시작
 
