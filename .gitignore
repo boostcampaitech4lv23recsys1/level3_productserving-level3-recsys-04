@@ -52,11 +52,15 @@ yarn-error.log*
 database/ssl
 
 # data
-model/data/*.csv
-model/data/user/
-crawings/area_csv/*
-crawings/user_csv/*
-
+area_csv
+user_csv
+G_train.csv
+G_test.csv
+backend/app/models/data/
 
 # model
 output/
+
+# poetry
+*.toml
+poetry*
