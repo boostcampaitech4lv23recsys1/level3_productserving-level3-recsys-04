@@ -180,7 +180,7 @@ export default function Album() {
                   />
                   <CardContent sx={{ flexGrow: 1 }}>
                     <Typography gutterBottom variant="h5" component="h2">
-                      이름 : {restaurants[card][idx[card]]["id"]}
+                      이름 : {restaurants[card][idx[card]]["name"]}
                     </Typography>
                     <Typography>
                       업종 : {restaurants[card][idx[card]]["tag"]}
