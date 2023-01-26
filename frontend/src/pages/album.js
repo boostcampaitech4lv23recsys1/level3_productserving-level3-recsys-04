@@ -49,6 +49,7 @@ export default function Album() {
   let [idx, setIdx] = React.useState(initialCounters);
  
   console.log(restaurants)
+<<<<<<< HEAD
   console.log(idx)
   console.log(idx[0])
   
@@ -64,6 +65,31 @@ export default function Album() {
     });
     setIdx(nextIdx);
   }
+=======
+
+  const album = (userData) => {
+    const requestOptions = {
+      method: "POST",
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "*",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(userData),
+    };
+    fetch('http://localhost:8001/album', requestOptions)
+      .then((response) => response.json())
+      .then((response) => {
+        // validate(response);
+        console.log(response)
+      })
+      .catch(error => alert(error.message));
+
+    
+
+  };
+
+>>>>>>> 4af44ffe877824d4b5823adbca214d41d4b1e86f
   const handleClick1 = (event) => {
       navigate('/signin');
     };
@@ -72,27 +98,27 @@ export default function Album() {
     // 일단 유저에서 열리게 
     var user = window.localStorage.getItem('link').substring(29,53)
     const card = event.target.id
-    const i = restaurants[card]['id']
+    const i = restaurants[card][idx[card]]["id"]
     const url = "https://m.place.naver.com/restaurant/"+i+"/review/visitor"
     window.open(url, "_blank", "noopener, noreferrer");
     // window.open(url, "_blank", "noopener, noreferrer");
+    album({
+      user_id: user,
+      rest_id: restaurants[card][idx[card]]["id"],
+      is_positive : true
+    });
   };
   
   const handleClick5 = (event) => {
     // 결과 리셋하는 코드 쓱쓱
+    var user = window.localStorage.getItem('link').substring(29,53)
     const card = event.target.id
-
-    if (card ==0) {
-      idx = [idx[0]+1,idx[1],idx[2]]
-    }
-    else if (card ==1) {
-      idx = [idx[0],idx[1]+1,idx[2]]
-    }
-    else if (card ==2) {
-      idx = [idx[0],idx[1],idx[2]+1]
-    }
-    console.log(idx)
-    console.log(card)
+    idx[card] = idx[card] +1
+    album({
+      user_id: user,
+      rest_id: restaurants[card][idx[card]]["id"],
+      is_positive : false
+    });
   };
   
   return (

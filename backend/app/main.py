@@ -44,6 +44,23 @@ def show_image(self):
     img.show()
 
 
+@app.post("/album")
+def album(data: AlbumRequest):
+    if data.is_positive == False:
+
+        return AlbumResponse(
+            user_id= data.user_id,
+            rest_id= data.rest_id,
+            is_positive = data.is_positive
+        )
+    else :
+        return AlbumResponse(
+            user_id= data.user_id,
+            rest_id= data.rest_id,
+            is_positive = data.is_positive
+        )
+
+
 @app.post("/signin")
 def signin(user: SignInRequest):
     select_sql = f"select * from user where user = '{user.name}'"

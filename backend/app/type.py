@@ -13,6 +13,10 @@ class SignInRequest(BaseModel):
     name: str
     location: str
 
+class AlbumRequest(BaseModel):
+    user_id: str
+    rest_id: str
+    is_positive : bool
 
 class GeneralRequest(BaseModel):
     qeury: str
@@ -38,6 +42,11 @@ class SignInResponse(BaseModel):
     restaurants2 : List[Restaurant]
     restaurants3 : List[Restaurant]
 
+class AlbumResponse(BaseModel):
+    user_id: str
+    rest_id: str
+    is_positive : bool
+    
 class User(BaseModel):
     name: str
     location: str
