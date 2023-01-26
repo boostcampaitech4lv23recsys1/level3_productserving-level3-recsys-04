@@ -49,23 +49,6 @@ export default function Album() {
   let [idx, setIdx] = React.useState(initialCounters);
  
   console.log(restaurants)
-<<<<<<< HEAD
-  console.log(idx)
-  console.log(idx[0])
-  
-  function handleIncrementClick(index) {
-    const nextIdx = idx.map((c, i) => {
-      if (i === index) {
-        // Increment the clicked counter
-        return c + 1;
-      } else {
-        // The rest haven't changed
-        return c;
-      }
-    });
-    setIdx(nextIdx);
-  }
-=======
 
   const album = (userData) => {
     const requestOptions = {
@@ -89,7 +72,6 @@ export default function Album() {
 
   };
 
->>>>>>> 4af44ffe877824d4b5823adbca214d41d4b1e86f
   const handleClick1 = (event) => {
       navigate('/signin');
     };
