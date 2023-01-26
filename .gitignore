@@ -54,9 +54,10 @@ database/ssl
 # data
 area_csv
 user_csv
-G_train.csv
-G_test.csv
 backend/app/models/data/
+model/data/user/*
+model/data/*.csv
+tem.ipynb
 
 # model
 output/
