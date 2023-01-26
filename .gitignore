@@ -18,6 +18,7 @@ crawling_user_review.ipynb
 crawling_rest_server.ipynb
 crawling_user_review_failed.ipynb
 crawling_user_review.py
+crawling_get_rest_info.ipynb
 crwaling_concat.ipynb
 csv_concat.ipynb
 notsaved.txt
@@ -52,9 +53,9 @@ database/ssl
 # data
 area_csv
 user_csv
-G_train.csv
-G_test.csv
 backend/app/models/data/
+model/data/user/*
+model/data/*.csv
 
 # model
 output/
