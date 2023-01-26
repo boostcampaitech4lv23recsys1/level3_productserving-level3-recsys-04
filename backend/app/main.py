@@ -46,19 +46,23 @@ def show_image(self):
 
 @app.post("/album")
 def album(data: AlbumRequest):
-    if data.is_positive == False:
-
-        return AlbumResponse(
-            user_id= data.user_id,
-            rest_id= data.rest_id,
-            is_positive = data.is_positive
+    if data.is_positive:
+        cursor.executemany(
+            "insert into positive values (?, ?)", [(data.user_id, data.rest_id)]
         )
-    else :
-        return AlbumResponse(
-            user_id= data.user_id,
-            rest_id= data.rest_id,
-            is_positive = data.is_positive
+        select_sql = "select * from positive"
+    else:
+        cursor.executemany(
+            "insert into negative values (?, ?)", [(data.user_id, data.rest_id)]
         )
+        select_sql = "select * from negative"
+    cnxn.commit()
+    cursor.execute(select_sql)
+    result = cursor.fetchall()
+    print(result)
+    return AlbumResponse(
+        user_id=data.user_id, rest_id=data.rest_id, is_positive=data.is_positive
+    )
 
 
 @app.post("/signin")
@@ -112,11 +116,11 @@ def signin(user: SignInRequest):
         cat3.append(restaurant_3)
 
     return SignInResponse(
-        state='start',
-        detail='not cold start',
-        restaurants1 = cat1,
-        restaurants2 = cat2,
-        restaurants3 = cat3
+        state="start",
+        detail="not cold start",
+        restaurants1=cat1,
+        restaurants2=cat2,
+        restaurants3=cat3,
     )
 
 
@@ -145,6 +149,7 @@ def ml_model(user_id):
 class Prediction(BaseModel):
     name: str = "predict_result"
     result: float
+
 
 # @app.get('/predict/{user_id}/{rest_id}', description="해당 유저의 정보를 모델에게 전달하고 예측 결과를 가져옵니다")
 # async def make_prediction(user_id: str, rest_id: str, model = trash_model()):
