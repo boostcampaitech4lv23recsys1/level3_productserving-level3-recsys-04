@@ -38,14 +38,14 @@ const theme = createTheme();
 
 export default function Album() {
   const navigate = useNavigate();
- 
-  const restaurants1 = JSON.parse(window.localStorage.getItem("restaurants1")); 
-  const restaurants2 = JSON.parse(window.localStorage.getItem("restaurants2")); 
-  const restaurants3 = JSON.parse(window.localStorage.getItem("restaurants3")); 
-  const restaurants = [restaurants1,restaurants2,restaurants3]
 
-  const idx = [0,0,0]
-  
+  const restaurants1 = JSON.parse(window.localStorage.getItem("restaurants1"));
+  const restaurants2 = JSON.parse(window.localStorage.getItem("restaurants2"));
+  const restaurants3 = JSON.parse(window.localStorage.getItem("restaurants3"));
+  const restaurants = [restaurants1, restaurants2, restaurants3]
+
+  const idx = [0, 0, 0]
+
   console.log(restaurants)
 
   const album = (userData) => {
@@ -66,41 +66,41 @@ export default function Album() {
       })
       .catch(error => alert(error.message));
 
-    
+
 
   };
 
   const handleClick1 = (event) => {
-      navigate('/signin');
-    };
+    navigate('/signin');
+  };
 
   const handleClick4 = (event) => {
     // 일단 유저에서 열리게 
-    var user = window.localStorage.getItem('link').substring(29,53)
+    var user = window.localStorage.getItem('link').substring(29, 53)
     const card = event.target.id
     const i = restaurants[card][idx[card]]["id"]
-    const url = "https://m.place.naver.com/restaurant/"+i+"/review/visitor"
+    const url = "https://m.place.naver.com/restaurant/" + i + "/review/visitor"
     window.open(url, "_blank", "noopener, noreferrer");
     // window.open(url, "_blank", "noopener, noreferrer");
     album({
       user_id: user,
       rest_id: restaurants[card][idx[card]]["id"],
-      is_positive : true
+      is_positive: true
     });
   };
-  
+
   const handleClick5 = (event) => {
     // 결과 리셋하는 코드 쓱쓱
-    var user = window.localStorage.getItem('link').substring(29,53)
+    var user = window.localStorage.getItem('link').substring(29, 53)
     const card = event.target.id
-    idx[card] = idx[card] +1
     album({
       user_id: user,
       rest_id: restaurants[card][idx[card]]["id"],
-      is_positive : false
+      is_positive: false
     });
+    idx[card] = idx[card] + 1
   };
-  
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -137,7 +137,7 @@ export default function Album() {
               color="text.secondary"
               paragraph
             >
-              {window.localStorage.getItem('link').substring(29,53)}님의 추천 목록
+              {window.localStorage.getItem('link').substring(29, 53)}님의 추천 목록
             </Typography>
             <Stack
               sx={{ pt: 4 }}
@@ -153,10 +153,10 @@ export default function Album() {
           </Container>
         </Box>
         <Container sx={{ py: 8 }} maxWidth="md">
-        {/* End hero unit */}
+          {/* End hero unit */}
 
           <Grid container spacing={4}>
-          {/* cards의 card 가 하나씩 들어가는 반복문 */}
+            {/* cards의 card 가 하나씩 들어가는 반복문 */}
             {cards.map((card) => (
               <Grid item key={card} xs={12} sm={6} md={4}>
                 <Card
@@ -185,8 +185,8 @@ export default function Album() {
                     </Typography>
                   </CardContent>
                   <CardActions>
-                    <Button id = {card} type="submit" size="small" onClick= {handleClick4}>식당 링크 열기</Button>
-                    <Button id = {card} type="submit" size="small" onClick= {handleClick5}>다른 결과 보기</Button>
+                    <Button id={card} type="submit" size="small" onClick={handleClick4}>식당 링크 열기</Button>
+                    <Button id={card} type="submit" size="small" onClick={handleClick5}>다른 결과 보기</Button>
                   </CardActions>
                 </Card>
               </Grid>
