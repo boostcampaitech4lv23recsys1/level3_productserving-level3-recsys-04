@@ -87,33 +87,24 @@ def signin(user: SignInRequest):
     cat2 = []
     cat3 = []
     for i, rest_id in enumerate(top_k):
+        select_sql = f"select url, x, y, image, tag, restaurant from rest where rest_code = {rest_id}.0"  # where rating = 4.42"
+        cursor.execute(select_sql)
+        url, x, y, image, tag, restaurant = cursor.fetchall()[0]
+
         restaurant_1 = Restaurant(
-            id=i,
-            x=_x,
-            y=_y,
-            tag="restaurant-tag",
-            name=str(rest_id),
-            img_url="imgurl",
+            id=url,
+            x=x,
+            y=y,
+            tag=tag,
+            name=restaurant,
+            img_url=image,
         )
-        restaurant_2 = Restaurant(
-            id=i + 10,
-            x=_x,
-            y=_y,
-            tag="restaurant-tag",
-            name="restaurant-name",
-            img_url="imgurl",
-        )
-        restaurant_3 = Restaurant(
-            id=i + 20,
-            x=_x,
-            y=_y,
-            tag="restaurant-tag",
-            name="restaurant-name",
-            img_url="imgurl",
-        )
-        cat1.append(restaurant_1)
-        cat2.append(restaurant_2)
-        cat3.append(restaurant_3)
+        if i % 3 == 0:
+            cat1.append(restaurant_1)
+        elif i % 3 == 1:
+            cat2.append(restaurant_1)
+        else:
+            cat3.append(restaurant_1)
 
     return SignInResponse(
         state="start",
