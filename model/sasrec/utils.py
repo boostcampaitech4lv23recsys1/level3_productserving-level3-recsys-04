@@ -117,8 +117,8 @@ def get_user_seqs(train, test):
 
     # lines : 유저인덱스/아이템리스트 형식의 판다스가 나옵니다.
     # ex) 11 [4643, 170, 531, 616, 2140, 2722, 2313, 2688, ...]
-    train_lines = train.groupby("user")["item"].apply(list)
-    test_lines = test.groupby("user")["item"].apply(list)
+    train_lines = train.groupby("user_code")["rest_code"].apply(list)
+    test_lines = test.groupby("user_code")["rest_code"].apply(list) 
 
     # user_seq : 유저마다 따로 아이템 리스트 저장. 2차원 배열.
     # ex) [[1번 유저 item_id 리스트], [2번 유저 item_id 리스트] .. ]
