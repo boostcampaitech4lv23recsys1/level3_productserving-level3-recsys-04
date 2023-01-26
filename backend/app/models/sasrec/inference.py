@@ -85,7 +85,7 @@ def recommend(user_seq: list):
     model = S3RecModel(args=args)
     model = model.to(args.device)
     # 트레이너에 load 함수 사용해 모델 불러옵니다.
-    model.load_state_dict(torch.load(args.data_dir + 'SASRec-0124.pt'))
+    model.load_state_dict(torch.load(args.data_dir + 'SASRec-0124.pt', map_location=torch.device(args.device)))
 
     pred = trainers(args, user_seq, model)
     return pred
