@@ -58,6 +58,7 @@ user_csv
 backend/app/models/data/
 model/data/user/*
 model/data/*.csv
+tem.ipynb
 
 # model
 output/
