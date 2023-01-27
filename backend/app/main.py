@@ -44,7 +44,7 @@ def show_image(self):
     img.show()
 
 
-@app.post("/album")
+@app.post("/api/album")
 def album(data: AlbumRequest):
     if data.is_positive:
         cursor.executemany(
@@ -65,7 +65,7 @@ def album(data: AlbumRequest):
     )
 
 
-@app.post("/signin")
+@app.post("/api/signin")
 def signin(user: SignInRequest):
     select_sql = f"select * from user where user = '{user.name}'"
     cursor.execute(select_sql)

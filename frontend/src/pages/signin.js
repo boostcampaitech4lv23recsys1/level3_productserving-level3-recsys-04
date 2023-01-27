@@ -76,7 +76,7 @@ export default function SignIn() {
       },
       body: JSON.stringify(userData),
     };
-    fetch('http://localhost:8001/signin', requestOptions)
+    fetch('/api/signin', requestOptions)
       .then((response) => response.json())
       .then((response) => {
         validate(response);
