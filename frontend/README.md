@@ -16,7 +16,6 @@ npm install sweetalert2
 
 ## 배포 환경 (Prod)
 
-Working Directory = "frontend/"
+Working Directory = "/home/ubuntu/code/frontend$"
 
-1. `docker build -t nodejs .`
-2. `docker run -dit -p 3000:3000 --name frontend nodejs`
+1. `docker-compose up -d`
