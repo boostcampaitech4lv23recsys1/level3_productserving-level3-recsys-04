@@ -7,11 +7,10 @@ from utils import neg_sample
 
 
 class SASRecTrainDataset(Dataset):
-    def __init__(self, args, user_seq, test_user_seq):
+    def __init__(self, args, user_seq):
         # user_seq : 유저마다 따로 아이템 리스트 저장. 2차원 배열, => [[1번 유저 item_id 리스트], [2번 유저 item_id 리스트] .. ]
         self.args = args
         self.user_seq = user_seq
-        self.test_user_seq = test_user_seq
         self.max_len = args.max_seq_length
         self.part_sequence = []
 
@@ -55,14 +54,14 @@ class SASRecTrainDataset(Dataset):
         assert len(target_neg) == self.max_len
         
         user_id = index
-        answer = self.test_user_seq[index] # test
+        #answer = self.test_user_seq[index] # test
         # to tensor
         cur_tensors = (
             torch.tensor(user_id, dtype=torch.long),  # user_id for testing
             torch.tensor(input_ids, dtype=torch.long),
             torch.tensor(target_pos, dtype=torch.long), # input_ids 대비 하나씩 밀림.
             torch.tensor(target_neg, dtype=torch.long), # input_ids 길이만큼 네거티브 샘플링.
-            torch.tensor(answer, dtype=torch.long)
+            #torch.tensor(answer, dtype=torch.long)
         )
 
         return cur_tensors

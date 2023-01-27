@@ -58,7 +58,7 @@ def iteration(args, epoch, dataloader, model):
         # 0. batch_data will be sent into the device(GPU or CPU) 
         # args.gpu_id args.cuda_condition
         batch = tuple(t.to(args.device) for t in batch)
-        _, input_ids, target_pos, target_neg, _ = batch
+        _, input_ids, target_pos, target_neg = batch
         # Binary cross_entropy
         sequence_output = model.finetune(input_ids)
         loss = cross_entropy(sequence_output, target_pos, target_neg, model)
@@ -79,7 +79,7 @@ def iteration(args, epoch, dataloader, model):
         print(str(post_fix))
 
 
-def test_score(args, epoch, dataloader, model):
+def test_score(args, epoch, dataloader, model, test_lines):
     # tqdm을 통해 iter를 만듭니다.
     # 핵심은 enumerate(dataloader) 이 것만 기억하셔도 문제 없습니다.
     # 나머지 코드는 tqdm 출력을 이쁘게 도와주는 도구입니다.
@@ -109,7 +109,7 @@ def test_score(args, epoch, dataloader, model):
     for i, batch in rec_data_iter:
 
         batch = tuple(t.to(args.device) for t in batch)
-        user_ids, input_ids, _, target_neg, answers = batch
+        user_ids, input_ids, _, target_neg = batch
         recommend_output = model.finetune(input_ids)  # [B, L, H]
 
         recommend_output = recommend_output[:, -1, :]  # [B, H]
@@ -127,23 +127,19 @@ def test_score(args, epoch, dataloader, model):
 
         # TOP 3 index 추출
         ind = np.argpartition(rating_pred, -3)[:, -3:]
-
         # pred_list : 예측 음식점 3개, (user 개수 * 3) 
         # answer_list : 정답(test) 음식점들, (user 개수 * n(유저의 test 개수마다 바뀜))
         if i == 0:
             pred_list = ind
-            answer_list = answers.cpu().data.numpy()
         else:
             pred_list = np.append(pred_list, ind, axis=0)
-            answer_list = np.append(
-                answer_list, answers.cpu().data.numpy(), axis=0
-            )
+
 
     # _recall : 유저마다 recall 개산하는 리스트.
     _recall = []
 
-    for _list in zip(answer_list, pred_list):
-        _recall.append(recallk(_list))
+    for answer, pred in zip(test_lines, pred_list):
+        _recall.append(recallk(answer,pred))
 
     # 모든 유저의 recall 평균 값 반환
     return sum(_recall) / len(_recall)
