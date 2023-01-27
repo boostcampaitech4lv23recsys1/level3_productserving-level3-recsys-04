@@ -60,8 +60,7 @@ export default function Album() {
       },
       body: JSON.stringify(userData),
     };
-    fetch('http://118.67.132.25:30001/album', requestOptions)
-    // fetch('http://localhost:8001/album', requestOptions)
+    fetch('/api/album', requestOptions)
       .then((response) => response.json())
       .then((response) => {
         // validate(response);
