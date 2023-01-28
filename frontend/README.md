@@ -18,4 +18,4 @@ npm install sweetalert2
 
 Working Directory = "/home/ubuntu/code/frontend$"
 
-1. `docker-compose up -d`
+1. `docker compose up -d`

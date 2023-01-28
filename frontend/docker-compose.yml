@@ -10,7 +10,7 @@ services:
     #   dockerfile: Dockerfile
     restart: always
     volumes:
-      - ./frontend:/usr/src/app
+      - .:/usr/src/app
     ports:
       - "3000:3000"
     container_name: frontend
