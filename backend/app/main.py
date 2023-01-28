@@ -67,18 +67,30 @@ def album(data: AlbumRequest):
 
 @app.post("/api/signin")
 def signin(user: SignInRequest):
+    """
+    user의 코드로 해당 user_list 받기
+    """
     select_sql = f"select * from user where user = '{user.name}'"
     cursor.execute(select_sql)
-    result = cursor.fetchall()
-
-    top_k = recommend(result[0][1])
-    print(top_k)
+    user_list = cursor.fetchall()
 
     """
     user.location으로 쿼리 날려서 좌표 가져오는 코드
     """
-    _x = 134
-    _y = 156
+    # 향후 user.location으로 x,y 받아야함.
+    _x = 314359 
+    _y = 547462
+
+    _inter = 5000 # 허용 가능한 거리, 임시방편.
+
+    _input = (_x - _inter, _x + _inter, _y - _inter, _y + _inter)
+    select_sql = "select rest_code from rest where ((x > ?) AND (x < ?) AND (y > ?) AND (y < ?))"
+    cursor.execute(select_sql, _input)
+    results = cursor.fetchall()
+    rest_codes = [rest_code[0] for rest_code in results]
+
+    top_k = recommend(user_list[0][1], rest_codes)
+    print(top_k)
 
     """
     모델 추천 결과 가져오는 코드
