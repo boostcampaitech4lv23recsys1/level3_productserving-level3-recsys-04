@@ -29,7 +29,7 @@ app.add_middleware(
 
 
 ################ DB 설정 ################
-cnxn = sqlite3.connect("a.db", check_same_thread=False)
+cnxn = sqlite3.connect("reccar.db", check_same_thread=False)
 cursor = cnxn.cursor()
 ################ DB 설정 ################
 
@@ -71,6 +71,7 @@ def signin(user: SignInRequest):
     user의 코드로 해당 user_list 받기
     """
     select_sql = f"select * from user where user = '{user.name}'"
+    #print(user.name)
     cursor.execute(select_sql)
 
     # user_list : [(user_code, rest_code, user)]
@@ -101,7 +102,7 @@ def signin(user: SignInRequest):
     cat2 = []
     cat3 = []
     for i, rest_id in enumerate(top_k):
-        select_sql = f"select url, x, y, image, tag, restaurant from rest where rest_code = {rest_id}.0"  # where rating = 4.42"
+        select_sql = f"select url, x, y, image, tag, name from rest where rest_code = {rest_id}.0"  # where rating = 4.42"
         cursor.execute(select_sql)
         url, x, y, image, tag, restaurant = cursor.fetchall()[0]
 
