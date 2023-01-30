@@ -14,6 +14,7 @@ import sqlite3
 
 from models.sasrec.inference import recommend
 
+import urllib.request
 
 app = FastAPI()
 
@@ -79,20 +80,9 @@ def signin(user: SignInRequest):
     """
     user.location으로 쿼리 날려서 좌표 가져오는 코드
     """
-    # 향후 user.location으로 x,y 받아야함.
-    _x = 314359 
-    _y = 547462
-
-    _inter = 5000 # 허용 가능한 거리, 임시방편.
-
-    _input = (_x - _inter, _x + _inter, _y - _inter, _y + _inter)
-    select_sql = "select rest_code from rest where ((x > ?) AND (x < ?) AND (y > ?) AND (y < ?))"
-    cursor.execute(select_sql, _input)
-    results = cursor.fetchall()
-    rest_codes = [rest_code[0] for rest_code in results]
-
-    top_k = recommend(user_list[0][1], rest_codes)
-    print(top_k)
+    _x,_y = get_xy(user.location)
+    #_x = 134
+    #_y = 156
 
     """
     모델 추천 결과 가져오는 코드
@@ -128,6 +118,25 @@ def signin(user: SignInRequest):
         restaurants3=cat3,
     )
 
+def get_xy(location: str):
+    client_id = "789Xk04GARJpb4omVvUq" # 개발자센터에서 발급받은 Client ID 값
+    client_secret = "oynUXBN1cW" # 개발자센터에서 발급받은 Client Secret 값
+    encText = urllib.parse.quote(location)
+    url = "https://openapi.naver.com/v1/search/local?query=" + encText # JSON 결과
+    request = urllib.request.Request(url)
+    request.add_header("X-Naver-Client-Id",client_id)
+    request.add_header("X-Naver-Client-Secret",client_secret)
+    response = urllib.request.urlopen(request)
+    rescode = response.getcode()
+    if(rescode==200):
+        response_body = response.read()
+        #print(response_body.decode('utf-8'))
+        x =  response_body.decode('utf-8').split("\"")[-6]
+        y =  response_body.decode('utf-8').split("\"")[-2]
+        return x,y
+    else:
+        #print("Error Code:" + rescode)
+        return 0,0
 
 # 특정 식당 정보 가져오는 API
 def get_restaurant(rest_id: str):
