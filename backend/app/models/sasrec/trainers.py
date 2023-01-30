@@ -49,8 +49,10 @@ def trainers(args, _input, model, item_candidate):
     rating_pred = rating_pred.cpu().data.numpy()
 
     # TOP 3 index 추출
+    
     ind = np.argpartition(rating_pred, -3)[-3:]
-
+    item_candidate = np.array(item_candidate)
+    #breakpoint()
     return item_candidate[ind] # index로 rest_code로 변환해주기.
 
     

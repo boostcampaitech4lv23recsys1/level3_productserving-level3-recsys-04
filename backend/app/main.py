@@ -72,6 +72,8 @@ def signin(user: SignInRequest):
     """
     select_sql = f"select * from user where user = '{user.name}'"
     cursor.execute(select_sql)
+
+    # user_list : [(user_code, rest_code, user)]
     user_list = cursor.fetchall()
 
     """
