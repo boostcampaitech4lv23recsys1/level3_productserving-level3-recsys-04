@@ -11,12 +11,21 @@ from .utils import set_seed
 from .trainers import trainers
 
 
-def recommend(user_seq: list, item_candidate = [1,5,10]):
+def recommend(user_seq: list, item_candidate : list, max_item = 41460):
+    """
+    Args:
+        user_seq (str(list)): 해당 유저가 방문한 rest_code 리스트. str 로 묶여서 옴.
+        item_candidate (list): 아이템 후보(x,y 또는 속성으로 걸러진) rest_code 리스트.
+        max_item (int, optional): 음식점 개수, Defaults to 41460.
+
+    Returns:
+        pred (list) : Top 3 rest_code list
+    """    
     parser = argparse.ArgumentParser()
 
     # 데이터 경로와 네이밍 부분.
-    parser.add_argument("--data_dir", default="./models/data/", type=str)
-    parser.add_argument("--model_name", default="SASRec-0124", type=str)
+    parser.add_argument("--data_dir", default="app/models/data/", type=str) # ./models/data/
+    parser.add_argument("--model_name", default="SASRec-0129", type=str)
     # parser.add_argument("--data_name", default="Ml", type=str)
     # parser.add_argument("--do_eval", action="store_true")
 
@@ -77,8 +86,8 @@ def recommend(user_seq: list, item_candidate = [1,5,10]):
     user_seq = eval(user_seq)
 
     ################# item max 값 받아오는 부분 나중에 처리 필요 (일단 임시로 csv 파일로 처리)
-    rest_info = pd.read_csv(args.data_dir + "rest2.csv")
-    max_item = int(max(rest_info['rest_code']))
+    #rest_info = pd.read_csv(args.data_dir + "rest2.csv")
+    #max_item = int(max(rest_info['rest_code']))
     args.item_size = max_item + 2
     args.mask_id = max_item + 1
     ################################################################

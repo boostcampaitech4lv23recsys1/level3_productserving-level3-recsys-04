@@ -148,19 +148,13 @@ def main():
 
     for epoch in range(args.epochs):
         iteration(args, epoch, train_dataloader, model)
-<<<<<<< HEAD
+
         if epoch == 9:
             scores = test_score(args, epoch, test_dataloader, model, test_lines)
             print("recall_k = ", scores)
-=======
-        #if epoch % 3 == 2:
-        scores = test_score(args, epoch, test_dataloader, model, test_lines)
-        print("recall_k = ", scores)
->>>>>>> 9d3faf09064e2b0b683d659cd2d61a97b11fdbc4
 
     torch.save(model.state_dict(), args.checkpoint_path)
     
-
 
 if __name__ == "__main__":
     main()

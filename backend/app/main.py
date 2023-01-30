@@ -79,13 +79,21 @@ def signin(user: SignInRequest):
     user_list = cursor.fetchall()
 
     """
+    전체 아이템의 크기 구하기.
+    """
+    select_sql = f"select max(rest_code) from rest"
+    cursor.execute(select_sql)
+    max_item = cursor.fetchall() # [(41460,)]
+    
+    """
     user.location으로 쿼리 날려서 좌표 가져오는 코드
     """
     # 향후 user.location으로 x,y 받아야함.
-    _x = 314359 
-    _y = 547462
+    _x,_y = get_xy(user.location)
+    # _x = 314359 
+    # _y = 547462
 
-    _inter = 5000 # 허용 가능한 거리, 임시방편.
+    _inter = 1000 # 허용 가능한 거리, 임시방편.
 
     _input = (_x - _inter, _x + _inter, _y - _inter, _y + _inter)
     select_sql = "select rest_code from rest where ((x > ?) AND (x < ?) AND (y > ?) AND (y < ?))"
@@ -93,7 +101,7 @@ def signin(user: SignInRequest):
     results = cursor.fetchall()
     rest_codes = [rest_code[0] for rest_code in results]
 
-    top_k = recommend(user_list[0][1], rest_codes)
+    top_k = recommend(user_list[0][1], rest_codes, max_item[0][0])
     print(top_k)
     # _x,_y = get_xy(user.location)
     #_x = 134
@@ -148,7 +156,7 @@ def get_xy(location: str):
         #print(response_body.decode('utf-8'))
         x =  response_body.decode('utf-8').split("\"")[-6]
         y =  response_body.decode('utf-8').split("\"")[-2]
-        return x,y
+        return int(x),int(y)
     else:
         #print("Error Code:" + rescode)
         return 0,0
