@@ -57,6 +57,7 @@ area_csv
 user_csv
 backend/app/models/data/
 model/data/user/*
+model/data/rest/*
 model/data/*.csv
 tem.ipynb
 tem.py

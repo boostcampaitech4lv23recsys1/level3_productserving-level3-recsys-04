@@ -23,7 +23,7 @@ def main():
     # 데이터 경로와 네이밍 부분.
     parser.add_argument("--data_dir", default="../data/", type=str)
     parser.add_argument("--output_dir", default="output/", type=str)
-    parser.add_argument("--data_name", default="0124", type=str)
+    parser.add_argument("--data_name", default="0129", type=str)
     parser.add_argument("--model_name", default="SASRec", type=str)
 
 
@@ -148,9 +148,9 @@ def main():
 
     for epoch in range(args.epochs):
         iteration(args, epoch, train_dataloader, model)
-        #if epoch % 3 == 2:
-        scores = test_score(args, epoch, test_dataloader, model, test_lines)
-        print("recall_k = ", scores)
+        if epoch == 9:
+            scores = test_score(args, epoch, test_dataloader, model, test_lines)
+            print("recall_k = ", scores)
 
     torch.save(model.state_dict(), args.checkpoint_path)
     
