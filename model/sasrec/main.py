@@ -24,7 +24,7 @@ def main():
     parser.add_argument("--data_dir", default="../data/", type=str)
     parser.add_argument("--output_dir", default="output/", type=str)
     parser.add_argument("--data_name", default="0130", type=str)
-    parser.add_argument("--model_name", default="SASRec", type=str)
+    parser.add_argument("--model_name", default="SASRec_time", type=str)
 
 
     # 모델 argument(하이퍼 파라미터)
@@ -95,8 +95,8 @@ def main():
     # 데이터 파일 불러오는 경로 설정합니다.
     path = '../data/'
 
-    train = pd.read_csv(path + 'train.csv')    
-    test = pd.read_csv(path + 'test.csv')
+    train = pd.read_csv(path + 'train_time.csv')    
+    test = pd.read_csv(path + 'test_time.csv')
    
     
     # 자세한건 get_user_seqs 함수(utils.py) 내에 써놨습니다.

@@ -14,8 +14,8 @@ class SignInRequest(BaseModel):
     location: str
 
 class AlbumRequest(BaseModel):
-    user_id: str
-    rest_id: str
+    user_id: str # user
+    rest_id: str # url
     is_positive : bool
 
 class GeneralRequest(BaseModel):
