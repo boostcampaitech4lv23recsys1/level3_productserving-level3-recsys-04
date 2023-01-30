@@ -78,6 +78,13 @@ def signin(user: SignInRequest):
     user_list = cursor.fetchall()
 
     """
+    전체 아이템의 크기 구하기.
+    """
+    select_sql = f"select max(rest_code) from rest"
+    cursor.execute(select_sql)
+    max_item = cursor.fetchall() # [(41460,)]
+    
+    """
     user.location으로 쿼리 날려서 좌표 가져오는 코드
     """
     # 향후 user.location으로 x,y 받아야함.
@@ -92,7 +99,7 @@ def signin(user: SignInRequest):
     results = cursor.fetchall()
     rest_codes = [rest_code[0] for rest_code in results]
 
-    top_k = recommend(user_list[0][1], rest_codes)
+    top_k = recommend(user_list[0][1], rest_codes, max_item[0][0])
     print(top_k)
 
     """
