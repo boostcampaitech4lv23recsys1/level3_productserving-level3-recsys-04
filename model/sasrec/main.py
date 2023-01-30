@@ -9,7 +9,6 @@ from models import S3RecModel
 from utils import (
     check_path,
     get_user_seqs,
-    get_test_list,
     set_seed,
 )
 from trainers import (
@@ -25,14 +24,12 @@ def main():
     parser.add_argument("--data_dir", default="../data/", type=str)
     parser.add_argument("--output_dir", default="output/", type=str)
     parser.add_argument("--data_name", default="0124", type=str)
+    parser.add_argument("--model_name", default="SASRec", type=str)
+
 
     # 모델 argument(하이퍼 파라미터)
-    parser.add_argument("--model_name", default="SASRec", type=str)
     parser.add_argument(
         "--hidden_size", type=int, default=256, help="hidden size of transformer model"
-    )
-    parser.add_argument(
-        "--num_k", type=int, default=3, help="data argument k"
     )
     parser.add_argument(
         "--num_hidden_layers", type=int, default=2, help="number of layers"
@@ -51,7 +48,7 @@ def main():
     parser.add_argument(
         "--hidden_dropout_prob", type=float, default=0.3, help="hidden dropout p"
     )
-    # 모델 파라미터 initializer 범위 설정? (모델 본 사람이 채워줘.)
+    # 모델 파라미터 initializer 범위 설정
     parser.add_argument("--initializer_range", type=float, default=0.02)
     # 최대 시퀀셜 길이 설정
     parser.add_argument("--max_seq_length", default=100, type=int)
@@ -98,12 +95,12 @@ def main():
     # 데이터 파일 불러오는 경로 설정합니다.
     path = '../data/'
 
-    train = pd.read_csv(path + 'G_train2.csv')    
-    test = pd.read_csv(path + 'G_test2.csv')
+    train = pd.read_csv(path + 'train.csv')    
+    test = pd.read_csv(path + 'test.csv')
    
     
     # 자세한건 get_user_seqs 함수(utils.py) 내에 써놨습니다.
-    user_seq, test_user_seq, max_item, train_matrix = get_user_seqs(
+    user_seq, test_lines, max_item, train_matrix = get_user_seqs(
         train, test
     )
 
@@ -130,7 +127,7 @@ def main():
     # SASRecDataset 클래스를 불러옵니다. (datasets.py 내 존재)
     # user_seq : 유저마다 따로 아이템 리스트 저장. 2차원 배열, => [[1번 유저 item_id 리스트], [2번 유저 item_id 리스트] .. ]
     # output : user_id(유저번호), input_ids(item), target_pos(item), target_neg(item), answer(test_item)
-    train_dataset = SASRecTrainDataset(args, user_seq, test_user_seq)
+    train_dataset = SASRecTrainDataset(args, user_seq)
 
     # RandomSampler : 데이터 셋을 랜덤하게 섞어줍니다. 인덱스를 반환해줍니다.
     train_sampler = RandomSampler(train_dataset)
@@ -138,6 +135,10 @@ def main():
     # 모델 학습을 하기 위한 데이터 로더를 만듭니다. 랜덤으로 섞고 배치 단위(defalut : 256)로 출력합니다.
     train_dataloader = DataLoader(
         train_dataset, sampler=train_sampler, batch_size=args.batch_size
+    )
+
+    test_dataloader = DataLoader(
+        train_dataset, shuffle=False, batch_size=args.batch_size
     )
 
     # S3RecModel 모델을 불러옵니다. (models.py 내 존재)
@@ -148,7 +149,7 @@ def main():
     for epoch in range(args.epochs):
         iteration(args, epoch, train_dataloader, model)
         #if epoch % 3 == 2:
-        scores = test_score(args, epoch, train_dataloader, model)
+        scores = test_score(args, epoch, test_dataloader, model, test_lines)
         print("recall_k = ", scores)
 
     torch.save(model.state_dict(), args.checkpoint_path)

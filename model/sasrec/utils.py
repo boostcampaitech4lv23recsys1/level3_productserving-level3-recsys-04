@@ -84,20 +84,6 @@ def generate_rating_matrix_submission(user_seq, num_users, num_items):
     return rating_matrix
 
 
-def generate_submission_file(data_file, preds):
-
-    rating_df = pd.read_csv(data_file)
-    users = rating_df["user"].unique()
-
-    result = []
-
-    for index, items in enumerate(preds):
-        for item in items:
-            result.append((users[index], item))
-
-    pd.DataFrame(result, columns=["user", "item"]).to_csv(
-        "output/submission.csv", index=False
-    )
 
 
 def get_user_seqs(train, test):
@@ -118,12 +104,11 @@ def get_user_seqs(train, test):
     # lines : 유저인덱스/아이템리스트 형식의 판다스가 나옵니다.
     # ex) 11 [4643, 170, 531, 616, 2140, 2722, 2313, 2688, ...]
     train_lines = train.groupby("user_code")["rest_code"].apply(list)
-    test_lines = test.groupby("user_code")["rest_code"].apply(list) 
+    test_lines = test.groupby("user_code")["rest_code"].apply(list).reset_index(drop=True) 
 
     # user_seq : 유저마다 따로 아이템 리스트 저장. 2차원 배열.
     # ex) [[1번 유저 item_id 리스트], [2번 유저 item_id 리스트] .. ]
     user_seq = []
-    test_user_seq = []
     
     item_set = set()
 
@@ -131,10 +116,6 @@ def get_user_seqs(train, test):
         items = line
         user_seq.append(items) # append : 리스트를 하나의 원소로 보고 append함
         item_set = item_set | set(items) # | : 합집합 연산자
-
-    for line in test_lines: # line : 한 유저의 아이템 리스트
-        items = line
-        test_user_seq.append(items) # append : 리스트를 하나의 원소로 보고 append함
 
     # 기록된 가장 큰 아이템 id(번호)
     max_item = max(item_set)
@@ -150,34 +131,10 @@ def get_user_seqs(train, test):
     )
     return (
         user_seq,
-        test_user_seq,
+        test_lines,
         max_item,
         train_matrix,
     )
-
-
-def get_test_list(test):
-    """
-    Args:
-    test_csv : 
-    user, item
-    0, 0
-    0, 1
-    1, 3
-    1, 4
-    ...
-    
-    Returns:
-    user, item
-    0, [0, 1]
-    1, [3, 4, ..]
-    ...
-    """    
-
-    # test id, 해당 유저가 방문한 rest item 정보를 담는 것 제작
-    test = test.groupby('user')['item'].unique().to_frame().reset_index()
-
-    return test
 
 
 
@@ -228,7 +185,7 @@ def get_metric(pred_list, topk=10):
 
 
 
-def recallk(_list, k = 3):
+def recallk(actual, predicted, k = 3):
     """ label과 prediction 사이의 recall 평가 함수 
     Args:
         actual : 실제로 본 상품 리스트
@@ -237,8 +194,8 @@ def recallk(_list, k = 3):
     Returns: 
         recall_k : recall@k 
     """ 
-    actual = _list[0]
-    predicted = _list[1]
+    #actual = _list[0]
+    #predicted = _list[1]
     set_actual = set(actual)
     recall_k = len(set_actual & set(predicted[:k])) / min(k, len(set_actual))
     return recall_k
