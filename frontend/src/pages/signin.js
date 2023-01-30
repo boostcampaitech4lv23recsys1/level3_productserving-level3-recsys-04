@@ -202,10 +202,10 @@ export default function SignIn() {
               }}
             />
 
-            <FormControlLabel
+            {/* <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}
               label="Remember me"
-            />
+            /> */}
             <div>
               <Button
                 // type="submit"

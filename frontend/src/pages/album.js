@@ -81,7 +81,7 @@ export default function Album() {
     var user = window.localStorage.getItem('link').substring(29, 53)
     const card = event.target.id
     const i = restaurants[card][idx[card]]["id"]
-    const url = "https://m.place.naver.com/restaurant/" + i + "/review/visitor"
+    const url = "https://m.place.naver.com/restaurant/" + i + "/home"
     window.open(url, "_blank", "noopener, noreferrer");
     // window.open(url, "_blank", "noopener, noreferrer");
     album({
@@ -171,19 +171,19 @@ export default function Album() {
 
                   <CardMedia
                     component="img"
-                    sx={{
+                    md={{
                       // 16:9
-                      pt: '56.25%',
+                      pt: '100%',
                     }}
                     image={restaurants[card][idx[card]]["img_url"]}
                     alt="random"
                   />
                   <CardContent sx={{ flexGrow: 1 }}>
                     <Typography gutterBottom variant="h5" component="h2">
-                      이름 : {restaurants[card][idx[card]]["name"]}
+                      {restaurants[card][idx[card]]["name"]}
                     </Typography>
                     <Typography>
-                      업종 : {restaurants[card][idx[card]]["tag"]}
+                      {restaurants[card][idx[card]]["tag"]}
                     </Typography>
                   </CardContent>
                   <CardActions>
