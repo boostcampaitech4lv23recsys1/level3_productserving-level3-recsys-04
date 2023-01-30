@@ -11,12 +11,12 @@ from .utils import set_seed
 from .trainers import trainers
 
 
-def recommend(user_seq: list):
+def recommend(user_seq: list, item_candidate = [1,5,10]):
     parser = argparse.ArgumentParser()
 
     # 데이터 경로와 네이밍 부분.
     parser.add_argument("--data_dir", default="app/models/data/", type=str)
-    # parser.add_argument("--output_dir", default="output/", type=str)
+    parser.add_argument("--model_name", default="SASRec-0124", type=str)
     # parser.add_argument("--data_name", default="Ml", type=str)
     # parser.add_argument("--do_eval", action="store_true")
 
@@ -85,7 +85,7 @@ def recommend(user_seq: list):
     model = S3RecModel(args=args)
     model = model.to(args.device)
     # 트레이너에 load 함수 사용해 모델 불러옵니다.
-    model.load_state_dict(torch.load(args.data_dir + 'SASRec-0124.pt', map_location=torch.device(args.device)))
+    model.load_state_dict(torch.load(args.data_dir + args.model_name + '.pt', map_location=torch.device(args.device)))
 
-    pred = trainers(args, user_seq, model)
+    pred = trainers(args, user_seq, model, item_candidate)
     return pred

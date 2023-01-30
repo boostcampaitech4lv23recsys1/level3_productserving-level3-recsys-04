@@ -3,75 +3,34 @@ import torch
 from tqdm import tqdm
 
 
-def test_score(args, epoch, dataloader, model):
-    # tqdm을 통해 iter를 만듭니다.
-    # 핵심은 enumerate(dataloader) 이 것만 기억하셔도 문제 없습니다.
-    # 나머지 코드는 tqdm 출력을 이쁘게 도와주는 도구입니다.
-    rec_data_iter = tqdm(
-        enumerate(dataloader),
-        desc="Recommendation EP:%d" % (epoch),
-        total=len(dataloader),
-        bar_format="{l_bar}{r_bar}",
-    )
+def trainers(args, _input, model, item_candidate):
+    """_summary_
+    Args:
+        args (_type_): 설정들
+        _input (_type_): 사용자가 방문한 음식점 기록 리스트(rest_code 형태).
+        model (Pytorch model): 모델
+        item_candidate (list): x,y / tag 등으로 걸러진 후보 음식점 리스트.
+    Returns:
+        ind (list): 추천 음식점 리스트(rest_code 형태)
+    """    
+    def predict_full(seq_out, mode, item_candidate):
+        """_summary_
+        Args:
+            seq_out ([1, hidden_size]): 추천 결과물
+            model : model 파일
+            item_candidate(list) : 후보군 리스트 
+        Returns:
+            rating_pred ([1, item_candidate_num]): 유저들(batch)에 대한 모든 아이템 score
+        """        
+        # [item_candidate_num, hidden_size]
+        test_item_emb = model.item_embeddings.weight[item_candidate,:]
+        # [1, hidden_size] * [hidden_size, item_candidate_num] = [1, item_candidate_num]
+        rating_pred = torch.matmul(seq_out, test_item_emb.transpose(0, 1))
+        return rating_pred # [1, item_candidate_num]
 
     model.eval()
 
-    def predict_full(seq_out, model):
-        """_summary_
-        Args:
-            seq_out ([batch, hidden_size]): 추천 결과물
-            model : model 파일
-        Returns:
-            rating_pred ([batch, item_num(2872)]): 유저들(batch)에 대한 모든 아이템 score
-        """        
-        # [item_num, hidden_size]
-        test_item_emb = model.item_embeddings.weight
-        # [batch, hidden_size]
-        rating_pred = torch.matmul(seq_out, test_item_emb.transpose(0, 1))
-        return rating_pred  # [B item_num]
-
-    for i, batch in rec_data_iter:
-
-        batch = tuple(t.to(args.device) for t in batch)
-        user_ids, input_ids, _, target_neg, answers = batch
-        recommend_output = model.finetune(input_ids)  # [B, L, H]
-
-        recommend_output = recommend_output[:, -1, :]  # [B, H]
-
-        rating_pred = predict_full(recommend_output, model)  # [B, item_num]
-
-        rating_pred = rating_pred.cpu().data.numpy().copy()
-        batch_user_index = user_ids.cpu().numpy()
-
-        # 해당 User가 이미 방문한 음식점 제외(마스킹)
-        rating_pred[args.train_matrix[batch_user_index].toarray() > 0] = -np.inf
-
-        # mask_id 제외(마스킹)
-        rating_pred[:, -1] = -np.inf
-
-        # TOP 3 index 추출
-        ind = np.argpartition(rating_pred, -3)[:, -3:]
-
-        return ind
-
-
-def trainers(args, _input, model):
-    def predict_full(seq_out, model):
-        """_summary_
-        Args:
-            seq_out ([batch, hidden_size]): 추천 결과물
-            model : model 파일
-        Returns:
-            rating_pred ([batch, item_num(2872)]): 유저들(batch)에 대한 모든 아이템 score
-        """        
-        # [item_num, hidden_size]
-        test_item_emb = model.item_embeddings.weight
-        # [batch, hidden_size]
-        rating_pred = torch.matmul(seq_out, test_item_emb.transpose(0, 1))
-        return rating_pred  # [B item_num]
-
-    model.eval()
-
+    # _input_model : 모델에 넣기 위해 _input(유저의 음식점 기록 리스트) 가공
     pad_len = args.max_seq_length - len(_input)
     _input_model = [0] * pad_len + _input
     _input_model = _input_model[-args.max_seq_length:]
@@ -80,20 +39,18 @@ def trainers(args, _input, model):
     
     recommend_output = model.finetune(_input_model.unsqueeze(0))
     recommend_output = recommend_output[:, -1, :]
-    rating_pred = predict_full(recommend_output, model)
-    rating_pred = rating_pred.squeeze()
+
+    # 이미 본 기록은 후보군에서 제외
+    item_candidate = list(set(item_candidate) - set(_input))
+
+    rating_pred = predict_full(recommend_output, model, item_candidate)
+    rating_pred = rating_pred.squeeze() # [1, item_candidate_num] => [item_candidate_num]
 
     rating_pred = rating_pred.cpu().data.numpy()
-
-    # 해당 User가 이미 방문한 음식점 제외(마스킹)
-    rating_pred[_input] = -np.inf
-
-    # mask_id 제외(마스킹)
-    rating_pred[-1] = -np.inf
 
     # TOP 3 index 추출
     ind = np.argpartition(rating_pred, -3)[-3:]
 
-    return ind
+    return item_candidate[ind] # index로 rest_code로 변환해주기.
 
     
