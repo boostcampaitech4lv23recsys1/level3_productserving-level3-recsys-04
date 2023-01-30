@@ -23,7 +23,7 @@ def main():
     # 데이터 경로와 네이밍 부분.
     parser.add_argument("--data_dir", default="../data/", type=str)
     parser.add_argument("--output_dir", default="output/", type=str)
-    parser.add_argument("--data_name", default="0129", type=str)
+    parser.add_argument("--data_name", default="0130", type=str)
     parser.add_argument("--model_name", default="SASRec", type=str)
 
 
@@ -58,7 +58,7 @@ def main():
     parser.add_argument(
         "--batch_size", type=int, default=256, help="number of batch_size"
     )
-    parser.add_argument("--epochs", type=int, default=10, help="number of epochs") # 200
+    parser.add_argument("--epochs", type=int, default=25, help="number of epochs") # 200
     parser.add_argument("--no_cuda", action="store_true")
     parser.add_argument("--log_freq", type=int, default=1, help="per epoch print res")
     parser.add_argument("--seed", default=42, type=int)
@@ -138,7 +138,7 @@ def main():
     )
 
     test_dataloader = DataLoader(
-        train_dataset, shuffle=False, batch_size=args.batch_size
+        train_dataset, shuffle=False, batch_size=args.batch_size * 4
     )
 
     # S3RecModel 모델을 불러옵니다. (models.py 내 존재)
@@ -148,7 +148,7 @@ def main():
 
     for epoch in range(args.epochs):
         iteration(args, epoch, train_dataloader, model)
-        if epoch == 9:
+        if epoch % 5== 4:
             scores = test_score(args, epoch, test_dataloader, model, test_lines)
             print("recall_k = ", scores)
 
