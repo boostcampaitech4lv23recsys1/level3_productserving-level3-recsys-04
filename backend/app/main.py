@@ -77,39 +77,6 @@ def signin(user: SignInRequest):
     # user_list : [(user_code, rest_code, user)]
     user_list = cursor.fetchall()
 
-    if len(user_list) ==0 :
-        select_sql = f"select url, x, y, image, tag, name from rest where rowid <= 10"  # where rating = 4.42"
-        cursor.execute(select_sql)
-        rest_list = cursor.fetchall()
-        i=0
-        for rest_id in rest_list:
-            select_sql = f"select url, x, y, image, tag, name from rest where rest_code = {rest_id[0]}.0"  # where rating = 4.42"
-            cursor.execute(select_sql)
-            url, x, y, image, tag, restaurant = cursor.fetchall()[0]
-
-            restaurant_1 = Restaurant(
-                id=url,
-                x=x,
-                y=y,
-                tag=tag,
-                name=restaurant,
-                img_url=image,
-            )
-            if i % 3 == 0:
-                cat1.append(restaurant_1)
-            elif i % 3 == 1:
-                cat2.append(restaurant_1)
-            else:
-                cat3.append(restaurant_1)
-            i+=1
-        #cold start
-        return SignInResponse(
-        state="start",
-        detail="cold start",
-        restaurants1=cat1,
-        restaurants2=cat2,
-        restaurants3=cat3,)
-
     """
     전체 아이템의 크기 구하기.
     """
@@ -121,19 +88,28 @@ def signin(user: SignInRequest):
     user.location으로 쿼리 날려서 좌표 가져오는 코드
     """
     # 향후 user.location으로 x,y 받아야함.
-    _x,_y = get_xy(user.location)
-    # _x = 314359 
-    # _y = 547462
-
+    _x,_y = get_xy(user.location) # _x = 314359, _y = 547462
     _inter = 1000 # 허용 가능한 거리, 임시방편.
-
     _input = (_x - _inter, _x + _inter, _y - _inter, _y + _inter)
-    select_sql = "select rest_code from rest where ((x > ?) AND (x < ?) AND (y > ?) AND (y < ?))"
-    cursor.execute(select_sql, _input)
-    results = cursor.fetchall()
-    rest_codes = [rest_code[0] for rest_code in results]
+    
+    """
+    모델을 이용한 Top3 추출
+    """
 
-    top_k = recommend(user_list[0][1], rest_codes, max_item[0][0])
+    if not user_list: # 만약 유저가 없는 사람이라면? 거리 내 인기도 기반 Top3 추천.
+        select_sql = "select rest_code from rest where ((x > ?) AND (x < ?) AND (y > ?) AND (y < ?)) order by cnt DESC"
+        cursor.execute(select_sql, _input)
+        results = cursor.fetchall()
+        top_k = [rest_code[0] for rest_code in results[:3]]
+        #print(top_k, 'HI')
+
+    else:
+        select_sql = "select rest_code from rest where ((x > ?) AND (x < ?) AND (y > ?) AND (y < ?))"
+        cursor.execute(select_sql, _input)
+        results = cursor.fetchall()
+        rest_codes = [rest_code[0] for rest_code in results]
+
+        top_k = recommend(user_list[0][1], rest_codes, max_item[0][0])
     print(top_k)
 
     """
