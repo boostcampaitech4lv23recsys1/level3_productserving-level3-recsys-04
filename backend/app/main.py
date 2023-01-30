@@ -72,11 +72,43 @@ def signin(user: SignInRequest):
     user의 코드로 해당 user_list 받기
     """
     select_sql = f"select * from user where user = '{user.name}'"
-    #print(user.name)
     cursor.execute(select_sql)
 
     # user_list : [(user_code, rest_code, user)]
     user_list = cursor.fetchall()
+
+    if len(user_list) ==0 :
+        select_sql = f"select url, x, y, image, tag, name from rest where rowid <= 10"  # where rating = 4.42"
+        cursor.execute(select_sql)
+        rest_list = cursor.fetchall()
+        i=0
+        for rest_id in rest_list:
+            select_sql = f"select url, x, y, image, tag, name from rest where rest_code = {rest_id[0]}.0"  # where rating = 4.42"
+            cursor.execute(select_sql)
+            url, x, y, image, tag, restaurant = cursor.fetchall()[0]
+
+            restaurant_1 = Restaurant(
+                id=url,
+                x=x,
+                y=y,
+                tag=tag,
+                name=restaurant,
+                img_url=image,
+            )
+            if i % 3 == 0:
+                cat1.append(restaurant_1)
+            elif i % 3 == 1:
+                cat2.append(restaurant_1)
+            else:
+                cat3.append(restaurant_1)
+            i+=1
+        #cold start
+        return SignInResponse(
+        state="start",
+        detail="cold start",
+        restaurants1=cat1,
+        restaurants2=cat2,
+        restaurants3=cat3,)
 
     """
     전체 아이템의 크기 구하기.
