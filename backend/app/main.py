@@ -72,7 +72,6 @@ def signin(user: SignInRequest):
     user의 코드로 해당 user_list 받기
     """
     select_sql = f"select * from user where user = '{user.name}'"
-    #print(user.name)
     cursor.execute(select_sql)
 
     # user_list : [(user_code, rest_code, user)]
@@ -89,19 +88,28 @@ def signin(user: SignInRequest):
     user.location으로 쿼리 날려서 좌표 가져오는 코드
     """
     # 향후 user.location으로 x,y 받아야함.
-    _x,_y = get_xy(user.location)
-    # _x = 314359 
-    # _y = 547462
-
+    _x,_y = get_xy(user.location) # _x = 314359, _y = 547462
     _inter = 1000 # 허용 가능한 거리, 임시방편.
-
     _input = (_x - _inter, _x + _inter, _y - _inter, _y + _inter)
-    select_sql = "select rest_code from rest where ((x > ?) AND (x < ?) AND (y > ?) AND (y < ?))"
-    cursor.execute(select_sql, _input)
-    results = cursor.fetchall()
-    rest_codes = [rest_code[0] for rest_code in results]
+    
+    """
+    모델을 이용한 Top3 추출
+    """
 
-    top_k = recommend(user_list[0][1], rest_codes, max_item[0][0])
+    if not user_list: # 만약 유저가 없는 사람이라면? 거리 내 인기도 기반 Top3 추천.
+        select_sql = "select rest_code from rest where ((x > ?) AND (x < ?) AND (y > ?) AND (y < ?)) order by cnt DESC"
+        cursor.execute(select_sql, _input)
+        results = cursor.fetchall()
+        top_k = [rest_code[0] for rest_code in results[:3]]
+        #print(top_k, 'HI')
+
+    else:
+        select_sql = "select rest_code from rest where ((x > ?) AND (x < ?) AND (y > ?) AND (y < ?))"
+        cursor.execute(select_sql, _input)
+        results = cursor.fetchall()
+        rest_codes = [rest_code[0] for rest_code in results]
+
+        top_k = recommend(user_list[0][1], rest_codes, max_item[0][0])
     print(top_k)
 
     """
