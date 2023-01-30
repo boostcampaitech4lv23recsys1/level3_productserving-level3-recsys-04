@@ -18,18 +18,6 @@ import { renderMatches, useNavigate } from 'react-router-dom';
 
 
 
-function Copyright() {
-  return (
-    <Typography variant="body2" color="text.secondary" align="center">
-      {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
 
 const cards = [0, 1, 2];
 
@@ -210,7 +198,7 @@ export default function Album() {
         >
           Something here to give the footer a purpose!
         </Typography>
-        <Copyright />
+        
       </Box>
       {/* End footer */}
 

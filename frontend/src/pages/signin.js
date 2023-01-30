@@ -2,44 +2,20 @@ import * as React from 'react';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
+import FormControl from "@mui/material/FormControl";
 import Checkbox from '@mui/material/Checkbox';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
-
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
 import Swal from 'sweetalert2';
 import { withRouter } from "react-router-dom";
-
-//https://m.place.naver.com/my/5c667add298eafd0547442d8/feed
-
-function Copyright(props) {
-  return (
-    <Typography
-      variant="body2"
-      color="text.secondary"
-      align="center"
-      {...props}
-    >
-      {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
-
-
-
-
-
-
 
 const theme = createTheme();
 
@@ -47,7 +23,8 @@ const theme = createTheme();
 export default function SignIn() {
   let [link, setLink] = React.useState('');
   let [location, setLocation] = React.useState('');
-  
+  const [menu, setMenu] = React.useState('');
+
   let [loading, setLoading] = React.useState(false);
   const navigate = useNavigate();
   const validate = (response) => {
@@ -128,7 +105,9 @@ export default function SignIn() {
 
 
 
-
+  const handleChange = (event: SelectChangeEvent) => {
+    setMenu(event.target.value);
+  };
 
   const handleClick1 = (event) => {
     
@@ -201,7 +180,20 @@ export default function SignIn() {
                 setLocation(e.target.value);
               }}
             />
-
+            <FormControl fullWidth>
+              <InputLabel id="demo-simple-select-label">식사 or 카페를 선택해주세요</InputLabel>
+              <Select
+                labelId="select1"
+                id="select_id"
+                value={menu}
+                label="munu"
+                onChange={handleChange}
+              >
+                <MenuItem value={1}>식사</MenuItem>
+                <MenuItem value={2}>카페&디저트</MenuItem>
+              </Select>
+            </FormControl>
+            
             {/* <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}
               label="Remember me"
@@ -226,7 +218,7 @@ export default function SignIn() {
             </Grid>
           </Box>
         </Box>
-        <Copyright sx={{ mt: 8, mb: 4 }} />
+        
       </Container>
     </ThemeProvider>
   );
