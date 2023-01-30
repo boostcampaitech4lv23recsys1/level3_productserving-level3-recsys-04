@@ -13,7 +13,7 @@ def trainers(args, _input, model, item_candidate):
     Returns:
         ind (list): 추천 음식점 리스트(rest_code 형태)
     """    
-    def predict_full(seq_out, model, item_candidate):
+    def predict_full(seq_out, mode, item_candidate):
         """_summary_
         Args:
             seq_out ([1, hidden_size]): 추천 결과물
