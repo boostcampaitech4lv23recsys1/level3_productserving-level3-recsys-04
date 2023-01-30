@@ -93,7 +93,7 @@ def signin(user: SignInRequest):
     # _x = 314359 
     # _y = 547462
 
-    _inter = 5000 # 허용 가능한 거리, 임시방편.
+    _inter = 1000 # 허용 가능한 거리, 임시방편.
 
     _input = (_x - _inter, _x + _inter, _y - _inter, _y + _inter)
     select_sql = "select rest_code from rest where ((x > ?) AND (x < ?) AND (y > ?) AND (y < ?))"
@@ -153,7 +153,7 @@ def get_xy(location: str):
         #print(response_body.decode('utf-8'))
         x =  response_body.decode('utf-8').split("\"")[-6]
         y =  response_body.decode('utf-8').split("\"")[-2]
-        return x,y
+        return int(x),int(y)
     else:
         #print("Error Code:" + rescode)
         return 0,0
