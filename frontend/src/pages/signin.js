@@ -76,7 +76,7 @@ export default function SignIn() {
       },
       body: JSON.stringify(userData),
     };
-    fetch('http://localhost:8001/signin', requestOptions)
+    fetch('/api/signin', requestOptions)
       .then((response) => response.json())
       .then((response) => {
         validate(response);
@@ -202,10 +202,10 @@ export default function SignIn() {
               }}
             />
 
-            <FormControlLabel
+            {/* <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}
               label="Remember me"
-            />
+            /> */}
             <div>
               <Button
                 // type="submit"

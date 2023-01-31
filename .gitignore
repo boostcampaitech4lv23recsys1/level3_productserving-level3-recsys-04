@@ -18,9 +18,12 @@ crawling_user_review.ipynb
 crawling_rest_server.ipynb
 crawling_user_review_failed.ipynb
 crawling_user_review.py
+crawling_get_rest_info.ipynb
 crwaling_concat.ipynb
+crawling_get_rest_info.ipynb
 csv_concat.ipynb
 notsaved.txt
+
 
 # front_end
 
@@ -52,9 +55,12 @@ database/ssl
 # data
 area_csv
 user_csv
-G_train.csv
-G_test.csv
 backend/app/models/data/
+model/data/user/*
+model/data/rest/*
+model/data/*.csv
+tem.ipynb
+tem.py
 
 # model
 output/
@@ -62,3 +68,6 @@ output/
 # poetry
 *.toml
 poetry*
+
+# DB
+*.db

@@ -6,18 +6,26 @@ import pandas as pd
 import torch
 from torch.utils.data import DataLoader, SequentialSampler
 
-from datasets import SASRecDataset
-from models import S3RecModel
-from utils import set_seed
-from trainers import trainers
- 
+from .models import S3RecModel
+from .utils import set_seed
+from .trainers import trainers
 
-def main():
+
+def recommend(user_seq: list, item_candidate : list, max_item = 41460):
+    """
+    Args:
+        user_seq (str(list)): 해당 유저가 방문한 rest_code 리스트. str 로 묶여서 옴.
+        item_candidate (list): 아이템 후보(x,y 또는 속성으로 걸러진) rest_code 리스트.
+        max_item (int, optional): 음식점 개수, Defaults to 41460.
+
+    Returns:
+        pred (list) : Top 3 rest_code list
+    """    
     parser = argparse.ArgumentParser()
 
     # 데이터 경로와 네이밍 부분.
-    parser.add_argument("--data_dir", default="../data/", type=str)
-    # parser.add_argument("--output_dir", default="output/", type=str)
+    parser.add_argument("--data_dir", default="app/models/data/", type=str) # ./models/data/
+    parser.add_argument("--model_name", default="SASRec-0129", type=str)
     # parser.add_argument("--data_name", default="Ml", type=str)
     # parser.add_argument("--do_eval", action="store_true")
 
@@ -71,34 +79,23 @@ def main():
     args.cuda_condition = torch.cuda.is_available() and not args.no_cuda
     args.device = torch.device("cuda" if args.cuda_condition else "cpu")
 
-    # 데이터 파일 불러오는 경로 설정합니다.
-    args.data_file = args.data_dir + "user.csv"
-    user_seqs = pd.read_csv(args.data_file)
-    rest_info = pd.read_csv(args.data_dir + "rest.csv")
+    # user_seq = user_seqs['rest_code'][0]  # [2062 2840  875 2841 2867 2855 2846    1 2839 2460 1841 2845 2872 1013]
+    #breakpoint()
+    #user_seq = user_seq[1:-1].split()
+    #user_seq = [int(num) for num in user_seq]
+    user_seq = eval(user_seq)
 
-    user_seq = user_seqs['rest_code'][0]  # [2062 2840  875 2841 2867 2855 2846    1 2839 2460 1841 2845 2872 1013]
-    user_seq = user_seq[1:-1].split()
-    user_seq = [int(num) for num in user_seq]
-    user_id = user_seqs['user_code'][0]  # 0
-
-    max_item = int(max(rest_info['rest_code']))
+    ################# item max 값 받아오는 부분 나중에 처리 필요 (일단 임시로 csv 파일로 처리)
+    #rest_info = pd.read_csv(args.data_dir + "rest2.csv")
+    #max_item = int(max(rest_info['rest_code']))
     args.item_size = max_item + 2
     args.mask_id = max_item + 1
-    '''
-    user_id : 해당 유저 encoding 값
-    user_seq : 해당 유저 음식점 리뷰 시퀀셜 기록
-    args.item_size : item encoding 최대값 + 2
-    '''
-    # args.mask_id = max_item + 1
+    ################################################################
 
     model = S3RecModel(args=args)
     model = model.to(args.device)
     # 트레이너에 load 함수 사용해 모델 불러옵니다.
-    model.load_state_dict(torch.load('../data/SASRec-0124.pt'))
+    model.load_state_dict(torch.load(args.data_dir + args.model_name + '.pt', map_location=torch.device(args.device)))
 
-    pred = trainers(args, user_seq, model)  # epoch 1로 넣음
-    print(pred)
-    
-
-if __name__ == "__main__":
-    main()
+    pred = trainers(args, user_seq, model, item_candidate)
+    return pred

@@ -4,17 +4,17 @@ from pydantic import BaseModel, Field
 from typing import List, Optional
 from starlette.responses import JSONResponse
 
-# from model import trash_model
 from type import *
-
-# from app.routes import index, auth
 
 from fastapi.param_functions import Depends
 from PIL import Image
 import torch
 
-
 import sqlite3
+
+from models.sasrec.inference import recommend
+
+import urllib.request
 
 app = FastAPI()
 
@@ -29,40 +29,10 @@ app.add_middleware(
 )
 
 
-################ mysql database 설정
-# config = {
-#     'user': 'root',
-#     'password': 'wogud1028',
-#     'host': '34.64.202.234',
-#     'client_flags': [ClientFlag.SSL],
-#     # 아래 인증키 경로들은 각자 환경에 맞게 수정 (언제 한번 통일 ㄱㄱ)
-#     #'ssl_ca': '/Users/hwang/AI_Tech_Frontend/level3_productserving-level3-recsys-04/db/ssl/server-ca.pem',
-#     #'ssl_cert': '/Users/hwang/AI_Tech_Frontend/level3_productserving-level3-recsys-04/db/ssl/client-cert.pem',
-#     #'ssl_key': '/Users/hwang/AI_Tech_Frontend/level3_productserving-level3-recsys-04/db/ssl/client-key.pem'
-#     'ssl_ca': r'C:\Users\bsj94\workspace\project\db\ssl\client-cert.pem',
-#     'ssl_cert': r'C:\Users\bsj94\workspace\project\db\ssl\client-cert.pem',
-#     'ssl_key': r'C:\Users\bsj94\workspace\project\db\ssl\client-key.pem'
-# }
-
-# config['database'] = 'rest'  # add "rest" database to config dict
-# cnxn = mysql.connector.connect(**config)
-# cursor = cnxn.cursor()
-# ################
-
-
-"""
-to-do list
-
-1. user 로그인
-    - 해당 user가 유저 테이블에 존재하는 user인지 검증
-2. user 로그인 후
-    - user의 x, y 좌표 가져오기
-    - user 방문 리스트 가져오기
-    - 방문 리스트와 좌표 기준으로 식당 걸러내기
-3. 식당 추천
-    - 걸러낸 식당 모델에 넣고 결과 받기
-    - Top 3 식당 데이터 반환
-"""
+################ DB 설정 ################
+cnxn = sqlite3.connect("reccar.db", check_same_thread=False)
+cursor = cnxn.cursor()
+################ DB 설정 ################
 
 
 @app.get("/")
@@ -75,125 +45,126 @@ def show_image(self):
     img.show()
 
 
-users = ["5c667add298eafd0547442d8", "5c3737d3d764236c17947538"]
-
-@app.post("/album")
+@app.post("/api/album")
 def album(data: AlbumRequest):
-    if data.is_positive == False:
-
-        return AlbumResponse(
-            user_id= data.user_id,
-            rest_id= data.rest_id,
-            is_positive = data.is_positive
+    if data.is_positive:
+        cursor.executemany(
+            "insert into positive values (?, ?)", [(data.user_id, data.rest_id)]
         )
-    else :
-        return AlbumResponse(
-            user_id= data.user_id,
-            rest_id= data.rest_id,
-            is_positive = data.is_positive
-        )
-
-@app.post("/signin")
-def signin(user: SignInRequest):
-    if user.name in users:
-        """
-        user.location으로 쿼리 날려서 좌표 가져오는 코드
-        """
-        _x = 134
-        _y = 156
-
-        """
-        모델 추천 결과 가져오는 코드
-        """
-        rec_result = [
-            "1675303081",
-            "1867823297",
-            "38969614",
-            "1867823297",
-            "1675303081",
-        ]
-        cat1 = []
-        cat2 = []
-        cat3 = []
-        for i, rest_id in enumerate(rec_result):
-            # select_sql = f"select * from rest where id = {rest_id}"
-            # cursor.execute(select_sql)
-            # result = cursor.fetchall()[0]
-            # result = result[:100]
-            # restaurants = {i: dict(Restaurant(id=_id, x=_x, y=_y, tag=_tag, name=_name, img_url=_imgurl)) for i, (_id, _x, _y,_tag,_name,_imgurl) in enumerate(result)}
-            # _id, _x, _y,_tag,_name,_imgurl = result
-            # restaurant = Restaurant(id=_id, x=_x, y=_y, tag=_tag, name=_name, img_url=_imgurl)
-            # restaurants.append(restaurant)
-            restaurant_1 = Restaurant(
-                id=i,
-                x=_x,
-                y=_y,
-                tag="restaurant-tag",
-                name="restaurant-name",
-                img_url="imgurl",
-            )
-            restaurant_2 = Restaurant(
-                id=i + 10,
-                x=_x,
-                y=_y,
-                tag="restaurant-tag",
-                name="restaurant-name",
-                img_url="imgurl",
-            )
-            restaurant_3 = Restaurant(
-                id=i + 20,
-                x=_x,
-                y=_y,
-                tag="restaurant-tag",
-                name="restaurant-name",
-                img_url="imgurl",
-            )
-            cat1.append(restaurant_1)
-            cat2.append(restaurant_2)
-            cat3.append(restaurant_3)
-
-        return SignInResponse(
-            state='start',
-            detail='not cold start',
-            restaurants1 = cat1,
-            restaurants2 = cat2,
-            restaurants3 = cat3
-        )
+        select_sql = "select * from positive"
     else:
-        '''
-        user.location으로 쿼리 날려서 좌표 가져오는 코드
-        '''
-        _x = 134; _y = 156
-        
-        
-        '''
-        모델 추천 결과 가져오는 코드
-        '''
-        rec_result = ["1675303081", "1867823297", "38969614", "1867823297", "1675303081"]
-        cat1 = []; cat2 = []; cat3 = []
-        for i, rest_id in enumerate(rec_result):
-            # select_sql = f"select * from rest where id = {rest_id}"
-            # cursor.execute(select_sql)
-            # result = cursor.fetchall()[0]
-            # result = result[:100]
-            # restaurants = {i: dict(Restaurant(id=_id, x=_x, y=_y, tag=_tag, name=_name, img_url=_imgurl)) for i, (_id, _x, _y,_tag,_name,_imgurl) in enumerate(result)}
-            # _id, _x, _y,_tag,_name,_imgurl = result
-            # restaurant = Restaurant(id=_id, x=_x, y=_y, tag=_tag, name=_name, img_url=_imgurl)
-            # restaurants.append(restaurant)
-            restaurant_1 = Restaurant(id=i, x=_x, y=_y, tag='restaurant-tag', name='restaurant-name', img_url='imgurl')
-            restaurant_2 = Restaurant(id=i+10, x=_x, y=_y, tag='restaurant-tag', name='restaurant-name', img_url='imgurl')
-            restaurant_3 = Restaurant(id=i+20, x=_x, y=_y, tag='restaurant-tag', name='restaurant-name', img_url='imgurl')
-            cat1.append(restaurant_1)
-            cat2.append(restaurant_2)
-            cat3.append(restaurant_3)
-        return SignInResponse(
-            state='start',
-            detail='cold start',
-            restaurants1 = cat1,
-            restaurants2 = cat2,
-            restaurants3 = cat3
+        cursor.executemany(
+            "insert into negative values (?, ?)", [(data.user_id, data.rest_id)]
         )
+        select_sql = "select * from negative"
+    cnxn.commit()
+    cursor.execute(select_sql)
+    result = cursor.fetchall()
+    print(result)
+    return AlbumResponse(
+        user_id=data.user_id, rest_id=data.rest_id, is_positive=data.is_positive
+    )
 
+
+@app.post("/api/signin")
+def signin(user: SignInRequest):
+    """
+    user의 코드로 해당 user_list 받기
+    """
+    select_sql = f"select * from user where user = '{user.name}'"
+    cursor.execute(select_sql)
+
+    # user_list : [(user_code, rest_code, user)]
+    user_list = cursor.fetchall()
+
+    """
+    전체 아이템의 크기 구하기.
+    """
+    select_sql = f"select max(rest_code) from rest"
+    cursor.execute(select_sql)
+    max_item = cursor.fetchall() # [(41460,)]
+    
+    """
+    user.location으로 쿼리 날려서 좌표 가져오는 코드
+    """
+    # 향후 user.location으로 x,y 받아야함.
+    _x,_y = get_xy(user.location) # _x = 314359, _y = 547462
+    _inter = 1000 # 허용 가능한 거리, 임시방편.
+    _input = (_x - _inter, _x + _inter, _y - _inter, _y + _inter)
+    
+    """
+    모델을 이용한 Top3 추출
+    """
+
+    if not user_list: # 만약 유저가 없는 사람이라면? 거리 내 인기도 기반 Top3 추천.
+        select_sql = "select rest_code from rest where ((x > ?) AND (x < ?) AND (y > ?) AND (y < ?)) order by cnt DESC"
+        cursor.execute(select_sql, _input)
+        results = cursor.fetchall()
+        top_k = [rest_code[0] for rest_code in results[:3]]
+        #print(top_k, 'HI')
+
+    else:
+        select_sql = "select rest_code from rest where ((x > ?) AND (x < ?) AND (y > ?) AND (y < ?))"
+        cursor.execute(select_sql, _input)
+        results = cursor.fetchall()
+        rest_codes = [rest_code[0] for rest_code in results]
+
+        top_k = recommend(user_list[0][1], rest_codes, max_item[0][0])
+    print(top_k)
+
+    """
+    모델 추천 결과 가져오는 코드
+    """
+    cat1 = []
+    cat2 = []
+    cat3 = []
+    for i, rest_id in enumerate(top_k):
+        select_sql = f"select url, x, y, image, tag, name from rest where rest_code = {rest_id}.0"  # where rating = 4.42"
+        cursor.execute(select_sql)
+        url, x, y, image, tag, restaurant = cursor.fetchall()[0]
+
+        restaurant_1 = Restaurant(
+            id=url,
+            x=x,
+            y=y,
+            tag=tag,
+            name=restaurant,
+            img_url=image,
+        )
+        if i % 3 == 0:
+            cat1.append(restaurant_1)
+        elif i % 3 == 1:
+            cat2.append(restaurant_1)
+        else:
+            cat3.append(restaurant_1)
+
+    return SignInResponse(
+        state="start",
+        detail="not cold start",
+        restaurants1=cat1,
+        restaurants2=cat2,
+        restaurants3=cat3,
+    )
+
+def get_xy(location: str):
+    client_id = "789Xk04GARJpb4omVvUq" # 개발자센터에서 발급받은 Client ID 값
+    client_secret = "oynUXBN1cW" # 개발자센터에서 발급받은 Client Secret 값
+    encText = urllib.parse.quote(location)
+    url = "https://openapi.naver.com/v1/search/local?query=" + encText # JSON 결과
+    request = urllib.request.Request(url)
+    request.add_header("X-Naver-Client-Id",client_id)
+    request.add_header("X-Naver-Client-Secret",client_secret)
+    response = urllib.request.urlopen(request)
+    rescode = response.getcode()
+    if(rescode==200):
+        response_body = response.read()
+        #print(response_body.decode('utf-8'))
+        x =  response_body.decode('utf-8').split("\"")[-6]
+        y =  response_body.decode('utf-8').split("\"")[-2]
+        return int(x),int(y)
+    else:
+        #print("Error Code:" + rescode)
+        return 0,0
 
 # 특정 식당 정보 가져오는 API
 def get_restaurant(rest_id: str):
@@ -220,6 +191,7 @@ def ml_model(user_id):
 class Prediction(BaseModel):
     name: str = "predict_result"
     result: float
+
 
 # @app.get('/predict/{user_id}/{rest_id}', description="해당 유저의 정보를 모델에게 전달하고 예측 결과를 가져옵니다")
 # async def make_prediction(user_id: str, rest_id: str, model = trash_model()):

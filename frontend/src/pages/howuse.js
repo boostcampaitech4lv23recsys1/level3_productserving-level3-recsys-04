@@ -20,7 +20,7 @@ export default function HowUse() {
     navigate('/signin');
   };
   return (
-    <Container component="main" maxWidth="xs">
+    <Container component="main" maxWidth="md">
       <div>
         <h1>렉카메추 사용 방법!</h1>
         <h2>1.
@@ -31,6 +31,8 @@ export default function HowUse() {
         </h2>
         <h2>3.주소 복사</h2>
         <img src= 'img/howto1.jpg' width ='800'/>
+        <h3>4.현재 서비스는 서울에 있는 식당을 기준으로 서비스 되고 있습니다. 
+          서울에서 추천을 원하는 주소를 입력해주세요.</h3>
       </div>
       <div>
       
@@ -38,8 +40,12 @@ export default function HowUse() {
       
       <Grid container>
         <Grid item xs>
-          <Link variant="body2" onClick={handleClick}>돌아가기</Link>
+          {/* <Link variant="body2" onClick={handleClick}>돌아가기</Link> */}
+          <Button variant="outlined" onClick={handleClick}>
+                처음 화면으로
+              </Button>
         </Grid>
+        
       </Grid>
     </Container>
   );
