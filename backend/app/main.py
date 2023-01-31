@@ -77,12 +77,6 @@ def signin(user: SignInRequest):
     # user_list : [(user_code, rest_code, user)]
     user_list = cursor.fetchall()
 
-    if not user_list: #cold start return
-        return SignInColdResponse(
-            state="start",
-            detail="cold start",
-        )
-
     """
     전체 아이템의 크기 구하기.
     """
@@ -103,11 +97,10 @@ def signin(user: SignInRequest):
     """
 
     if not user_list: # 만약 유저가 없는 사람이라면? 거리 내 인기도 기반 Top3 추천.
-        select_sql = "select rest_code from rest where ((x > ?) AND (x < ?) AND (y > ?) AND (y < ?)) order by cnt DESC"
-        cursor.execute(select_sql, _input)
-        results = cursor.fetchall()
-        top_k = [rest_code[0] for rest_code in results[:3]]
-        #print(top_k, 'HI')
+        return SignInColdResponse(
+            state="start",
+            detail="cold start",
+        )
 
     else:
         select_sql = "select rest_code from rest where ((x > ?) AND (x < ?) AND (y > ?) AND (y < ?))"

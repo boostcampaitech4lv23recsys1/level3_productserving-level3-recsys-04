@@ -31,7 +31,7 @@ export default function SignIn() {
     if (response["detail"] == "cold start") {
       //cold start 시에 실행시켜야 하는 항목
       Swal.fire({
-        title: '음식을 고르세요',
+        title: '싫어하는 음식을 선택해주세요.',
         html: `
         <input type="checkbox" id="c1"  /><label for="c1"></label>
         <input type="checkbox" id="c2"  /><label for="c2"></label>
@@ -54,10 +54,18 @@ export default function SignIn() {
           var c7 = Swal.getPopup().querySelector('#c7').checked
           var c8 = Swal.getPopup().querySelector('#c8').checked
           var c9 = Swal.getPopup().querySelector('#c9').checked
-  
-          return { c1: c1, c2: c2, c3: c3, c4: c4, c5: c5, c6: c6, c7: c7, c8: c8, c9: c9 }
+          var count = c1+ c2+c3+c4+c5+c6+c7+c9+c9
+          if (count <= 3) {
+            return { c1: c1, c2: c2, c3: c3, c4: c4, c5: c5, c6: c6, c7: c7, c8: c8, c9: c9 }
+          }
+          else {
+            Swal.showValidationMessage(
+              '<i class="fa fa-info-circle"></i> 3개 까지만 선택해주세요'
+            )
+          }
         }
-      }).then((result) => {
+      }
+      ).then((result) => {
         cold_start({
           name: link.substring(29,53),
           location: location,
