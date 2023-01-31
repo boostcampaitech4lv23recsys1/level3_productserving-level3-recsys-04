@@ -43,18 +43,7 @@ config = Box(config)
 
 
 
-#multivae 용 csv 생성
-file_path = "/opt/ml/input/project/model/data/train_rand.csv"
 
-if not os.path.exists(file_path):
-    train_df = pd.read_csv('/opt/ml/input/project/model/data/train_rand.csv')
-    train_df = train_df.drop(columns='date')
-    train_df.columns=['user','item','user_idx','item_idx']
-    train_df.to_csv('/opt/ml/input/project/model/data/MVtrain_rand.csv',index=False)
-
-    valid_df = pd.read_csv('/opt/ml/input/project/model/data/test_rand.csv')
-    valid_df.columns=['user','item','user_idx','item_idx']
-    valid_df.to_csv('/opt/ml/input/project/model/data/MVtest_rand.csv',index=False)
 
 
 
@@ -65,8 +54,8 @@ class MakeMatrixDataSet():
     """
     def __init__(self, config):
         self.config = config
-        self.df = pd.read_csv(os.path.join(self.config.data_path, 'MVtrain_rand.csv'))
-        self.val = pd.read_csv(os.path.join(self.config.data_path, 'MVtest_rand.csv'))
+        self.df = pd.read_csv(os.path.join(self.config.data_path, 'MVtrain_time.csv'))
+        self.val = pd.read_csv(os.path.join(self.config.data_path, 'MVtest_time.csv'))
         # self.item_encoder, self.item_decoder = self.generate_encoder_decoder('item')
         # self.user_encoder, self.user_decoder = self.generate_encoder_decoder('user')
         self.num_item, self.num_user = sorted(self.df['item_idx'].unique())[-1]+1,sorted(self.df['user_idx'].unique())[-1]+1
@@ -397,6 +386,22 @@ def evaluate(model, data_loader, user_train, user_valid, make_matrix_data_set, K
 
 if __name__ == "__main__":
     print("it's working don't worry ")
+    # 데이터
+    #multivae 용 csv 생성
+    file_path = "/opt/ml/input/project/model/data/MVtrain_time.csv"
+
+    if not os.path.exists(file_path):
+        train_df = pd.read_csv('/opt/ml/input/project/model/data/train_time.csv')
+        train_df = train_df.drop(columns='date')
+        train_df.columns=['user','item','user_idx','item_idx']
+        train_df.to_csv('/opt/ml/input/project/model/data/MVtrain_time.csv',index=False)
+
+        valid_df = pd.read_csv('/opt/ml/input/project/model/data/test_time.csv')
+        valid_df.columns=['user','item','user_idx','item_idx']
+        valid_df.to_csv('/opt/ml/input/project/model/data/MVtest_time.csv',index=False)
+
+    print('file get success!')
+
     # 학습
     make_matrix_data_set = MakeMatrixDataSet(config = config)
     user_train, user_valid = make_matrix_data_set.get_train_valid_data()
@@ -404,7 +409,7 @@ if __name__ == "__main__":
     ae_dataset = AEDataSet(
     num_user = make_matrix_data_set.num_user,
     )
-    print('/n')
+
     print('Dataset finished')
     data_loader = DataLoader(
     ae_dataset,
@@ -425,7 +430,7 @@ if __name__ == "__main__":
 
     criterion = LossFunc(loss_type = 'Multinomial', model_type = 'VAE')
     optimizer = torch.optim.Adam(model.parameters(), lr=config.lr)
-    print('/n')
+
     print('model create finished!!!')
     best_recall = 0
     update_count = 1
@@ -434,7 +439,7 @@ if __name__ == "__main__":
     # hit_list = []
     recall_list = []
     K = 20
-    print('/n')
+
     print('train start!!')
     for epoch in range(1, config.num_epochs + 1):
         start = time.time()
