@@ -81,7 +81,7 @@ def signin(user: SignInRequest):
         return SignInColdResponse(
             state="start",
             detail="cold start",
-        )   
+        )
 
     """
     전체 아이템의 크기 구하기.

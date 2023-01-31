@@ -16,7 +16,7 @@ input[type=checkbox]+label {
 
 
 #c1+label {
-  background-image: url('1.jpg');
+  background-image: url('../public/img/1.jpg');
   background-size: cover;
   zoom: 5;
 }
@@ -24,12 +24,12 @@ input[type=checkbox]+label {
 #c1:checked+label {
   background-size: cover;
   zoom: 5;
-  background-image: url('1.jpg');
+  background-image: url('../public/img/1.jpg');
   opacity: 0.7;
 }
 
 #c2+label {
-  background-image: url('2.jpg');
+  background-image: url('../public/img/2.jpg');
   background-size: cover;
   zoom: 5;
 }
@@ -37,13 +37,13 @@ input[type=checkbox]+label {
 #c2:checked+label {
   background-size: cover;
   zoom: 5;
-  background-image: url('2.jpg');
+  background-image: url('../public/img/2.jpg');
   opacity: 0.7;
 }
 
 
 #c3+label {
-  background-image: url('3.jpg');
+  background-image: url('../public/img/3.jpg');
   background-size: cover;
   zoom: 5;
 }
@@ -51,12 +51,12 @@ input[type=checkbox]+label {
 #c3:checked+label {
   background-size: cover;
   zoom: 5;
-  background-image: url('3.jpg');
+  background-image: url('../public/img/3.jpg');
   opacity: 0.7;
 }
 
 #c4+label {
-  background-image: url('4.jpg');
+  background-image: url('../public/img/4.jpg');
   background-size: cover;
   zoom: 5;
 }
@@ -64,12 +64,12 @@ input[type=checkbox]+label {
 #c4:checked+label {
   background-size: cover;
   zoom: 5;
-  background-image: url('4.jpg');
+  background-image: url('../public/img/4.jpg');
   opacity: 0.7;
 }
 
 #c5+label {
-  background-image: url('5.jpg');
+  background-image: url('../public/img/5.jpg');
   background-size: cover;
   zoom: 5;
 }
@@ -77,12 +77,12 @@ input[type=checkbox]+label {
 #c5:checked+label {
   background-size: cover;
   zoom: 5;
-  background-image: url('5.jpg');
+  background-image: url('../public/img/5.jpg');
   opacity: 0.7;
 }
 
 #c6+label {
-  background-image: url('6.jpg');
+  background-image: url('../public/img/6.jpg');
   background-size: cover;
   zoom: 5;
 }
@@ -90,12 +90,12 @@ input[type=checkbox]+label {
 #c6:checked+label {
   background-size: cover;
   zoom: 5;
-  background-image: url('6.jpg');
+  background-image: url('../public/img/6.jpg');
   opacity: 0.7;
 }
 
 #c7+label {
-  background-image: url('7.jpg');
+  background-image: url('../public/img/7.jpg');
   background-size: cover;
   zoom: 5;
 }
@@ -103,12 +103,12 @@ input[type=checkbox]+label {
 #c7:checked+label {
   background-size: cover;
   zoom: 5;
-  background-image: url('7.jpg');
+  background-image: url('../public/img/7.jpg');
   opacity: 0.7;
 }
 
 #c8+label {
-  background-image: url('8.jpg');
+  background-image: url('../public/img/8.jpg');
   background-size: cover;
   zoom: 5;
 }
@@ -116,12 +116,12 @@ input[type=checkbox]+label {
 #c8:checked+label {
   background-size: cover;
   zoom: 5;
-  background-image: url('8.jpg');
+  background-image: url('../public/img/8.jpg');
   opacity: 0.7;
 }
 
 #c9+label {
-  background-image: url('9.jpg');
+  background-image: url('../public/img/9.jpg');
   background-size: cover;
   zoom: 5;
 }
@@ -129,6 +129,6 @@ input[type=checkbox]+label {
 #c9:checked+label {
   background-size: cover;
   zoom: 5;
-  background-image: url('9.jpg');
+  background-image: url('../public/img/9.jpg');
   opacity: 0.7;
 }
