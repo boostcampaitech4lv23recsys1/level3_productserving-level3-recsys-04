@@ -14,7 +14,7 @@ import sqlite3
 
 # from models.sasrec.inference import recommend
 from models.sasrec.inference import recommend as sasrec_inference
-from models.sasrec.inference import recommend as ease_inference
+from models.ease.inference import recommend as ease_inference
 
 import urllib.request
 
@@ -112,7 +112,7 @@ def signin(user: SignInRequest):
 
     #     top_k = recommend(user_list[0][1], rest_codes, max_item[0][0])
     # print(top_k)
-        sasrec_top_k = sasrec_inference(user_list[0][1], rest_codes, max_item[0][0])
+        sasrec_top_k = sasrec_inference(user_list[0][1], rest_codes, max_item[0][0]-1)
         ease_top_k = ease_inference(user_list[0][0], user_list[0][1], set(rest_codes))
     print(sasrec_top_k)
     print(ease_top_k)
@@ -123,7 +123,7 @@ def signin(user: SignInRequest):
     cat1 = []
     cat2 = []
     cat3 = []
-    for i, rest_id in enumerate(top_k):
+    for i, rest_id in enumerate(sasrec_top_k):
         select_sql = f"select url, x, y, image, tag, name from rest where rest_code = {rest_id}.0"  # where rating = 4.42"
         cursor.execute(select_sql)
         url, x, y, image, tag, restaurant = cursor.fetchall()[0]

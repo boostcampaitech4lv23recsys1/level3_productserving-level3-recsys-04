@@ -8,7 +8,6 @@ import argparse
 class EASE:
     def __init__(self, pred):
         self.pred = pred
-        breakpoint()
         self.item_size = pred.shape[0]
 
 
@@ -27,23 +26,24 @@ class EASE:
         return list(r['rest_code'])
 
 
-def recommend(user, user_seq, candidate, k):
+def recommend(user, user_seq, candidate):
     ''' parser '''
     parser = argparse.ArgumentParser()
-    parser.add_argument("--data_dir", default="../data/", type=str)  # app/models/data/
-    parser.add_argument("--thres", default="2000", type=int)  # sync with ease model train
+    parser.add_argument("--data_dir", default="app/models/data/", type=str)  # ../data/
+    parser.add_argument("--thres", default=2000, type=int)  # sync with ease model train
+    parser.add_argument("--k", default=20, type=int)
     args = parser.parse_args()
     ''''''
 
     ''' load pred matrix '''
     ith_file, user_idx = divmod( user, args.thres )
-    with open(args.data_dir + f'ease/ease-pred-{ith_file}', 'rb') as f:
+    with open(args.data_dir + f'ease/ease-pred-{ith_file}.pickle', 'rb') as f:
         pred = pickle.load(f)
     pred = pred[user_idx]
     ''''''
 
     ''' recommend top k '''
     model = EASE(pred)
-    top_k = model.predict_for_user(user_seq, candidate, k)
+    top_k = model.predict_for_user(user_seq, candidate, args.k)
     return top_k
     ''''''
