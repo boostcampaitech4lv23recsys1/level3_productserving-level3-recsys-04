@@ -85,6 +85,7 @@ export default function SignIn() {
     }
     else if (response["detail"] == "not cold start") {
       // 콜드스타트 아니고 기존에 실행히시켜야 하던 항목
+      await window.localStorage.setItem('restaurants0', JSON.stringify(response["restaurants0"]));
       await window.localStorage.setItem('restaurants1', JSON.stringify(response["restaurants1"]));
       await window.localStorage.setItem('restaurants2', JSON.stringify(response["restaurants2"]));
       await window.localStorage.setItem('restaurants3', JSON.stringify(response["restaurants3"]));

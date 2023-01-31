@@ -114,6 +114,7 @@ def signin(user: SignInRequest):
     """
     모델 추천 결과 가져오는 코드
     """
+    cat0 = []
     cat1 = []
     cat2 = []
     cat3 = []
@@ -130,9 +131,11 @@ def signin(user: SignInRequest):
             name=restaurant,
             img_url=image,
         )
-        if i % 3 == 0:
+        if i % 4 == 0:
+            cat0.append(restaurant_1)
+        elif i % 4 == 1:
             cat1.append(restaurant_1)
-        elif i % 3 == 1:
+        elif i % 4 == 2:
             cat2.append(restaurant_1)
         else:
             cat3.append(restaurant_1)
@@ -140,9 +143,10 @@ def signin(user: SignInRequest):
     return SignInResponse(
         state="start",
         detail="not cold start",
-        restaurants1=cat1,
-        restaurants2=cat2,
-        restaurants3=cat3,
+        restaurants0=cat0, # best rec
+        restaurants1=cat1, # rec 1
+        restaurants2=cat2, # rec 2
+        restaurants3=cat3, # rec 3
     )
 
 @app.post("/api/signin/cold")
@@ -180,6 +184,7 @@ def signin(user: SignInColdRequest):
     """
     모델 추천 결과 가져오는 코드
     """
+    cat0 = []
     cat1 = []
     cat2 = []
     cat3 = []
@@ -196,18 +201,22 @@ def signin(user: SignInColdRequest):
             name=restaurant,
             img_url=image,
         )
-        if i % 3 == 0:
+        if i % 4 == 0:
+            cat0.append(restaurant_1)
+        elif i % 4 == 1:
             cat1.append(restaurant_1)
-        elif i % 3 == 1:
+        elif i % 4 == 2:
             cat2.append(restaurant_1)
         else:
             cat3.append(restaurant_1)
+
     return SignInResponse(
         state="start",
         detail="not cold start",
-        restaurants1=cat1,
-        restaurants2=cat2,
-        restaurants3=cat3,
+        restaurants0=cat0, # best rec
+        restaurants1=cat1, # rec 1
+        restaurants2=cat2, # rec 2
+        restaurants3=cat3, # rec 3
     )
 
 def get_xy(location: str):
