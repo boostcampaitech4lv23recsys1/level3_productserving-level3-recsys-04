@@ -30,7 +30,7 @@ app.add_middleware(
 
 
 ################ DB 설정 ################
-cnxn = sqlite3.connect("reccar.db", check_same_thread=False)
+cnxn = sqlite3.connect("reccar_0130.db", check_same_thread=False)
 cursor = cnxn.cursor()
 ################ DB 설정 ################
 
@@ -108,7 +108,7 @@ def signin(user: SignInRequest):
         results = cursor.fetchall()
         rest_codes = [rest_code[0] for rest_code in results]
 
-        top_k = recommend(user_list[0][1], rest_codes, max_item[0][0])
+        top_k = recommend(user_list[0][1], rest_codes, max_item[0][0]-1) # 임시조치
     print(top_k)
 
     """
