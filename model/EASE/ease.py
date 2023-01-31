@@ -70,41 +70,41 @@ class EASE:
         return r
         
 
-''' load data '''
+''' global variables '''
 path = '../../backend/app/models/data/'
+k = 20
+''''''
 
+''' load data '''
 train = pd.read_csv(path + 'train_time.csv')
 test = pd.read_csv(path + 'test_time.csv')
+''''''
 
-'''
-model train
-'''
+''' model train '''
 model = EASE()
 model.fit(train)
+model.X = model.X.astype(np.float16)
+model.B = np.float16(model.B)
+''''''
 
-with open('../data/ease-X-f16.pickle', 'rb') as f:
-    X = pickle.load(f)
-with open('../data/ease-B-f16.pickle', 'rb') as f:
-    B = pickle.load(f)
+# with open('../data/ease-X-f16.pickle', 'rb') as f:
+#     X = pickle.load(f)
+# with open('../data/ease-B-f16.pickle', 'rb') as f:
+#     B = pickle.load(f)
 
-'''
-save pred matrix seperated
-'''
-thres = 2000
-user_max = X.shape[0] - 1
+''' save pred matrix seperated '''
+thres = 2000  # Should be synced with "thres" in ease inference.py
+user_max = model.X.shape[0] - 1
 for i in tqdm(range(user_max//thres + 1)):
-    # with open(f'{path}ease/ease-pred-{i}.pickle', 'wb') as f:
-    with open(f'../data/ease/ease-pred-{i}.pickle', 'wb') as f:
-        XX = X[ i*thres : (i+1)*thres ]
-        pred_cur = XX.dot(B)
+    with open(f'{path}/ease/ease-pred-{i}.pickle', 'wb') as f:
+        XX = model.X[ i*thres : (i+1)*thres ]
+        pred_cur = XX.dot(model.B)
         pred_cur = np.float16(pred_cur)
         pickle.dump(pred_cur, f, pickle.HIGHEST_PROTOCOL)
+''''''
 
-
-np.save('../data/ease-pred.npy', model.pred)
-
-
-predict = model.predict(train,train['user'].unique(),train['item'].unique(),3)
+''' recall@k '''
+predict = model.predict(train, train['user'].unique(), train['item'].unique(), k)
 predict = predict.drop('score',axis = 1)
 
 predict_user = predict.groupby('user_code')['rest_code'].apply(list) 
@@ -123,4 +123,5 @@ for i, ans in enumerate(answer_user):
     _recall.append(a/2)
 
 recall = sum(_recall) / len(_recall)
-recall
+print(recall)
+''''''
