@@ -25,7 +25,7 @@ def recommend(user_seq: list, item_candidate : list, max_item = 41460):
 
     # 데이터 경로와 네이밍 부분.
     parser.add_argument("--data_dir", default="app/models/data/", type=str) # ./models/data/
-    parser.add_argument("--model_name", default="SASRec-0129", type=str)
+    parser.add_argument("--model_name", default="SASRec_time-0130", type=str)
     # parser.add_argument("--data_name", default="Ml", type=str)
     # parser.add_argument("--do_eval", action="store_true")
 
