@@ -89,7 +89,7 @@ export default function SignIn() {
       await window.localStorage.setItem('restaurants2', JSON.stringify(response["restaurants2"]));
       await window.localStorage.setItem('restaurants3', JSON.stringify(response["restaurants3"]));
 
-      console.log(response);
+      await console.log(response);
     }
     let timeoutId;
 
@@ -127,7 +127,7 @@ export default function SignIn() {
 
 
   };
-  const cold_start = (userData) => {
+  const cold_start = async (userData) => {
     const requestOptions = {
       method: "POST",
       headers: {
@@ -137,7 +137,7 @@ export default function SignIn() {
       },
       body: JSON.stringify(userData),
     };
-    fetch('/api/signin/cold', requestOptions)
+    await fetch('/api/signin/cold', requestOptions)
       .then((response) => response.json())
       .then((response) => {
         validate(response);
