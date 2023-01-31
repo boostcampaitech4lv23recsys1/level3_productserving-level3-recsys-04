@@ -237,41 +237,41 @@ class MultiVAE(nn.Module):
             layer.bias.data.normal_(0.0, 0.001)
 
 
-# class MultiDAE(nn.Module):
+class MultiDAE(nn.Module):
     
-#     def __init__(self, p_dims, dropout_rate = 0.5):
-#         super(MultiDAE, self).__init__()
-#         self.p_dims = p_dims
-#         self.q_dims = p_dims[::-1]
+    def __init__(self, p_dims, dropout_rate = 0.5):
+        super(MultiDAE, self).__init__()
+        self.p_dims = p_dims
+        self.q_dims = p_dims[::-1]
 
-#         self.dims = self.q_dims + self.p_dims[1:]
-#         self.layers = nn.ModuleList([nn.Linear(d_in, d_out) for
-#             d_in, d_out in zip(self.dims[:-1], self.dims[1:])])
-#         self.drop = nn.Dropout(dropout_rate)
+        self.dims = self.q_dims + self.p_dims[1:]
+        self.layers = nn.ModuleList([nn.Linear(d_in, d_out) for
+            d_in, d_out in zip(self.dims[:-1], self.dims[1:])])
+        self.drop = nn.Dropout(dropout_rate)
         
-#         self.init_weights()
+        self.init_weights()
     
-#     def forward(self, input):
-#         h = F.normalize(input)
-#         h = self.drop(h)
+    def forward(self, input):
+        h = F.normalize(input)
+        h = self.drop(h)
 
-#         for i, layer in enumerate(self.layers):
-#             h = layer(h)
-#             if i != len(self.layers) - 1:
-#                 h = F.tanh(h)
-#         return h
+        for i, layer in enumerate(self.layers):
+            h = layer(h)
+            if i != len(self.layers) - 1:
+                h = F.tanh(h)
+        return h
 
-#     def init_weights(self):
-#         for layer in self.layers:
-#             # Xavier Initialization for weights
-#             size = layer.weight.size()
-#             fan_out = size[0]
-#             fan_in = size[1]
-#             std = np.sqrt(2.0/(fan_in + fan_out))
-#             layer.weight.data.normal_(0.0, std)
+    def init_weights(self):
+        for layer in self.layers:
+            # Xavier Initialization for weights
+            size = layer.weight.size()
+            fan_out = size[0]
+            fan_in = size[1]
+            std = np.sqrt(2.0/(fan_in + fan_out))
+            layer.weight.data.normal_(0.0, std)
 
-#             # Normal Initialization for Biases
-#             layer.bias.data.normal_(0.0, 0.001)
+            # Normal Initialization for Biases
+            layer.bias.data.normal_(0.0, 0.001)
 
 
 # 학습함수
@@ -368,8 +368,8 @@ def train(model, criterion, optimizer, data_loader, make_matrix_data_set, config
 def evaluate(model, data_loader, user_train, user_valid, make_matrix_data_set, K = 20):
     model.eval()
 
-    NDCG = 0.0 # NDCG@10
-    HIT = 0.0 # HIT@10
+    # NDCG = 0.0 # NDCG@K
+    # HIT = 0.0 # HIT@K
     RECALL_K =0.0 #Recall@10
 
     with torch.no_grad():
@@ -384,15 +384,15 @@ def evaluate(model, data_loader, user_train, user_valid, make_matrix_data_set, K
             for user, rec in zip(users, rec_list):
                 uv = user_valid[user.item()]
                 up = rec[-K:].cpu().numpy().tolist()
-                NDCG += get_ndcg(pred_list = up, true_list = uv)
-                HIT += get_hit(pred_list = up, true_list = uv)
+                # NDCG += get_ndcg(pred_list = up, true_list = uv)
+                # HIT += get_hit(pred_list = up, true_list = uv)
                 RECALL_K +=get_recallk(pred_list = up, true_list = uv, K = K )
                 
-    NDCG /= len(data_loader.dataset)
-    HIT /= len(data_loader.dataset)
+    # NDCG /= len(data_loader.dataset)
+    # HIT /= len(data_loader.dataset)
     RECALL_K /= len(data_loader.dataset)
 
-    return NDCG, HIT, RECALL_K
+    return RECALL_K
 
 
 if __name__ == "__main__":
@@ -404,7 +404,8 @@ if __name__ == "__main__":
     ae_dataset = AEDataSet(
     num_user = make_matrix_data_set.num_user,
     )
-
+    print('/n')
+    print('Dataset finished')
     data_loader = DataLoader(
     ae_dataset,
     batch_size = config.batch_size, 
@@ -414,8 +415,8 @@ if __name__ == "__main__":
     )
 
     loss_dict = {}
-    ndcg_dict = {}
-    hit_dict = {}
+    # ndcg_dict = {}
+    # hit_dict = {}
     recall_dict = {}
 
     model = MultiVAE(
@@ -424,14 +425,17 @@ if __name__ == "__main__":
 
     criterion = LossFunc(loss_type = 'Multinomial', model_type = 'VAE')
     optimizer = torch.optim.Adam(model.parameters(), lr=config.lr)
-
+    print('/n')
+    print('model create finished!!!')
     best_recall = 0
     update_count = 1
     loss_list = []
-    ndcg_list = []
-    hit_list = []
+    # ndcg_list = []
+    # hit_list = []
     recall_list = []
     K = 20
+    print('/n')
+    print('train start!!')
     for epoch in range(1, config.num_epochs + 1):
         start = time.time()
 
@@ -444,23 +448,23 @@ if __name__ == "__main__":
             config = config,
             )
         
-        ndcg, hit, recall= evaluate(
+        recall= evaluate(
             model = model, 
             data_loader = data_loader,
             user_train = user_train,
-
+            user_valid = user_valid,
             make_matrix_data_set = make_matrix_data_set,
             K = K
             )
 
         loss_list.append(train_loss)
-        ndcg_list.append(ndcg)
-        hit_list.append(hit)
+        # ndcg_list.append(ndcg)
+        # hit_list.append(hit)
         recall_list.append(recall)
         end = time.time()
         time_taken = end - start
 
-        print(f'Epoch: {epoch:3d}| Train loss: {train_loss:.5f}| NDCG@{K}: {ndcg:.5f}| HIT@{K}: {hit:.5f} |Recall@{K}: {recall:.5f}|time taken : {time_taken}')
+        print(f'Epoch: {epoch:3d}| Train loss: {train_loss:.5f} |Recall@{K}: {recall:.5f}|time taken : {time_taken:.1f}')
 
 
         if recall > best_recall:
