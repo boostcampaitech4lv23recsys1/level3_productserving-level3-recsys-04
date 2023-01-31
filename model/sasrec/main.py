@@ -16,7 +16,7 @@ from trainers import (
     test_score
 )
 
-
+# 0.01687, 25에폭(time)
 def main():
     parser = argparse.ArgumentParser()
     
@@ -24,8 +24,9 @@ def main():
     parser.add_argument("--data_dir", default="../data/", type=str)
     parser.add_argument("--output_dir", default="output/", type=str)
     parser.add_argument("--data_name", default="0130", type=str)
+    parser.add_argument("--data_type", default="rand", type=str)
     parser.add_argument("--model_name", default="SASRec", type=str)
-
+    
 
     # 모델 argument(하이퍼 파라미터)
     parser.add_argument(
@@ -95,8 +96,8 @@ def main():
     # 데이터 파일 불러오는 경로 설정합니다.
     path = '../data/'
 
-    train = pd.read_csv(path + 'train.csv')    
-    test = pd.read_csv(path + 'test.csv')
+    train = pd.read_csv(path + f'train_{args.data_type}.csv')    
+    test = pd.read_csv(path + f'test_{args.data_type}.csv')
    
     
     # 자세한건 get_user_seqs 함수(utils.py) 내에 써놨습니다.
@@ -112,7 +113,7 @@ def main():
     args.mask_id = max_item + 1
     
     # save model args, (model_name : Finetune_full, data_name : Ml, output_dir : output/)
-    args_str = f"{args.model_name}-{args.data_name}"
+    args_str = f"{args.model_name}_{args.data_type}-{args.data_name}"
     args.log_file = os.path.join(args.output_dir, args_str + ".txt")
     print(str(args))
 

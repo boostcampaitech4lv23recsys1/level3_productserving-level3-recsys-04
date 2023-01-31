@@ -1,0 +1,13 @@
+name: Release Management
+on: 
+  schedule:
+   - cron: "*/5 * * * *"
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - with:
+          ref: 'Database'
+      - name: Run main.py
+        run:
+          python database/DB_test.py
