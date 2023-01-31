@@ -12,7 +12,9 @@ import torch
 
 import sqlite3
 
-from models.sasrec.inference import recommend
+# from models.sasrec.inference import recommend
+from models.sasrec.inference import recommend as sasrec_inference
+from models.sasrec.inference import recommend as ease_inference
 
 import urllib.request
 
@@ -109,8 +111,12 @@ def signin(user: SignInRequest):
         results = cursor.fetchall()
         rest_codes = [rest_code[0] for rest_code in results]
 
-        top_k = recommend(user_list[0][1], rest_codes, max_item[0][0])
-    print(top_k)
+    #     top_k = recommend(user_list[0][1], rest_codes, max_item[0][0])
+    # print(top_k)
+        sasrec_top_k = sasrec_inference(user_list[0][1], rest_codes, max_item[0][0])
+        ease_top_k = ease_inference(user_list[0][0], user_list[0][1], set(rest_codes))
+    print(sasrec_top_k)
+    print(ease_top_k)
 
     """
     모델 추천 결과 가져오는 코드
