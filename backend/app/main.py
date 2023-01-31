@@ -77,6 +77,12 @@ def signin(user: SignInRequest):
     # user_list : [(user_code, rest_code, user)]
     user_list = cursor.fetchall()
 
+    if not user_list: #cold start return
+        return SignInColdResponse(
+            state="start",
+            detail="cold start",
+        )   
+
     """
     전체 아이템의 크기 구하기.
     """
@@ -138,6 +144,71 @@ def signin(user: SignInRequest):
         else:
             cat3.append(restaurant_1)
 
+    return SignInResponse(
+        state="start",
+        detail="not cold start",
+        restaurants1=cat1,
+        restaurants2=cat2,
+        restaurants3=cat3,
+    )
+
+@app.post("/api/signin/cold")
+def signin(user: SignInColdRequest):
+
+    """
+    전체 아이템의 크기 구하기.
+    """
+    select_sql = f"select max(rest_code) from rest"
+    cursor.execute(select_sql)
+    max_item = cursor.fetchall() # [(41460,)]
+    
+    """
+    user.location으로 쿼리 날려서 좌표 가져오는 코드
+    """
+    # 향후 user.location으로 x,y 받아야함.
+    _x,_y = get_xy(user.location) # _x = 314359, _y = 547462
+    _inter = 1000 # 허용 가능한 거리, 임시방편.
+    _input = (_x - _inter, _x + _inter, _y - _inter, _y + _inter)
+    
+    """
+    모델을 이용한 Top3 추출
+    """
+
+    # 만약 유저가 없는 사람이라면? 거리 내 인기도 기반 Top3 추천.
+    select_sql = "select rest_code from rest where ((x > ?) AND (x < ?) AND (y > ?) AND (y < ?)) order by cnt DESC"
+    cursor.execute(select_sql, _input)
+    results = cursor.fetchall()
+    top_k = [rest_code[0] for rest_code in results[:3]]
+    #print(top_k, 'HI')
+
+    
+    print(top_k)
+
+    """
+    모델 추천 결과 가져오는 코드
+    """
+    cat1 = []
+    cat2 = []
+    cat3 = []
+    for i, rest_id in enumerate(top_k):
+        select_sql = f"select url, x, y, image, tag, name from rest where rest_code = {rest_id}.0"  # where rating = 4.42"
+        cursor.execute(select_sql)
+        url, x, y, image, tag, restaurant = cursor.fetchall()[0]
+
+        restaurant_1 = Restaurant(
+            id=url,
+            x=x,
+            y=y,
+            tag=tag,
+            name=restaurant,
+            img_url=image,
+        )
+        if i % 3 == 0:
+            cat1.append(restaurant_1)
+        elif i % 3 == 1:
+            cat2.append(restaurant_1)
+        else:
+            cat3.append(restaurant_1)
     return SignInResponse(
         state="start",
         detail="not cold start",
