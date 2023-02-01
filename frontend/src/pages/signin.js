@@ -150,42 +150,25 @@ export default function SignIn() {
 
   };
 
-
-  let timeoutId;
-
-  const showAutoClose = () => {
-    const loading = Swal.fire({
-      title: '로딩 중입니다',
-      text: '잠시만 기다려주세요',
-      icon: 'info',
-      timer: 5000,
-      showConfirmButton: false,
-      showCancelButton: true,
-      cancelButtonText: 'Cancel',
-
-      // onOpen: () => {
-      //   Swal.showLoading()
-      //   timeoutId = setTimeout(() => {
-
-      //     loading.close();
-
-      //   }, 5000);
-      // },
-      // onClose: () => {
-      //   clearTimeout(timeoutId);
-      //   console.log('Alert closed')
-
-      // }
-
-    }).then((result) => {
-      if (result.dismiss === Swal.DismissReason.cancel) {
-        clearTimeout(timeoutId);
-        console.log('Cancelled');
-        // window.location = '/signin'
-      } else {
-        window.location = '/album'
-      }
-    });
+  const howtouse = (event) => {
+    Swal.fire({
+      width: 800,
+      html: `
+      <div>
+        <h1>렉카메추 사용 방법!</h1>
+        <h2>1.
+        <a href="https://naver.com">네이버 </a>로그인 후</h2>
+        <h2>2.
+        <a href="https://m.place.naver.com/my/">네이버 마이플레이스</a>
+        - 클릭
+        </h2>
+        <h2>3.주소 복사</h2>
+        <img src= 'img/howto1.jpg' width ='600'/>
+        <h3>4.현재 서비스는 서울에 있는 식당을 기준으로 서비스 되고 있습니다. </h3>
+        <h3>서울에서 추천을 원하는 주소를 입력해주세요.</h3>
+      </div>
+      `
+    })
   }
 
 
@@ -298,7 +281,7 @@ export default function SignIn() {
             </div>
             <Grid container>
               <Grid item xs>
-                <Link variant="body2" onClick={handleClick2}>
+                <Link variant="body2" onClick={howtouse}>
                   어떻게 사용하나요?
                 </Link>
               </Grid>
