@@ -70,13 +70,13 @@ export default function Album() {
     // 일단 유저에서 열리게 
     var user = window.localStorage.getItem('link').substring(29, 53)
     const card = event.target.id
-    const i = restaurants[card][idx[card]]["id"]
+    const i = restaurants[card][card_num[card]]["id"]
     const url = "https://m.place.naver.com/restaurant/" + i + "/home"
     window.open(url, "_blank", "noopener, noreferrer");
     // window.open(url, "_blank", "noopener, noreferrer");
     album({
       user_id: user,
-      rest_id: restaurants[card][idx[card]]["id"],
+      rest_id: restaurants[card][card_num[card]]["id"],
       is_positive: true
     });
   };
@@ -88,7 +88,7 @@ export default function Album() {
       
     album({
       user_id: user,
-      rest_id: restaurants[card][idx[card]]["id"],
+      rest_id: restaurants[card][card_num[card]]["id"],
       is_positive: false
     });
     if (card == 0){
@@ -103,7 +103,6 @@ export default function Album() {
     else if (card == 3){
       setCardNum([card_num[0]+1, card_num[1],card_num[2],card_num[3]+1])
     }
-    idx[card] = idx[card] + 1
     console.log(card)
     console.log(typeof(card))
     console.log(card_num)
@@ -131,15 +130,15 @@ export default function Album() {
           <Card sx={{ maxWidth: 1200 }}>
               <CardMedia
                 sx={{ height: 200 }}
-                image={restaurants[0][idx[card_num[0]]]["img_url"]}
+                image={restaurants[0][card_num[0]]["img_url"]}
                 title="green iguana"
               />
               <CardContent>
                 <Typography gutterBottom variant="h5" component="div">
-                  {restaurants[0][idx[card_num[0]]]["name"]}
+                  {restaurants[0][card_num[0]]["name"]}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  {restaurants[0][idx[card_num[0]]]["tag"]}
+                  {restaurants[0][card_num[0]]["tag"]}
                 </Typography>
               </CardContent>
               <CardActions>
@@ -165,15 +164,15 @@ export default function Album() {
                       // 16:9
                       pt: '100%',
                     }}
-                    image={restaurants[card][idx[card_num[card]]]["img_url"]}
+                    image={restaurants[card][card_num[card]]["img_url"]}
                     alt="random"
                   />
                   <CardContent sx={{ flexGrow: 1 }}>
                     <Typography gutterBottom variant="h5" component="h2">
-                      {restaurants[card][idx[card_num[card]]]["name"]}
+                      {restaurants[card][card_num[card]]["name"]}
                     </Typography>
                     <Typography>
-                      {restaurants[card][idx[card_num[card]]]["tag"]}
+                      {restaurants[card][card_num[card]]["tag"]}
                     </Typography>
                   </CardContent>
                   <CardActions>
