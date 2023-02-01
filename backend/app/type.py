@@ -12,10 +12,24 @@ class RateRequest(BaseModel):
 class SignInRequest(BaseModel):
     name: str
     location: str
-
+    menu : str
+    
+class SignInColdRequest(BaseModel):
+    name: str
+    location: str
+    menu : str
+    c1 : bool
+    c2 : bool
+    c3 : bool
+    c4 : bool
+    c5 : bool
+    c6 : bool
+    c7 : bool
+    c8 : bool
+    c9 : bool
 class AlbumRequest(BaseModel):
-    user_id: str
-    rest_id: str
+    user_id: str # user
+    rest_id: str # url
     is_positive : bool
 
 class GeneralRequest(BaseModel):
@@ -38,9 +52,15 @@ class Restaurant(BaseModel):
 class SignInResponse(BaseModel):
     state: str
     detail: str  # cold-start or not
-    restaurants1 : List[Restaurant]
-    restaurants2 : List[Restaurant]
-    restaurants3 : List[Restaurant]
+    restaurants0 : List[Restaurant] #best rec
+    restaurants1 : List[Restaurant] #rec 1
+    restaurants2 : List[Restaurant] #rec 2
+    restaurants3 : List[Restaurant] #rec 3
+
+class SignInColdResponse(BaseModel):
+    state: str
+    detail: str  # cold-start or not
+
 
 class AlbumResponse(BaseModel):
     user_id: str

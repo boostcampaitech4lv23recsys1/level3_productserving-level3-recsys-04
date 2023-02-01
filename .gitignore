@@ -8,9 +8,11 @@ google-chrome-stable_current_amd64.deb
 __pycache__
 .vscode
 .empty
+.venv
 
 # schini
 schini_concat.ipynb
+lab.ipynb
 
 # 개인화된 crawling 처리
 study
@@ -61,6 +63,8 @@ model/data/rest/*
 model/data/*.csv
 tem.ipynb
 tem.py
+*.npy
+*.pickle
 
 # model
 output/
