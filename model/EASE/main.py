@@ -7,21 +7,21 @@ import os
 from model import EASE
 
 
-############# Warning... 실행 전 반드시 설정 확인해주세요!! #############
-''' global variables '''
 
+''' global variables '''
+############# Warning... 실행 전 반드시 설정 확인해주세요!! #############
 path = '../../backend/app/models/data/'  # Data 저장 경로
 data_type = 'rand'  # ['time', 'rand']
+k = 20  # Should be synced with "k" in ease inference.py
+thres = 2000  # Should be synced with "thres" in ease inference.py
+output_dir = './output/'
+output_csv_name = '20230202'  # output csv 이름 설정
+#######################################################################
 try:  # data_type & 이미 저장된 pickle 파일 존재하는지 체크 (bool)
     is_pickle_exist = True if data_type=='time' and os.listdir( path + 'ease/' ) else False
 except FileNotFoundError:
     is_pickle_exist = False
-k = 20  # Should be synced with "k" in ease inference.py
-thres = 2000  # Should be synced with "thres" in ease inference.py
-output_dir = './output/'
-output_csv_name = '20230201'  # output csv 이름 설정
 ''''''
-#######################################################################
 
 
 ''' load data '''
@@ -67,13 +67,14 @@ for i in tqdm(range( user_max//thres + 1 )):
             with open(f'{path}/ease/ease-pred-{i}.pickle', 'wb') as f:
                 pickle.dump(pred_cur, f, pickle.HIGHEST_PROTOCOL)
     
-    pred_cur = model.predict(start, train_gbr[start:end], train['rest_code'].unique(), pred_cur)
+    pred_cur = model.predict(start, train_gbr[start:end], items_tot, pred_cur)
     predict = pd.concat([predict, pred_cur])
 ''''''
 
 ''' recall@k '''
-predcit = predict.reset_index(drop=True)
+predict = predict.reset_index(drop=True)
 predict = predict.drop('score', axis = 1)
+predict = predict.astype('int')
 
 predict_user = predict.groupby('user_code')['rest_code'].apply(list)
 answer_user = test.groupby('user_code')['rest_code'].apply(list)
@@ -81,7 +82,6 @@ answer_user = test.groupby('user_code')['rest_code'].apply(list)
 predict_user = predict_user.reset_index(drop=True)
 answer_user = answer_user.reset_index(drop=True)
 
-breakpoint()
 # output csv 생성
 if not os.path.exists(output_dir):
     os.mkdir(output_dir)
