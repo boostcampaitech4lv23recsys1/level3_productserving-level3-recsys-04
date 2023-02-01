@@ -8,8 +8,8 @@ from model import EASE
         
 
 ''' global variables '''
-path = '../../backend/app/models/data/'
-is_pickle_exist = True if listdir( path + 'ease/' ) else False
+path = '../../backend/app/models/data/'  # Data 저장 경로
+is_pickle_exist = True if listdir( path + 'ease/' ) else False  # 이미 저장된 pickle 파일이 존재하는지 여부 (bool)
 k = 20  # Should be synced with "k" in ease inference.py
 thres = 2000  # Should be synced with "thres" in ease inference.py
 ''''''
@@ -52,7 +52,7 @@ for i in tqdm(range( user_max//thres + 1 )):
         with open(f'{path}/ease/ease-pred-{i}.pickle', 'wb') as f:
             X_cur = model.X[ start : end ]
             pred_cur = X_cur.dot(model.B)
-            pred_cur = np.float16(pred_cur)
+            pred_cur = np.float16(pred_cur)  ## 용량 줄이기
             pickle.dump(pred_cur, f, pickle.HIGHEST_PROTOCOL)
     
     pred_cur = model.predict(start, train_gbr[start:end], train['rest_code'].unique(), pred_cur, k)
