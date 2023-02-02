@@ -134,19 +134,7 @@ def signin(user: SignInRequest):
     def add_top_k(model_top_k):
         for i, model_info in enumerate(model_top_k):
             rest_id, model_name = model_info
-            select_sql = f"select url, x, y, image, tag, name from rest where rest_code = {rest_id}.0"
-            cursor.execute(select_sql)
-            url, x, y, image, tag, restaurant = cursor.fetchall()[0]
-
-            restaurant_1 = Restaurant(
-                id=url,
-                x=x,
-                y=y,
-                tag=tag,
-                name=restaurant,
-                img_url=image,
-                model=model_name,
-            )
+            restaurant_1 = get_restaurant(rest_id)
             if i % 3 == 0:
                 cat0.append(restaurant_1)
             elif i % 3 == 1:
@@ -235,7 +223,7 @@ def get_restaurant(rest_id):
     """
     rest_id를 입력하면 화면에 띄울 Restaurant 클래스를 배출해주는 함수.
     """    
-    select_sql = f"select url, x, y, image, tag, name from rest where rest_code = {rest_id}.0"  # where rating = 4.42"
+    select_sql = f"select url, x, y, image, tag, name from rest where rest_code = {rest_id}.0"
     cursor.execute(select_sql)
     url, x, y, image, tag, restaurant = cursor.fetchall()[0]
 
@@ -246,6 +234,7 @@ def get_restaurant(rest_id):
         tag=tag,
         name=restaurant,
         img_url=image,
+        model=model_name,
     )
 
     return restaurant
