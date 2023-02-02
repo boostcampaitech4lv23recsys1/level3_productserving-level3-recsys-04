@@ -170,8 +170,11 @@ def batch():
     sys.path.append('sasrec')
 
     from sasrec.main import sasrec_main
+    from ease.main import ease_main
 
-    recall_score = sasrec_main()
-    print(recall_score)
+    sasrec_recall_score = sasrec_main()
+    ease_recall_score = ease_main()
+    print("sasrec : ", sasrec_recall_score)
+    print("ease : ", ease_recall_score)
 
     return
