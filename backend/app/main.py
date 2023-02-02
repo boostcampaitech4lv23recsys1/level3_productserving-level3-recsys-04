@@ -19,7 +19,8 @@ from models.ease.inference import recommend as ease_inference
 import urllib.request
 
 import random
-
+from bs4 import BeautifulSoup
+import requests
 app = FastAPI()
 
 origins = ["*"]
@@ -102,6 +103,12 @@ def signin(user: SignInRequest):
     _inter = 1000  # 허용 가능한 거리, 임시방편.
     _input = (_x - _inter, _x + _inter, _y - _inter, _y + _inter)
 
+
+    """
+    user.name 쿼리 날려서 좌표 가져오는 코드
+    """
+    user_name = get_name(user.name)
+
     """
     모델을 이용한 Top3 추출
     """
@@ -161,6 +168,7 @@ def signin(user: SignInRequest):
     return SignInResponse(
         state="start",
         detail="not cold start",
+        name = str(user_name),
         restaurants0=cat0,  # rec 1
         restaurants1=cat1,  # rec 2
         restaurants2=cat2,  # rec 3
@@ -183,6 +191,11 @@ def signin(user: SignInColdRequest):
     _x, _y = get_xy(user.location)  # _x = 314359, _y = 547462
     _inter = 1000  # 허용 가능한 거리, 임시방편.
     _input = (_x - _inter, _x + _inter, _y - _inter, _y + _inter)
+
+    """
+    user.name 쿼리 날려서 좌표 가져오는 코드
+    """
+    user_name = get_name(user.name)
 
     """
     모델을 이용한 Top3 추출
@@ -227,11 +240,19 @@ def signin(user: SignInColdRequest):
     return SignInResponse(
         state="start",
         detail="not cold start",
+        name = user_name,
         restaurants0=cat0,  # rec 1
         restaurants1=cat1,  # rec 2
         restaurants2=cat2,  # rec 3
     )
 
+def get_name(target : str):
+    # target = '6130db4973adbe125329a3e4'
+    url = 'https://m.place.naver.com/my/{}/review?v=2'.format(target)
+    req = requests.get(url)
+    soup = BeautifulSoup(req.content,'html.parser',from_encoding='cp949')
+    id = soup.select_one('meta[property="article:author"]')['content']
+    return id
 
 def get_xy(location: str):
     client_id = "789Xk04GARJpb4omVvUq"  # 개발자센터에서 발급받은 Client ID 값

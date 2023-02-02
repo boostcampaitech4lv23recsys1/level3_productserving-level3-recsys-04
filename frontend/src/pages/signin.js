@@ -88,6 +88,7 @@ export default function SignIn() {
       await window.localStorage.setItem('restaurants0', JSON.stringify(response["restaurants0"]));
       await window.localStorage.setItem('restaurants1', JSON.stringify(response["restaurants1"]));
       await window.localStorage.setItem('restaurants2', JSON.stringify(response["restaurants2"]));
+      await window.localStorage.setItem('name', JSON.stringify(response["name"]));
 
       await console.log(response);
     }
