@@ -12,7 +12,7 @@ class RateRequest(BaseModel):
 class SignInRequest(BaseModel):
     name: str
     location: str
-    menu : str
+    menu : str  # 1 : 식사, 2 : 카페/디저트
     
 class SignInColdRequest(BaseModel):
     name: str

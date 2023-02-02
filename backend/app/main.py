@@ -92,7 +92,8 @@ def signin(user: SignInRequest):
     # 향후 user.location으로 x,y 받아야함.
     _x,_y = get_xy(user.location) # _x = 314359, _y = 547462
     _inter = 1000 # 허용 가능한 거리, 임시방편.
-    _input = (_x - _inter, _x + _inter, _y - _inter, _y + _inter)
+
+    _input = (_x - _inter, _x + _inter, _y - _inter, _y + _inter, '음식아님', '카페&디저트')
     
     """
     모델을 이용한 Top3 추출
@@ -105,15 +106,18 @@ def signin(user: SignInRequest):
         )
 
     else:
-        select_sql = "select rest_code from rest where ((x > ?) AND (x < ?) AND (y > ?) AND (y < ?))"
+        if user.manu == 1: # 식사인경우
+            select_sql = "select rest_code from rest where ((x > ?) AND (x < ?) AND (y > ?) AND (y < ?) AND (tag != ?) AND (tag != ?))"
+        else: # 카페&디저트인 경우
+            select_sql = "select rest_code from rest where ((x > ?) AND (x < ?) AND (y > ?) AND (y < ?) AND (tag != ?) AND (tag = ?))"
+        
         cursor.execute(select_sql, _input)
         results = cursor.fetchall()
         rest_codes = [rest_code[0] for rest_code in results]
 
-    #     top_k = recommend(user_list[0][1], rest_codes, max_item[0][0])
-    # print(top_k)
         sasrec_top_k = sasrec_inference(user_list[0][1], rest_codes, max_item[0][0]-1)
         ease_top_k = ease_inference(user_list[0][0], user_list[0][1], set(rest_codes))
+
     print(sasrec_top_k)
     print(ease_top_k)
 
@@ -125,18 +129,8 @@ def signin(user: SignInRequest):
     cat2 = []
     cat3 = []
     for i, rest_id in enumerate(sasrec_top_k):
-        select_sql = f"select url, x, y, image, tag, name from rest where rest_code = {rest_id}.0"  # where rating = 4.42"
-        cursor.execute(select_sql)
-        url, x, y, image, tag, restaurant = cursor.fetchall()[0]
+        restaurant_1 = get_restaurant(rest_id)
 
-        restaurant_1 = Restaurant(
-            id=url,
-            x=x,
-            y=y,
-            tag=tag,
-            name=restaurant,
-            img_url=image,
-        )
         if i % 4 == 0:
             cat0.append(restaurant_1)
         elif i % 4 == 1:
@@ -195,18 +189,8 @@ def signin(user: SignInColdRequest):
     cat2 = []
     cat3 = []
     for i, rest_id in enumerate(top_k):
-        select_sql = f"select url, x, y, image, tag, name from rest where rest_code = {rest_id}.0"  # where rating = 4.42"
-        cursor.execute(select_sql)
-        url, x, y, image, tag, restaurant = cursor.fetchall()[0]
+        restaurant_1 = get_restaurant(rest_id)
 
-        restaurant_1 = Restaurant(
-            id=url,
-            x=x,
-            y=y,
-            tag=tag,
-            name=restaurant,
-            img_url=image,
-        )
         if i % 4 == 0:
             cat0.append(restaurant_1)
         elif i % 4 == 1:
@@ -224,6 +208,26 @@ def signin(user: SignInColdRequest):
         restaurants2=cat2, # rec 2
         restaurants3=cat3, # rec 3
     )
+
+def get_restaurant(rest_id):
+    """
+    rest_id를 입력하면 화면에 띄울 Restaurant 클래스를 배출해주는 함수.
+    """    
+    select_sql = f"select url, x, y, image, tag, name from rest where rest_code = {rest_id}.0"  # where rating = 4.42"
+    cursor.execute(select_sql)
+    url, x, y, image, tag, restaurant = cursor.fetchall()[0]
+
+    restaurant = Restaurant(
+        id=url,
+        x=x,
+        y=y,
+        tag=tag,
+        name=restaurant,
+        img_url=image,
+    )
+
+    return restaurant
+
 
 def get_xy(location: str):
     client_id = "789Xk04GARJpb4omVvUq" # 개발자센터에서 발급받은 Client ID 값
