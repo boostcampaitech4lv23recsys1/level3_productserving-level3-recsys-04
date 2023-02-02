@@ -34,7 +34,7 @@ app.add_middleware(
 
 
 ################ DB 설정 ################
-cnxn = sqlite3.connect("reccar_0130.db", check_same_thread=False)
+cnxn = sqlite3.connect("reccar_0202.db", check_same_thread=False)
 cursor = cnxn.cursor()
 ################ DB 설정 ################
 
@@ -54,12 +54,14 @@ def album(data: AlbumRequest):
     print(data.model)
     if data.is_positive:
         cursor.executemany(
-            "insert into positive values (?, ?)", [(data.user_id, data.rest_id)]
+            "insert into positive values (?, ?, ?)",
+            [(data.user_id, data.rest_id, data.model)],
         )
         select_sql = "select * from positive"
     else:
         cursor.executemany(
-            "insert into negative values (?, ?)", [(data.user_id, data.rest_id)]
+            "insert into negative values (?, ?, ?)",
+            [(data.user_id, data.rest_id, data.model)],
         )
         select_sql = "select * from negative"
     cnxn.commit()
@@ -67,7 +69,10 @@ def album(data: AlbumRequest):
     result = cursor.fetchall()
     print(result)
     return AlbumResponse(
-        user_id=data.user_id, rest_id=data.rest_id, is_positive=data.is_positive
+        user_id=data.user_id,
+        rest_id=data.rest_id,
+        is_positive=data.is_positive,
+        model=data.model,
     )
 
 
@@ -210,6 +215,7 @@ def signin(user: SignInColdRequest):
             tag=tag,
             name=restaurant,
             img_url=image,
+            model="cold start",
         )
         if i % 3 == 0:
             cat0.append(restaurant_1)
