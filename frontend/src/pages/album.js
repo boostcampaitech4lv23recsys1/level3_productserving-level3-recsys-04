@@ -128,12 +128,12 @@ export default function Album() {
             <Grid container spacing={3}>
               {/* cards의 card 가 하나씩 들어가는 반복문 */}
               {cards.map((card) => (
-                <Grid item key={card} xs={12} sm={6} md={4}>
+                <Grid item key={card} xs={12} sm={6} md={12}>
                   <Card
                     sx={{
                       height: '100%',
                       display: 'flex',
-                      flexDirection: 'column',
+                      // flexDirection: 'column',
                     }}
                   >
 
@@ -143,20 +143,24 @@ export default function Album() {
                         // 16:9
                         pt: '100%',
                       }}
+                      sx={{ position: "relative", objectFit: "contain", height: 250, left: -125 }}
                       image={restaurants[card][card_num[card]]["img_url"]}
                       alt="random"
                     />
-                    <CardContent sx={{ flexGrow: 1 }}>
+                    <CardContent sx={{ position: "relative", objectFit: "contain", left: -100, width: 1000 }}>
                       <Typography gutterBottom variant="h5" component="h2">
                         {restaurants[card][card_num[card]]["name"]}
                       </Typography>
                       <Typography>
                         {restaurants[card][card_num[card]]["tag"]}
                       </Typography>
+                      <Typography>
+                        제발되라제발되라제발되라제발되라제발되라제발되라제발되라제발되라제발되라제발되라
+                      </Typography>
                     </CardContent>
                     <CardActions>
-                      <Button id={card} type="submit" size="small" onClick={handleClick4}>식당 링크 열기</Button>
-                      <Button id={card} type="submit" size="small" onClick={handleClick5}>다른 결과 보기</Button>
+                      <Button id={card} type="submit" size="small" onClick={handleClick4} sx={{ position: "relative", bottom: -90, width: 100 }}>식당 링크 열기</Button>
+                      {/* <Button id={card} type="submit" size="small" onClick={handleClick5}>다른 결과 보기</Button> */}
                     </CardActions>
                   </Card>
                 </Grid>
@@ -166,7 +170,7 @@ export default function Album() {
               sx={{ pt: 4 }}
               direction="row"
               spacing={2}
-              justifyContent="center"
+              justifyContent="none"
             >
               {/* <Button variant="contained">더보기</Button> */}
 
@@ -190,6 +194,8 @@ export default function Album() {
           >
             <Button variant="outlined" onClick={handleClick1}>
               처음 화면으로</Button>
+            <Button variant="outlined" onClick={handleClick1}>
+              다른 결과 보기</Button>
           </Box>
         </Container>
 
