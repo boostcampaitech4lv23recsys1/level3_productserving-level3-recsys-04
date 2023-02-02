@@ -171,7 +171,7 @@ def batch():
 
     from sasrec.main import sasrec_main
 
-    recall_score = sasrec_main()
-    print(recall_score)
+    recall_score, per_score = sasrec_main()
+    print(recall_score, per_score)
 
     return
