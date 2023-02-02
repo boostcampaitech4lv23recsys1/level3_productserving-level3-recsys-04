@@ -76,7 +76,8 @@ export default function Album() {
     album({
       user_id: user,
       rest_id: restaurants[card][card_num[card]]["id"],
-      is_positive: true
+      is_positive: true,
+      model: restaurants[card][card_num[card]]["model"]
     });
   };
 
@@ -88,7 +89,8 @@ export default function Album() {
     album({
       user_id: user,
       rest_id: restaurants[card][card_num[card]]["id"],
-      is_positive: false
+      is_positive: false,
+      model: restaurants[card][card_num[card]]["model"]
     });
     if (card == 0) {
       setCardNum([card_num[0] + 1, card_num[1], card_num[2], card_num[3]])

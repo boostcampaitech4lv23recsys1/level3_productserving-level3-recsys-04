@@ -33,6 +33,7 @@ class AlbumRequest(BaseModel):
     user_id: str  # user
     rest_id: str  # url
     is_positive: bool
+    model: str
 
 
 class GeneralRequest(BaseModel):

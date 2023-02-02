@@ -51,6 +51,7 @@ def show_image(self):
 
 @app.post("/api/album")
 def album(data: AlbumRequest):
+    print(data.model)
     if data.is_positive:
         cursor.executemany(
             "insert into positive values (?, ?)", [(data.user_id, data.rest_id)]
