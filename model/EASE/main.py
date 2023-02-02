@@ -16,6 +16,8 @@ k = 20  # Should be synced with "k" in ease inference.py
 thres = 2000  # Should be synced with "thres" in ease inference.py
 output_dir = './output/'
 output_csv_name = '20230202'  # output csv 이름 설정
+
+lambda_ = 500  # EASE 모델 lambda 값 설정 (이미 만들어진 pickle 파일이 없을 경우에만 유효)
 #######################################################################
 try:  # data_type & 이미 저장된 pickle 파일 존재하는지 체크 (bool)
     is_pickle_exist = True if data_type=='time' and os.listdir( path + 'ease/' ) else False
@@ -35,7 +37,7 @@ model = EASE(k, thres)
 if is_pickle_exist:
     model.load_X_B_matrix(path)
 else:
-    model.fit(train)
+    model.fit(train, lambda_)
     if data_type == 'time':
         model.save_X_B_matrix(path)
 ''''''
