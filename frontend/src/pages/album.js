@@ -65,6 +65,12 @@ export default function Album() {
     navigate('/signin');
   };
 
+  const test = (event) => {
+    setCardNum([card_num[0] + 1, card_num[1] + 1, card_num[2] + 1])
+  };
+
+
+
   const handleClick4 = (event) => {
     // 일단 유저에서 열리게 
     var user = window.localStorage.getItem('link').substring(29, 53)
@@ -194,7 +200,7 @@ export default function Album() {
           >
             <Button variant="outlined" onClick={handleClick1}>
               처음 화면으로</Button>
-            <Button variant="outlined" onClick={handleClick1}>
+            <Button variant="outlined" onClick={test}>
               다른 결과 보기</Button>
           </Box>
         </Container>
