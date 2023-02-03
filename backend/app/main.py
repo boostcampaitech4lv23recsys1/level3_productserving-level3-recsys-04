@@ -134,10 +134,10 @@ def signin(user: SignInRequest):
         # print(top_k)
         sasrec_top_k = sasrec_inference(user_list[0][1], rest_codes, max_item[0][0] - 1)
         ease_top_k = ease_inference(user_list[0][0], user_list[0][1], set(rest_codes))
-        multivae_top_k = multivae_inference(rest_codes=user_list[0][1])
+        # multivae_top_k = multivae_inference(rest_codes=user_list[0][1])
     print(sasrec_top_k)
     print(ease_top_k)
-    print(multivae_top_k)
+    # print(multivae_top_k)
     """
     모델 추천 결과 가져오는 코드
     """
@@ -148,7 +148,13 @@ def signin(user: SignInRequest):
     def add_top_k(model_top_k):
         for i, model_info in enumerate(model_top_k):
             rest_id, model_name = model_info
-            restaurant_1 = get_restaurant(rest_id, model_name)
+            ment = {
+                "sasrec": "최근 방문한 음식점을 고려한 추천입니다.",
+                "multivae": "당신의 숨겨진 취향을 고려한 추천입니다.",
+                "ease": "당신과 유사한 유저들을 고려한 추천입니다.",
+                "rulebase": "지역 내 음식점 인기도를 고려한 추천입니다.",
+            }
+            restaurant_1 = get_restaurant(rest_id, model_name, ment[model_name])
             if i % 3 == 0:
                 cat0.append(restaurant_1)
             elif i % 3 == 1:
@@ -158,8 +164,8 @@ def signin(user: SignInRequest):
 
     sasrec_top_k = [(top_k, "sasrec") for top_k in sasrec_top_k]
     ease_top_k = [(top_k, "ease") for top_k in ease_top_k]
-    multivae_top_k = [(top_k, "multivae") for top_k in multivae_top_k]
-    all_top_k = sasrec_top_k + ease_top_k + multivae_top_k
+    # multivae_top_k = [(top_k, "multivae") for top_k in multivae_top_k]
+    all_top_k = sasrec_top_k + ease_top_k
     random.shuffle(all_top_k)
     add_top_k(all_top_k)
     return SignInResponse(
@@ -244,7 +250,7 @@ def signin(user: SignInColdRequest):
     )
 
 
-def get_restaurant(rest_id, model_name):
+def get_restaurant(rest_id, model_name, ment):
     """
     rest_id를 입력하면 화면에 띄울 Restaurant 클래스를 배출해주는 함수.
     """
@@ -262,6 +268,7 @@ def get_restaurant(rest_id, model_name):
         name=restaurant,
         img_url=image,
         model=model_name,
+        ment=ment,
     )
 
     return restaurant
