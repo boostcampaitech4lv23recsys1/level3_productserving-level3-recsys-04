@@ -66,7 +66,7 @@ export default function Album() {
   };
 
   const test = (event) => {
-    setCardNum([card_num[0] + 1, card_num[1] + 1, card_num[2] + 1])
+    setCardNum([(card_num[0] + 1) % restaurants[0].length, (card_num[1] + 1) % restaurants[1].length, (card_num[2] + 1) % restaurants[2].length])
   };
 
 
