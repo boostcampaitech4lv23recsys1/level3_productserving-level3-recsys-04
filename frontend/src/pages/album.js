@@ -124,12 +124,14 @@ export default function Album() {
             bgcolor: 'background.paper',
             pt: 8,
             pb: 6,
+            // backgroundColor: "black"
           }}
+
         >
 
           <Container maxWidth="md">
-            <Typography variant="h4" color="inherit" noWrap>
-              {window.localStorage.getItem('name')}님의 추천 목록          </Typography>
+            <Typography variant="h4" color="inherit" noWrap sx={{ marginBottom: 2 }}>
+              {window.localStorage.getItem('name')}님의 추천 목록         </Typography>
 
             <Grid container spacing={3}>
               {/* cards의 card 가 하나씩 들어가는 반복문 */}
@@ -160,7 +162,7 @@ export default function Album() {
                       <Typography>
                         {restaurants[card][card_num[card]]["tag"]}
                       </Typography>
-                      <Typography>
+                      <Typography sx={{ position: "relative", top: 10, fontSize: 18 }}>
                         제발되라제발되라제발되라제발되라제발되라제발되라제발되라제발되라제발되라제발되라
                       </Typography>
                     </CardContent>
@@ -198,9 +200,9 @@ export default function Album() {
               pb: 6,
             }}
           >
-            <Button variant="outlined" onClick={handleClick1}>
+            <Button variant="outlined" onClick={handleClick1} sx={{ position: "relative", top: -200, height: 50, right: 300 }}>
               처음 화면으로</Button>
-            <Button variant="outlined" onClick={test}>
+            <Button variant="outlined" onClick={test} sx={{ position: "relative", top: -200, height: 50, left: 300 }}>
               다른 결과 보기</Button>
           </Box>
         </Container>
@@ -208,6 +210,6 @@ export default function Album() {
 
       </main>
 
-    </ThemeProvider>
+    </ThemeProvider >
   );
 }
