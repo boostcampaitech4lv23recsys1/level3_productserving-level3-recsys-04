@@ -16,6 +16,8 @@ k = 20  # Should be synced with "k" in ease inference.py
 thres = 2000  # Should be synced with "thres" in ease inference.py
 output_dir = './output/'
 output_csv_name = '20230202'  # output csv 이름 설정
+
+lambda_ = 500  # EASE 모델 lambda 값 설정 (이미 만들어진 pickle 파일이 없을 경우에만 유효)
 #######################################################################
 try:  # data_type & 이미 저장된 pickle 파일 존재하는지 체크 (bool)
     is_pickle_exist = True if data_type=='time' and os.listdir( path + 'ease/' ) else False
@@ -35,7 +37,7 @@ model = EASE(k, thres)
 if is_pickle_exist:
     model.load_X_B_matrix(path)
 else:
-    model.fit(train)
+    model.fit(train, lambda_)
     if data_type == 'time':
         model.save_X_B_matrix(path)
 ''''''
@@ -57,14 +59,14 @@ for i in tqdm(range( user_max//thres + 1 )):
     end = end if end < user_max else user_max+1
 
     if is_pickle_exist:
-        with open(f'{path}/ease/ease-pred-{i}.pickle', 'rb') as f:
+        with open(f'{path}/ease/ease-pred-{i}.pkl', 'rb') as f:
             pred_cur = pickle.load(f)
     else:
         X_cur = model.X[ start : end ]
         pred_cur = X_cur.dot(model.B)
         pred_cur = np.float16(pred_cur)  ## 용량 줄이기
         if data_type == 'time':
-            with open(f'{path}/ease/ease-pred-{i}.pickle', 'wb') as f:
+            with open(f'{path}/ease/ease-pred-{i}.pkl', 'wb') as f:
                 pickle.dump(pred_cur, f, pickle.HIGHEST_PROTOCOL)
     
     pred_cur = model.predict(start, train_gbr[start:end], items_tot, pred_cur)
