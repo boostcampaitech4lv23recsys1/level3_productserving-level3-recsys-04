@@ -15,7 +15,7 @@ import sqlite3
 # from models.sasrec.inference import recommend
 from models.sasrec.inference import recommend as sasrec_inference
 from models.ease.inference import recommend as ease_inference
-
+from models.multivae.inference import recommend as multivae_inference
 import urllib.request
 
 import random
@@ -129,13 +129,15 @@ def signin(user: SignInRequest):
         cursor.execute(select_sql, _input)
         results = cursor.fetchall()
         rest_codes = [rest_code[0] for rest_code in results]
+
+        #     top_k = recommend(user_list[0][1], rest_codes, max_item[0][0])
+        # print(top_k)
         sasrec_top_k = sasrec_inference(user_list[0][1], rest_codes, max_item[0][0] - 1)
-        # ease_top_k = ease_inference(user_list[0][0], user_list[0][1], set(rest_codes))
+        ease_top_k = ease_inference(user_list[0][0], user_list[0][1], set(rest_codes))
+        multivae_top_k = multivae_inference(rest_codes=user_list[0][1])
     print(sasrec_top_k)
-    # print(ease_top_k)
-    sasrec_top_k = [(topk, "sasrec") for topk in sasrec_top_k]
-    # ease_top_k = [(topk, "ease") for topk in ease_top_k]
-    print(sasrec_top_k)
+    print(ease_top_k)
+    print(multivae_top_k)
     """
     모델 추천 결과 가져오는 코드
     """
