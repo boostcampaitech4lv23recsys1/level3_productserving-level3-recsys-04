@@ -11,8 +11,9 @@ class RateRequest(BaseModel):
 class SignInRequest(BaseModel):
     name: str
     location: str
-    menu : str  # 1 : 식사, 2 : 카페/디저트
-    
+    menu: str  # 1 : 식사, 2 : 카페/디저트
+
+
 class SignInColdRequest(BaseModel):
     name: str
     location: str
@@ -53,6 +54,7 @@ class Restaurant(BaseModel):
     name: str
     img_url: str
     model: str
+    ment: str
 
 
 class SignInResponse(BaseModel):
