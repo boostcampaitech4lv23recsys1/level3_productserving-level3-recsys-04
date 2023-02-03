@@ -27,10 +27,10 @@ export default function SignIn() {
 
   let [loading, setLoading] = React.useState(false);
   const navigate = useNavigate();
-  const validate = (response) => {
+  const validate = async (response) => {
     if (response["detail"] == "cold start") {
       //cold start 시에 실행시켜야 하는 항목
-      Swal.fire({
+      await Swal.fire({
         title: '싫어하는 음식을 선택해주세요.',
         html: `
         <input type="checkbox" id="c1"  /><label for="c1"></label>
@@ -54,7 +54,7 @@ export default function SignIn() {
           var c7 = Swal.getPopup().querySelector('#c7').checked
           var c8 = Swal.getPopup().querySelector('#c8').checked
           var c9 = Swal.getPopup().querySelector('#c9').checked
-          var count = c1+ c2+c3+c4+c5+c6+c7+c9+c9
+          var count = c1 + c2 + c3 + c4 + c5 + c6 + c7 + c9 + c9
           if (count <= 3) {
             return { c1: c1, c2: c2, c3: c3, c4: c4, c5: c5, c6: c6, c7: c7, c8: c8, c9: c9 }
           }
@@ -67,34 +67,45 @@ export default function SignIn() {
       }
       ).then((result) => {
         cold_start({
-          name: link.substring(29,53),
+          name: link.substring(29, 53),
           location: location,
-          menu : menu,
-          c1 : result.value.c1,
-          c2 : result.value.c2,
-          c3 : result.value.c3,
-          c4 : result.value.c4,
-          c5 : result.value.c5,
-          c6 : result.value.c6,
-          c7 : result.value.c7,
-          c8 : result.value.c8,
-          c9 : result.value.c9,
+          menu: menu,
+          c1: result.value.c1,
+          c2: result.value.c2,
+          c3: result.value.c3,
+          c4: result.value.c4,
+          c5: result.value.c5,
+          c6: result.value.c6,
+          c7: result.value.c7,
+          c8: result.value.c8,
+          c9: result.value.c9,
         });
       })
-    
-    }
-    else if (response["detail"] == "not cold start"){
-      // 콜드스타트 아니고 기존에 실행히시켜야 하던 항목
-      window.localStorage.setItem('restaurants1', JSON.stringify(response["restaurants1"]));
-      window.localStorage.setItem('restaurants2', JSON.stringify(response["restaurants2"]));
-      window.localStorage.setItem('restaurants3', JSON.stringify(response["restaurants3"]));
 
-      console.log(response);
-      window.location ='/album'
     }
-    
+    else if (response["detail"] == "not cold start") {
+      // 콜드스타트 아니고 기존에 실행히시켜야 하던 항목
+      await window.localStorage.setItem('restaurants0', JSON.stringify(response["restaurants0"]));
+      await window.localStorage.setItem('restaurants1', JSON.stringify(response["restaurants1"]));
+      await window.localStorage.setItem('restaurants2', JSON.stringify(response["restaurants2"]));
+      await window.localStorage.setItem('restaurants3', JSON.stringify(response["restaurants3"]));
+
+      await console.log(response);
+    }
+    let timeoutId;
+
+    Swal.fire({
+      title: '로딩 중입니다',
+      text: '잠시만 기다려주세요',
+      icon: 'info',
+      timer: 565555555,
+      showConfirmButton: false,
+      showCancelButton: true,
+      cancelButtonText: 'Cancel'
+    })
+    window.location = '/album'
   };
-  
+
 
   const signin = (userData) => {
     const requestOptions = {
@@ -110,14 +121,14 @@ export default function SignIn() {
       .then((response) => response.json())
       .then((response) => {
         validate(response);
-        
+
       })
       .catch(error => alert(error.message));
 
-    
+
 
   };
-  const cold_start = (userData) => {
+  const cold_start = async (userData) => {
     const requestOptions = {
       method: "POST",
       headers: {
@@ -127,54 +138,37 @@ export default function SignIn() {
       },
       body: JSON.stringify(userData),
     };
-    fetch('/api/signin/cold', requestOptions)
+    await fetch('/api/signin/cold', requestOptions)
       .then((response) => response.json())
       .then((response) => {
         validate(response);
-        
+
       })
       .catch(error => alert(error.message));
 
-    
+
 
   };
 
-
-  let timeoutId;
-
-  const showAutoClose = () => {
-    const loading = Swal.fire({
-      title: '로딩 중입니다',
-      text: '잠시만 기다려주세요',
-      icon: 'info',
-      timer: 5000,
-      showConfirmButton : false,
-      showCancelButton: true,
-      cancelButtonText: 'Cancel',
-
-      // onOpen: () => {
-      //   Swal.showLoading()
-      //   timeoutId = setTimeout(() => {
-          
-      //     loading.close();
-          
-      //   }, 5000);
-      // },
-      // onClose: () => {
-      //   clearTimeout(timeoutId);
-      //   console.log('Alert closed')
-        
-      // }
-
-    }).then((result) => {
-      if (result.dismiss === Swal.DismissReason.cancel) {
-        clearTimeout(timeoutId);
-        console.log('Cancelled');
-        // window.location = '/signin'
-      } else {
-        window.location ='/album'
-      }
-    });
+  const howtouse = (event) => {
+    Swal.fire({
+      width: 800,
+      html: `
+      <div>
+        <h1>렉카메추 사용 방법!</h1>
+        <h2>1.
+        <a href="https://naver.com">네이버 </a>로그인 후</h2>
+        <h2>2.
+        <a href="https://m.place.naver.com/my/">네이버 마이플레이스</a>
+        - 클릭
+        </h2>
+        <h2>3.주소 복사</h2>
+        <img src= 'img/howto1.jpg' width ='600'/>
+        <h3>4.현재 서비스는 서울에 있는 식당을 기준으로 서비스 되고 있습니다. </h3>
+        <h3>서울에서 추천을 원하는 주소를 입력해주세요.</h3>
+      </div>
+      `
+    })
   }
 
 
@@ -185,14 +179,14 @@ export default function SignIn() {
   };
 
   const handleClick1 = (event) => {
-    
+
     if (link.includes('place.naver.com/my')) {
-      
+
       window.localStorage.setItem('link', link);
       signin({
-        name: link.substring(29,53),
+        name: link.substring(29, 53),
         location: location,
-        menu : menu,
+        menu: menu,
       });
 
 
@@ -269,7 +263,7 @@ export default function SignIn() {
                 <MenuItem value={2}>카페&디저트</MenuItem>
               </Select>
             </FormControl>
-            
+
             {/* <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}
               label="Remember me"
@@ -287,14 +281,14 @@ export default function SignIn() {
             </div>
             <Grid container>
               <Grid item xs>
-                <Link variant="body2" onClick={handleClick2}>
+                <Link variant="body2" onClick={howtouse}>
                   어떻게 사용하나요?
                 </Link>
               </Grid>
             </Grid>
           </Box>
         </Box>
-        
+
       </Container>
     </ThemeProvider>
   );

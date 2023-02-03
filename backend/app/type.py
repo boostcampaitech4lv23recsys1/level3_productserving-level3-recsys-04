@@ -52,9 +52,10 @@ class Restaurant(BaseModel):
 class SignInResponse(BaseModel):
     state: str
     detail: str  # cold-start or not
-    restaurants1 : List[Restaurant]
-    restaurants2 : List[Restaurant]
-    restaurants3 : List[Restaurant]
+    restaurants0 : List[Restaurant] #best rec
+    restaurants1 : List[Restaurant] #rec 1
+    restaurants2 : List[Restaurant] #rec 2
+    restaurants3 : List[Restaurant] #rec 3
 
 class SignInColdResponse(BaseModel):
     state: str

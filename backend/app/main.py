@@ -12,7 +12,9 @@ import torch
 
 import sqlite3
 
-from models.sasrec.inference import recommend
+# from models.sasrec.inference import recommend
+from models.sasrec.inference import recommend as sasrec_inference
+from models.ease.inference import recommend as ease_inference
 
 import urllib.request
 
@@ -30,7 +32,7 @@ app.add_middleware(
 
 
 ################ DB 설정 ################
-cnxn = sqlite3.connect("reccar.db", check_same_thread=False)
+cnxn = sqlite3.connect("reccar_0130.db", check_same_thread=False)
 cursor = cnxn.cursor()
 ################ DB 설정 ################
 
@@ -108,16 +110,21 @@ def signin(user: SignInRequest):
         results = cursor.fetchall()
         rest_codes = [rest_code[0] for rest_code in results]
 
-        top_k = recommend(user_list[0][1], rest_codes, max_item[0][0])
-    print(top_k)
+    #     top_k = recommend(user_list[0][1], rest_codes, max_item[0][0])
+    # print(top_k)
+        sasrec_top_k = sasrec_inference(user_list[0][1], rest_codes, max_item[0][0]-1)
+        ease_top_k = ease_inference(user_list[0][0], user_list[0][1], set(rest_codes))
+    print(sasrec_top_k)
+    print(ease_top_k)
 
     """
     모델 추천 결과 가져오는 코드
     """
+    cat0 = []
     cat1 = []
     cat2 = []
     cat3 = []
-    for i, rest_id in enumerate(top_k):
+    for i, rest_id in enumerate(sasrec_top_k):
         select_sql = f"select url, x, y, image, tag, name from rest where rest_code = {rest_id}.0"  # where rating = 4.42"
         cursor.execute(select_sql)
         url, x, y, image, tag, restaurant = cursor.fetchall()[0]
@@ -130,9 +137,11 @@ def signin(user: SignInRequest):
             name=restaurant,
             img_url=image,
         )
-        if i % 3 == 0:
+        if i % 4 == 0:
+            cat0.append(restaurant_1)
+        elif i % 4 == 1:
             cat1.append(restaurant_1)
-        elif i % 3 == 1:
+        elif i % 4 == 2:
             cat2.append(restaurant_1)
         else:
             cat3.append(restaurant_1)
@@ -140,9 +149,10 @@ def signin(user: SignInRequest):
     return SignInResponse(
         state="start",
         detail="not cold start",
-        restaurants1=cat1,
-        restaurants2=cat2,
-        restaurants3=cat3,
+        restaurants0=cat0, # best rec
+        restaurants1=cat1, # rec 1
+        restaurants2=cat2, # rec 2
+        restaurants3=cat3, # rec 3
     )
 
 @app.post("/api/signin/cold")
@@ -180,6 +190,7 @@ def signin(user: SignInColdRequest):
     """
     모델 추천 결과 가져오는 코드
     """
+    cat0 = []
     cat1 = []
     cat2 = []
     cat3 = []
@@ -196,18 +207,22 @@ def signin(user: SignInColdRequest):
             name=restaurant,
             img_url=image,
         )
-        if i % 3 == 0:
+        if i % 4 == 0:
+            cat0.append(restaurant_1)
+        elif i % 4 == 1:
             cat1.append(restaurant_1)
-        elif i % 3 == 1:
+        elif i % 4 == 2:
             cat2.append(restaurant_1)
         else:
             cat3.append(restaurant_1)
+
     return SignInResponse(
         state="start",
         detail="not cold start",
-        restaurants1=cat1,
-        restaurants2=cat2,
-        restaurants3=cat3,
+        restaurants0=cat0, # best rec
+        restaurants1=cat1, # rec 1
+        restaurants2=cat2, # rec 2
+        restaurants3=cat3, # rec 3
     )
 
 def get_xy(location: str):
