@@ -15,7 +15,7 @@ import sqlite3
 # from models.sasrec.inference import recommend
 from models.sasrec.inference import recommend as sasrec_inference
 from models.ease.inference import recommend as ease_inference
-
+from models.multivae.inference import recommend as multivae_inference
 import urllib.request
 
 app = FastAPI()
@@ -114,9 +114,10 @@ def signin(user: SignInRequest):
     # print(top_k)
         sasrec_top_k = sasrec_inference(user_list[0][1], rest_codes, max_item[0][0]-1)
         ease_top_k = ease_inference(user_list[0][0], user_list[0][1], set(rest_codes))
+        multivae_top_k = multivae_inference(rest_codes= user_list[0][1])
     print(sasrec_top_k)
     print(ease_top_k)
-
+    print(multivae_top_k)
     """
     모델 추천 결과 가져오는 코드
     """
