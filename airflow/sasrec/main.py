@@ -10,6 +10,7 @@ from utils import (
     check_path,
     get_user_seqs,
     set_seed,
+    personalizeion,
 )
 from trainers import (
     iteration,
@@ -24,7 +25,7 @@ def sasrec_main():
     parser.add_argument("--data_dir", default="../data/", type=str)
     parser.add_argument("--output_dir", default="/opt/ml/input/project/backend/app/models/data", type=str)
     parser.add_argument("--data_name", default="0130", type=str)
-    parser.add_argument("--data_type", default="time", type=str)
+    parser.add_argument("--data_type", default="rand", type=str)
     parser.add_argument("--model_name", default="SASRec", type=str)
     
 
@@ -157,8 +158,11 @@ def sasrec_main():
     pred_df['pred'] = pred_df.apply(lambda x : [x[i] for i in range(0,20)], axis = 1)
     pred_df = pred_df.reset_index()
     pred_df = pred_df[['index','pred']]
-
-    pred_df.to_csv(f'{args.model_name}_{args.data_type}_test_{args.data_name}.csv', index = False)
+    per_score = personalizeion(pred_df)
+    #pred_df.to_csv(f'{args.model_name}_{args.data_type}_test_{args.data_name}.csv', index = False)
     torch.save(model.state_dict(), args.checkpoint_path)
 
-    return scores
+    return scores, per_score
+
+if __name__ == "__main__":
+    sasrec_main()

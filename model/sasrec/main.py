@@ -10,6 +10,7 @@ from utils import (
     check_path,
     get_user_seqs,
     set_seed,
+    personalizeion
 )
 from trainers import (
     iteration,
@@ -157,7 +158,7 @@ def main():
     pred_df['pred'] = pred_df.apply(lambda x : [x[i] for i in range(0,20)], axis = 1)
     pred_df = pred_df.reset_index()
     pred_df = pred_df[['index','pred']]
-    pred_df.to_csv(f'{args.model_name}_{args.data_type}_test_{args.data_name}.csv', index = False)
+    #pred_df.to_csv(f'{args.model_name}_{args.data_type}_test_{args.data_name}.csv', index = False)
     
     
     torch.save(model.state_dict(), args.checkpoint_path)
