@@ -156,10 +156,10 @@ def signin(user: SignInRequest):
             elif i % 3 == 2:
                 cat2.append(restaurant_1)
 
-    random.shuffle(sasrec_top_k)
-    # random.shuffle(ease_top_k)
-    add_top_k(sasrec_top_k)
-    # add_top_k(sasrec_top_k + ease_top_k)
+    all_top_k = sasrec_top_k + ease_top_k + multivae_top_k
+    random.shuffle(all_top_k)
+    # add_top_k(sasrec_top_k)
+    add_top_k(all_top_k)
     return SignInResponse(
         state="start",
         detail="not cold start",
