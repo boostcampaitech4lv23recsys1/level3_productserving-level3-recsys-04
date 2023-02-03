@@ -185,7 +185,6 @@ def get_metric(pred_list, topk=10):
     return HIT / len(pred_list), NDCG / len(pred_list), MRR / len(pred_list)
 
 
-
 def recallk(actual, predicted, k = 3):
     """ label과 prediction 사이의 recall 평가 함수 
     Args:
@@ -216,7 +215,7 @@ def personalizeion(pred_list):
     y_lst = []
 
     def fun(x):
-        x = eval(x)
+        # x = eval(x)
         y_lst.extend(x)
         return x
 
@@ -231,7 +230,7 @@ def personalizeion(pred_list):
 
     x_array = x_array.T.reshape(-1)
     dat_array = np.ones(x_array.shape[0])
-    matrix = sparse.csr_matrix((dat_array, (x_array, y_array)), shape = (pred_list.shape[0],y_array.max()+1), dtype=int)
+    matrix = csr_matrix((dat_array, (x_array, y_array)), shape = (pred_list.shape[0],y_array.max()+1), dtype=int)
 
 
     _sum = 0
