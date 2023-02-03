@@ -83,7 +83,7 @@ def ease_main():
     predict_user = predict.groupby('user_code')['rest_code'].apply(list)
     answer_user = test.groupby('user_code')['rest_code'].apply(list)
 
-    predict_user = predict_user.reset_index(drop=True)
+    predict_user = predict_user.reset_index()
     predict_user.columns = ['index', 'pred']
     answer_user = answer_user.reset_index(drop=True)
     ''''''
