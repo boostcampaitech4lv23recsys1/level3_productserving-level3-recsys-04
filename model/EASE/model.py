@@ -7,9 +7,9 @@ import pickle
 
 ''' EASE model class '''
 class EASE:
-    def __init__(self, thres):
+    def __init__(self, k, thres):
+        self.k = k
         self.thres = thres
-        return
     
 
     def fit(self, df, lambda_: float = 500, implicit=True):
@@ -66,7 +66,7 @@ class EASE:
             self.B = pickle.load(f)
 
     
-    def predict(self, start, watched, items, pred, k):
+    def predict(self, start, watched, items, pred):
         """_summary_
         start ~ start+thred 구간의 user들에 대해, pred 행렬을 바탕으로 k개 추천
         Args:
@@ -82,7 +82,7 @@ class EASE:
         with Pool(cpu_count()) as p:
             user_preds = p.starmap(
                 self.predict_for_user,
-                [(user, watch, pred[user % self.thres, :], items, k) for user, watch in enumerate(watched, start=start)],
+                [(user, watch, pred[user % self.thres, :], items, self.k) for user, watch in enumerate(watched, start=start)],
             )
         df = pd.concat(user_preds)
         return df

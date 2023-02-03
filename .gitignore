@@ -65,6 +65,7 @@ tem.ipynb
 tem.py
 *.npy
 *.pickle
+airflow/data/
 
 # model
 output/
