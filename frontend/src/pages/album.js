@@ -155,19 +155,19 @@ export default function Album() {
                       image={restaurants[card][card_num[card]]["img_url"]}
                       alt="random"
                     />
-                    <CardContent sx={{ position: "relative", objectFit: "contain", left: -100, width: 1000 }}>
+                    <CardContent sx={{ position: "relative", objectFit: "contain", left: -100, width: 700 }}>
                       <Typography gutterBottom variant="h5" component="h2">
                         {restaurants[card][card_num[card]]["name"]}
                       </Typography>
                       <Typography>
                         {restaurants[card][card_num[card]]["tag"]}
                       </Typography>
-                      <Typography sx={{ position: "relative", top: 10, fontSize: 18 }}>
-                        제발되라제발되라제발되라제발되라제발되라제발되라제발되라제발되라제발되라제발되라
+                      <Typography sx={{ position: "relative", top: 10, fontSize: 18, width: 400 }}>
+                        {restaurants[card][card_num[card]]["ment"]}
                       </Typography>
                     </CardContent>
                     <CardActions>
-                      <Button id={card} type="submit" size="small" onClick={handleClick4} sx={{ position: "relative", bottom: -90, width: 100 }}>식당 링크 열기</Button>
+                      <Button id={card} type="submit" size="small" onClick={handleClick4} sx={{ position: "relative", bottom: -90, width: 100, left: -130 }}>식당 링크 열기</Button>
                       {/* <Button id={card} type="submit" size="small" onClick={handleClick5}>다른 결과 보기</Button> */}
                     </CardActions>
                   </Card>

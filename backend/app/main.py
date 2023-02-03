@@ -148,7 +148,13 @@ def signin(user: SignInRequest):
     def add_top_k(model_top_k):
         for i, model_info in enumerate(model_top_k):
             rest_id, model_name = model_info
-            restaurant_1 = get_restaurant(rest_id, model_name)
+            ment = {
+                "sasrec": "최근 방문한 음식점을 고려한 추천입니다.",
+                "multivae": "당신의 숨겨진 취향을 고려한 추천입니다.",
+                "ease": "당신과 유사한 유저들을 고려한 추천입니다.",
+                "rulebase": "지역 내 음식점 인기도를 고려한 추천입니다.",
+            }
+            restaurant_1 = get_restaurant(rest_id, model_name, ment[model_name])
             if i % 3 == 0:
                 cat0.append(restaurant_1)
             elif i % 3 == 1:
@@ -244,7 +250,7 @@ def signin(user: SignInColdRequest):
     )
 
 
-def get_restaurant(rest_id, model_name):
+def get_restaurant(rest_id, model_name, ment):
     """
     rest_id를 입력하면 화면에 띄울 Restaurant 클래스를 배출해주는 함수.
     """
@@ -262,6 +268,7 @@ def get_restaurant(rest_id, model_name):
         name=restaurant,
         img_url=image,
         model=model_name,
+        ment=ment,
     )
 
     return restaurant
