@@ -174,9 +174,9 @@ def batch():
     from ease.main import ease_main
 
     sasrec_recall_score, sasrec_per_score = sasrec_main()
-    ease_recall_score = ease_main()
-    print("sasrec : ", sasrec_recall_score)
-    print("ease : ", ease_recall_score)
+    ease_recall_score, ease_per_score = ease_main()
+    print("sasrec : ", sasrec_recall_score, sasrec_per_score)
+    print("ease : ", ease_recall_score, ease_per_score)
 
     return
 

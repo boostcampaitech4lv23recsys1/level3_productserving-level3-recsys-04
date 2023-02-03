@@ -4,16 +4,17 @@ from tqdm import tqdm
 import pickle
 import os
 
-from model import EASE
+from ease.model import EASE
+from sasrec.utils import personalizeion
 
 
 def ease_main():
     ''' global variables '''
     ############# Warning... 실행 전 반드시 설정 확인해주세요!! #############
-    csv_input_path = '../data/'  # input csv 경로
-    csv_output_path = './output/'  # output csv 저장 경로
+    csv_input_path = 'data/'  # input csv 경로
+    csv_output_path = 'output/'  # output csv 저장 경로
     csv_output_name = '20230202'  # output csv 이름 설정
-    pkl_path = '/opt/ml/input/project/backend/app/models/data'  # pickle 파일 저장&로드 경로
+    pkl_path = '/opt/ml/input/project/backend/app/models/data/'  # pickle 파일 저장&로드 경로
 
     data_type = 'time'  # ['time', 'rand']
     k = 20  # Should be synced with "k" in ease inference.py
@@ -29,8 +30,8 @@ def ease_main():
 
 
     ''' load data '''
-    train = pd.read_csv(f'{csv_input_path}train_{data_type}.csv')
-    test = pd.read_csv(f'{csv_input_path}test_{data_type}.csv')
+    train = pd.read_csv(csv_input_path + f'train_{data_type}.csv')
+    test = pd.read_csv(csv_input_path + f'test_{data_type}.csv')
     ''''''
 
     ''' model train '''
@@ -61,21 +62,20 @@ def ease_main():
         end = end if end < user_max else user_max+1
 
         if is_pickle_exist:
-            with open(f'{pkl_path}/ease/ease-pred-{i}.pkl', 'rb') as f:
+            with open(pkl_path + f'ease/ease-pred-{i}.pkl', 'rb') as f:
                 pred_cur = pickle.load(f)
         else:
             X_cur = model.X[ start : end ]
             pred_cur = X_cur.dot(model.B)
             pred_cur = np.float16(pred_cur)  ## 용량 줄이기
             if data_type == 'time':
-                with open(f'{pkl_path}/ease/ease-pred-{i}.pkl', 'wb') as f:
+                with open(pkl_path + f'ease/ease-pred-{i}.pkl', 'wb') as f:
                     pickle.dump(pred_cur, f, pickle.HIGHEST_PROTOCOL)
         
         pred_cur = model.predict(start, train_gbr[start:end], items_tot, pred_cur)
         predict = pd.concat([predict, pred_cur])
     ''''''
-
-    ''' recall@k '''
+    ''' preprocess answer & predict '''
     predict = predict.reset_index(drop=True)
     predict = predict.drop('score', axis = 1)
     predict = predict.astype('int')
@@ -84,7 +84,9 @@ def ease_main():
     answer_user = test.groupby('user_code')['rest_code'].apply(list)
 
     predict_user = predict_user.reset_index(drop=True)
+    predict_user.columns = ['index', 'pred']
     answer_user = answer_user.reset_index(drop=True)
+    ''''''
 
     # output csv 생성
     if not os.path.exists(csv_output_path):
@@ -92,6 +94,7 @@ def ease_main():
     predict_user.to_csv(f'{csv_output_path}ease_{data_type}_top{k}_{csv_output_name}.csv')
     #################
 
+    ''' recall@k '''
     _recall = []
 
     for i, ans in enumerate(answer_user):
@@ -102,5 +105,14 @@ def ease_main():
         _recall.append(a/2)
 
     recall = sum(_recall) / len(_recall)
-    return recall
     ''''''
+
+    ''' personalization score '''
+    per_score = personalizeion(predict_user)
+    ''''''
+
+    return recall, per_score
+
+
+if __name__ == '__main__':
+    ease_main()
