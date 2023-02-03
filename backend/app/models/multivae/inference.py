@@ -103,7 +103,7 @@ def recommend(rest_codes, K = 20):
     with open('/opt/ml/input/project/backend/app/models/data/model_1.pt', 'rb') as f:
         model = torch.load(f)
     model.eval()
-
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
     with torch.no_grad():
         
