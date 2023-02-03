@@ -32,7 +32,7 @@ def recommend(user_seq: list, item_candidate : list, max_item = 41460):
     # # 모델 argument(하이퍼 파라미터)
     # parser.add_argument("--model_name", default="Finetune_full", type=str)
     parser.add_argument(
-        "--hidden_size", type=int, default=256, help="hidden size of transformer model"
+        "--hidden_size", type=int, default=128, help="hidden size of transformer model"
     )
     parser.add_argument(
         "--num_hidden_layers", type=int, default=2, help="number of layers"
@@ -55,7 +55,7 @@ def recommend(user_seq: list, item_candidate : list, max_item = 41460):
     # # 모델 파라미터 initializer 범위 설정? (모델 본 사람이 채워줘.)
     parser.add_argument("--initializer_range", type=float, default=0.02)
     # # 최대 시퀀셜 길이 설정
-    parser.add_argument("--max_seq_length", default=100, type=int)
+    parser.add_argument("--max_seq_length", default=150, type=int)
 
     # # train args, 트레이너 하이퍼파라미터
     parser.add_argument(

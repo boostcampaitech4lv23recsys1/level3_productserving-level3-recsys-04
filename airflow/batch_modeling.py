@@ -23,7 +23,7 @@ def batch():
     """
     Backend에서 사용하는 reccar_0130 DB 연결하기.
     """
-    cnxn = sqlite3.connect("../backend/reccar_0130.db")
+    cnxn = sqlite3.connect("../backend/reccar_0202.db")
     cursor = cnxn.cursor()
 
     """
