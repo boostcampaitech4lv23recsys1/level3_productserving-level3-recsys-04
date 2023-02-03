@@ -129,7 +129,7 @@ export default function Album() {
 
           <Container maxWidth="md">
             <Typography variant="h4" color="inherit" noWrap>
-              {window.localStorage.getItem('link').substring(29, 53)}님의 추천 목록          </Typography>
+              {window.localStorage.getItem('name')}님의 추천 목록          </Typography>
 
             <Grid container spacing={3}>
               {/* cards의 card 가 하나씩 들어가는 반복문 */}
