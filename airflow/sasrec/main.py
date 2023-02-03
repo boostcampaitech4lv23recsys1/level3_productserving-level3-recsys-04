@@ -162,6 +162,3 @@ def sasrec_main():
     torch.save(model.state_dict(), args.checkpoint_path)
 
     return scores
-
-if __name__ == "__main__":
-    sasrec_main()
