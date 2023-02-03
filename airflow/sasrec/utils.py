@@ -9,7 +9,6 @@ import torch
 from scipy.sparse import csr_matrix
 from sklearn.metrics.pairwise import cosine_similarity
 
-
 def set_seed(seed):
     random.seed(seed)
     os.environ["PYTHONHASHSEED"] = str(seed)
@@ -200,6 +199,7 @@ def recallk(actual, predicted, k = 3):
     set_actual = set(actual)
     recall_k = len(set_actual & set(predicted[:k])) / min(k, len(set_actual))
     return recall_k
+
 
 
 def personalizeion(pred_list):

@@ -2,7 +2,6 @@ from pydantic import BaseModel
 from typing import List
 
 
-
 class RateRequest(BaseModel):
     user_id: int
     recipe_id: int
@@ -12,25 +11,29 @@ class RateRequest(BaseModel):
 class SignInRequest(BaseModel):
     name: str
     location: str
-    menu : str
+    menu : str  # 1 : 식사, 2 : 카페/디저트
     
 class SignInColdRequest(BaseModel):
     name: str
     location: str
-    menu : str
-    c1 : bool
-    c2 : bool
-    c3 : bool
-    c4 : bool
-    c5 : bool
-    c6 : bool
-    c7 : bool
-    c8 : bool
-    c9 : bool
+    menu: str
+    c1: bool
+    c2: bool
+    c3: bool
+    c4: bool
+    c5: bool
+    c6: bool
+    c7: bool
+    c8: bool
+    c9: bool
+
+
 class AlbumRequest(BaseModel):
-    user_id: str # user
-    rest_id: str # url
-    is_positive : bool
+    user_id: str  # user
+    rest_id: str  # url
+    is_positive: bool
+    model: str
+
 
 class GeneralRequest(BaseModel):
     qeury: str
@@ -41,6 +44,7 @@ class GeneralResponse(BaseModel):
     state: str
     detail: str
 
+
 class Restaurant(BaseModel):
     id: str
     x: int
@@ -48,14 +52,17 @@ class Restaurant(BaseModel):
     tag: str
     name: str
     img_url: str
+    model: str
+
 
 class SignInResponse(BaseModel):
     state: str
     detail: str  # cold-start or not
-    restaurants0 : List[Restaurant] #best rec
-    restaurants1 : List[Restaurant] #rec 1
-    restaurants2 : List[Restaurant] #rec 2
-    restaurants3 : List[Restaurant] #rec 3
+    name: str
+    restaurants0: List[Restaurant]  # rec 1
+    restaurants1: List[Restaurant]  # rec 2
+    restaurants2: List[Restaurant]  # rec 3
+
 
 class SignInColdResponse(BaseModel):
     state: str
@@ -65,13 +72,12 @@ class SignInColdResponse(BaseModel):
 class AlbumResponse(BaseModel):
     user_id: str
     rest_id: str
-    is_positive : bool
-    
+    is_positive: bool
+
+
 class User(BaseModel):
     name: str
     location: str
-
-
 
 
 class ThemeSample(BaseModel):
@@ -92,5 +98,3 @@ class ThemeListRequest(BaseModel):
 
 class ThemeListResponse(BaseModel):
     articles: List[ThemeSamples]
-
-
