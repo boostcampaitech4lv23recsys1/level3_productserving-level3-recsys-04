@@ -121,7 +121,7 @@ def signin(user: SignInRequest):
         )
 
     else:
-        if user.menu == 1:  # 식사인경우
+        if user.menu == "1":  # 식사인경우
             select_sql = "select rest_code from rest where ((x > ?) AND (x < ?) AND (y > ?) AND (y < ?) AND (tag != ?) AND (tag != ?))"
         else:  # 카페&디저트인 경우
             select_sql = "select rest_code from rest where ((x > ?) AND (x < ?) AND (y > ?) AND (y < ?) AND (tag != ?) AND (tag = ?))"
