@@ -156,9 +156,11 @@ def signin(user: SignInRequest):
             elif i % 3 == 2:
                 cat2.append(restaurant_1)
 
+    sasrec_top_k = [(top_k, "sasrec") for top_k in sasrec_top_k]
+    ease_top_k = [(top_k, "ease") for top_k in ease_top_k]
+    multivae_top_k = [(top_k, "multivae") for top_k in multivae_top_k]
     all_top_k = sasrec_top_k + ease_top_k + multivae_top_k
     random.shuffle(all_top_k)
-    # add_top_k(sasrec_top_k)
     add_top_k(all_top_k)
     return SignInResponse(
         state="start",
