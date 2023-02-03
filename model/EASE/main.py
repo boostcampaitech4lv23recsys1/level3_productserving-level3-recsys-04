@@ -59,14 +59,14 @@ for i in tqdm(range( user_max//thres + 1 )):
     end = end if end < user_max else user_max+1
 
     if is_pickle_exist:
-        with open(f'{path}/ease/ease-pred-{i}.pickle', 'rb') as f:
+        with open(f'{path}/ease/ease-pred-{i}.pkl', 'rb') as f:
             pred_cur = pickle.load(f)
     else:
         X_cur = model.X[ start : end ]
         pred_cur = X_cur.dot(model.B)
         pred_cur = np.float16(pred_cur)  ## 용량 줄이기
         if data_type == 'time':
-            with open(f'{path}/ease/ease-pred-{i}.pickle', 'wb') as f:
+            with open(f'{path}/ease/ease-pred-{i}.pkl', 'wb') as f:
                 pickle.dump(pred_cur, f, pickle.HIGHEST_PROTOCOL)
     
     pred_cur = model.predict(start, train_gbr[start:end], items_tot, pred_cur)

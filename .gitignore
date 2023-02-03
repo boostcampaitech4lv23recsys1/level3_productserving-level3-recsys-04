@@ -65,6 +65,7 @@ tem.ipynb
 tem.py
 *.npy
 *.pickle
+*.pkl
 airflow/data/
 
 # model

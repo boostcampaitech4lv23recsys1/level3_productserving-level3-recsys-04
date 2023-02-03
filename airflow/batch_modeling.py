@@ -168,6 +168,7 @@ def batch():
     """
     import sys
     sys.path.append('sasrec')
+    sys.path.append('ease')
 
     from sasrec.main import sasrec_main
     from ease.main import ease_main
@@ -178,3 +179,7 @@ def batch():
     print("ease : ", ease_recall_score)
 
     return
+
+
+if __name__ == '__main__':
+    batch()

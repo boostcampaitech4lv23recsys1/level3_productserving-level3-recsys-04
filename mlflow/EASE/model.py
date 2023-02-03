@@ -48,9 +48,9 @@ class EASE:
         Args:
             path (_type_): 저장 저장 경로 (str)
         """
-        with open(path + 'ease-X.pickle', 'wb') as f:
+        with open(path + 'ease-X.pkl', 'wb') as f:
             pickle.dump(self.X, f, pickle.HIGHEST_PROTOCOL)
-        with open(path + 'ease-B.pickle', 'wb') as f:
+        with open(path + 'ease-B.pkl', 'wb') as f:
             pickle.dump(self.B, f, pickle.HIGHEST_PROTOCOL)
 
 
@@ -60,9 +60,9 @@ class EASE:
         Args:
             path (_type_): 파일 로드 경로 (str)
         """
-        with open(path + 'ease-X.pickle', 'rb') as f:
+        with open(path + 'ease-X.pkl', 'rb') as f:
             self.X = pickle.load(f)
-        with open(path + 'ease-B.pickle', 'rb') as f:
+        with open(path + 'ease-B.pkl', 'rb') as f:
             self.B = pickle.load(f)
 
     
