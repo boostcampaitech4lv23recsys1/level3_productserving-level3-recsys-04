@@ -2,12 +2,11 @@ import pandas as pd
 import numpy as np
 import pandas as pd
 from numpy import random
-import time
 import sqlite3
 
 import re
-
 import random
+from datetime import date
 
 import warnings
 warnings.filterwarnings('ignore')
@@ -47,7 +46,10 @@ def batch():
     """
     positive 로깅 데이터 전처리 진행 (user_code, rest_code 넣어주기)
     """
-    positive_df['date'] = '2023년 1월 31일' # 이건 매일 바꿔줘야.
+    cur_date = str(date.today())  # "2023-02-04"
+    cur_date = cur_date.split("-")  # ["2023", "02", "04"]
+    cur_date = cur_date[0]+"년 "+cur_date[1].lstrip('0')+"월 "+cur_date[2]+"일"
+    positive_df['date'] = cur_date  # "2023년 2월 04일"
 
     positive_df = pd.merge(positive_df, rest, left_on = 'rest', right_on = 'url', how = 'left')
     positive_df = positive_df[~positive_df['rest_code'].isnull()] # 음식점 DB에 없는 곳 제외.

@@ -235,12 +235,16 @@ def personalizeion(pred_list):
 
     _sum = 0
 
-    for i in (range(0, 39)):
+    thres = 10000
+    i_end = matrix.shape[0]//thres + 1
+
+    for i in (range(0, i_end)):
         #print(i)
-        idx = i * 10000
-        a = cosine_similarity(matrix[idx:idx + 10000], matrix[idx:idx + 10000])
+        idx = i * thres
+        
+        a = cosine_similarity(matrix[idx:idx + thres], matrix[idx:idx + thres])
         a = np.triu(a, k = 1)
         _sum += a.sum()
 
-    cnt = (pred_list.shape[0] / 10000) * (10000 * 10000 - 10000) // 2
+    cnt = (pred_list.shape[0] / thres) * (thres * thres - thres) // 2
     return _sum / cnt

@@ -100,7 +100,7 @@ def ease_main():
     for i, ans in enumerate(answer_user):
         a = 0
         for j in ans:
-            if j in predict_user[i]:
+            if j in predict_user['pred'][i]:
                 a += 1 
         _recall.append(a/2)
 

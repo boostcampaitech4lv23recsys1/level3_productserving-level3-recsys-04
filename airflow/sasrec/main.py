@@ -60,7 +60,7 @@ def sasrec_main():
     parser.add_argument(
         "--batch_size", type=int, default=256, help="number of batch_size"
     )
-    parser.add_argument("--epochs", type=int, default=1, help="number of epochs") # 200
+    parser.add_argument("--epochs", type=int, default=5, help="number of epochs") # 200
     parser.add_argument("--no_cuda", action="store_true")
     parser.add_argument("--log_freq", type=int, default=1, help="per epoch print res")
     parser.add_argument("--seed", default=42, type=int)
@@ -150,7 +150,7 @@ def sasrec_main():
 
     for epoch in range(args.epochs):
         iteration(args, epoch, train_dataloader, model)
-        if epoch % 5== 0:
+        if epoch % 5 == 4:
             scores, pred_list = test_score(args, epoch, test_dataloader, model, test_lines)
             print("recall_k = ", scores)
 
