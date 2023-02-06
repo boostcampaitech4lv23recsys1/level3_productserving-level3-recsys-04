@@ -92,18 +92,26 @@ export default function SignIn() {
 
       await console.log(response);
     }
-    let timeoutId;
-
-    Swal.fire({
-      title: '로딩 중입니다',
-      text: '잠시만 기다려주세요',
-      icon: 'info',
-      timer: 565555555,
-      showConfirmButton: false,
-      showCancelButton: true,
-      cancelButtonText: 'Cancel'
-    })
-    window.location = '/album'
+    if (response["detail"] == "low data") {
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: '인근에 음식점이 충분하지 않습니다',
+      })
+    }
+    else {
+      let timeoutId;
+      Swal.fire({
+        title: '로딩 중입니다',
+        text: '잠시만 기다려주세요',
+        icon: 'info',
+        timer: 565555555,
+        showConfirmButton: false,
+        showCancelButton: true,
+        cancelButtonText: 'Cancel'
+      })
+      window.location = '/album'
+    }
   };
 
 

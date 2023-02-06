@@ -138,6 +138,7 @@ def signin(user: SignInRequest):
     print(sasrec_top_k)
     #print(ease_top_k)
     # print(multivae_top_k)
+    
     """
     모델 추천 결과 가져오는 코드
     """
@@ -162,13 +163,24 @@ def signin(user: SignInRequest):
             elif i % 3 == 2:
                 cat2.append(restaurant_1)
 
-    sasrec_top_k = [(top_k, "sasrec") for top_k in sasrec_top_k]
+    sasrec_top_k = [(top_k, "sasrec") for top_k in sasrec_top_k]    
+    
     #ease_top_k = [(top_k, "ease") for top_k in ease_top_k]
     # multivae_top_k = [(top_k, "multivae") for top_k in multivae_top_k]
     #all_top_k = sasrec_top_k + ease_top_k
     #random.shuffle(all_top_k)
     # add_top_k(all_top_k)
+    
+    if len(sasrec_top_k) < 30:  # 식당이 30개보다 적다면 에러메세지
+        return SignInColdResponse(
+            state="start",
+            detail="low data",
+        )
+    
     add_top_k(sasrec_top_k)
+    
+    
+    
     return SignInResponse(
         state="start",
         detail="not cold start",
