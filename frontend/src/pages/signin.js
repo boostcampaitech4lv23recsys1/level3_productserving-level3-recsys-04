@@ -226,7 +226,7 @@ export default function SignIn() {
           }}
         >
           <Typography component="h1" variant="h5">
-            네이버 맛집 추천
+            머글끼니
           </Typography>
           <Box component="form" noValidate sx={{ mt: 1 }}>
             <TextField

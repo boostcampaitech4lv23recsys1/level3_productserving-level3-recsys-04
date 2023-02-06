@@ -163,7 +163,7 @@ export default function Album() {
                         {restaurants[card][card_num[card]]["tag"]}
                       </Typography>
                       <Typography sx={{ position: "relative", top: 10, fontSize: 18, width: 400 }}>
-                        {restaurants[card][card_num[card]]["ment"]}
+                        {window.localStorage.getItem('name') + restaurants[card][card_num[card]]["ment"]}
                       </Typography>
                     </CardContent>
                     <CardActions>
