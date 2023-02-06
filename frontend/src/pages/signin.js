@@ -163,7 +163,7 @@ export default function SignIn() {
       width: 800,
       html: `
       <div>
-        <h1>렉카메추 사용 방법!</h1>
+        <h1>머글끼니 사용 방법!</h1>
         <h2>1.
         <a href="https://naver.com">네이버 </a>로그인 후</h2>
         <h2>2.
@@ -246,7 +246,7 @@ export default function SignIn() {
               required
               fullWidth
               id="location"
-              label="추천을 원하는 주소"
+              label="추천을 원하는 장소 ex) 강남역, 신촌역 등"
               name="location"
               onChange={(e) => {
                 setLocation(e.target.value);

@@ -77,6 +77,25 @@ def album(data: AlbumRequest):
         model=data.model,
     )
 
+@app.post("/api/album/negative")
+def album(data: AlbumNegativeRequest):
+    
+    cursor.executemany(
+        "insert into negative values (?, ?, ?)",
+        [(data.user_id1, data.rest_id1, data.model1)],
+    )
+    select_sql = "select * from negative"
+    cnxn.commit()
+    cursor.execute(select_sql)
+    result = cursor.fetchall()
+    print(result)
+    return AlbumResponse(
+        user_id=data.user_id1,
+        rest_id=data.rest_id1,
+        is_positive=data.is_positive1,
+        model=data.model1,
+    )
+
 
 @app.post("/api/signin")
 def signin(user: SignInRequest):
