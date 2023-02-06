@@ -84,6 +84,14 @@ def album(data: AlbumNegativeRequest):
         "insert into negative values (?, ?, ?)",
         [(data.user_id1, data.rest_id1, data.model1)],
     )
+    cursor.executemany(
+        "insert into negative values (?, ?, ?)",
+        [(data.user_id2, data.rest_id2, data.model2)],
+    )
+    cursor.executemany(
+        "insert into negative values (?, ?, ?)",
+        [(data.user_id3, data.rest_id3, data.model3)],
+    )
     select_sql = "select * from negative"
     cnxn.commit()
     cursor.execute(select_sql)
