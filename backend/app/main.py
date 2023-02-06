@@ -104,7 +104,7 @@ def signin(user: SignInRequest):
     _inter = 1000  # 허용 가능한 거리, 임시방편.
 
     _input = (_x - _inter, _x + _inter, _y - _inter, _y + _inter, "음식아님", "카페&디저트")
-
+    
     """
     user.name 쿼리 날려서 좌표 가져오는 코드
     """
@@ -135,9 +135,14 @@ def signin(user: SignInRequest):
         sasrec_top_k = sasrec_inference(user_list[0][1], rest_codes, max_item[0][0] - 1)
         #ease_top_k = ease_inference(user_list[0][0], user_list[0][1], set(rest_codes))
         # multivae_top_k = multivae_inference(rest_codes=user_list[0][1])
+        select_sql += " order by cnt DESC"
+        cursor.execute(select_sql, _input)
+        results = cursor.fetchall()
+        rulebase_top_k = [rest_code[0] for rest_code in results[:10]]
     print(sasrec_top_k)
     #print(ease_top_k)
     # print(multivae_top_k)
+    print(rulebase_top_k)
     
     """
     모델 추천 결과 가져오는 코드
@@ -164,20 +169,18 @@ def signin(user: SignInRequest):
                 cat2.append(restaurant_1)
 
     sasrec_top_k = [(top_k, "sasrec") for top_k in sasrec_top_k]    
-    
+    rulebase_top_k = [(top_k, "rulebase") for top_k in rulebase_top_k]
     #ease_top_k = [(top_k, "ease") for top_k in ease_top_k]
     # multivae_top_k = [(top_k, "multivae") for top_k in multivae_top_k]
-    #all_top_k = sasrec_top_k + ease_top_k
-    #random.shuffle(all_top_k)
-    # add_top_k(all_top_k)
+    all_top_k = sasrec_top_k + rulebase_top_k
+    random.shuffle(all_top_k)
+    add_top_k(all_top_k)
     
-    if len(sasrec_top_k) < 30:  # 식당이 30개보다 적다면 에러메세지
+    if len(all_top_k) < 1:  # 식당이 30개보다 적다면 에러메세지
         return SignInColdResponse(
             state="start",
             detail="low data",
         )
-    
-    add_top_k(sasrec_top_k)
     
     
     
