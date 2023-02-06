@@ -2,6 +2,8 @@ import argparse
 import os
 import pandas as pd
 import numpy as np
+from datetime import date
+
 import torch
 from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
 from datasets import SASRecTrainDataset
@@ -27,7 +29,7 @@ def sasrec_main():
     # 데이터 경로와 네이밍 부분.
     parser.add_argument("--data_dir", default="../data/", type=str)
     parser.add_argument("--output_dir", default="/opt/ml/input/project/backend/app/models/data", type=str)
-    parser.add_argument("--data_name", default="0130", type=str)
+    parser.add_argument("--data_name", default=str(date.today()), type=str)  # 2023-02-04
     parser.add_argument("--data_type", default="rand", type=str)
     parser.add_argument("--model_name", default="SASRec", type=str)
     

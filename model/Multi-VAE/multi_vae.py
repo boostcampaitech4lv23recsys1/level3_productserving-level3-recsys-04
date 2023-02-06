@@ -6,6 +6,7 @@ from tqdm import tqdm
 from collections import defaultdict
 import os
 import time
+from datetime import date
 
 import torch
 import torch.nn as nn
@@ -32,7 +33,7 @@ config = {
     'seed' : 22,
     'anneal_cap' : 0.2,
     'total_anneal_steps' : 200000,
-    'save' : '/opt/ml/input/project/model/Multi-VAE/model_2.pt',
+    'save' : '/opt/ml/input/project/model/Multi-VAE/multivae-',
     
     'lr' : 0.005,
     'batch_size' : 500,
@@ -477,7 +478,7 @@ if __name__ == "__main__":
 
         
         if recall > best_recall:
-            torch.save(model.state_dict(), config.save)
+            torch.save(model.state_dict(), config.save + config.data_type + '-' + str(date.today()) + '.pt')  # multivae-time-2023-02-04.pt
             best_recall = recall
             earlystop = 0
         else: 

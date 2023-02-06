@@ -174,11 +174,14 @@ def batch():
 
     from sasrec.main import sasrec_main
     from ease.main import ease_main
+    from multi_vae.main import multivae_main
 
     sasrec_recall_score, sasrec_per_score = sasrec_main()
     ease_recall_score, ease_per_score = ease_main()
+    multivae_recall_score, multivae_per_score = multivae_main()
     print("sasrec : ", sasrec_recall_score, sasrec_per_score)
     print("ease : ", ease_recall_score, ease_per_score)
+    print("multivae : ", multivae_recall_score, multivae_per_score)
 
     return
 

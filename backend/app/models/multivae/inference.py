@@ -1,6 +1,7 @@
 import numpy as np
 import torch
 from .model import MultiVAE
+from datetime import date
 
 
 def recommend(rest_codes, K=20):
@@ -13,7 +14,7 @@ def recommend(rest_codes, K=20):
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
     model = MultiVAE(p_dims=[100, 400, 41460])
-    model.load_state_dict(torch.load('/opt/ml/input/project/backend/app/models/data/model_1.pt'))
+    model.load_state_dict(torch.load(f'/opt/ml/input/project/backend/app/models/data/multivae-time-{str(date.today())}.pt'))
     model.to(device)
     model.eval()
 
@@ -33,5 +34,4 @@ def recommend(rest_codes, K=20):
 
 if __name__ == '__main__':
     user_list = '[88, 87, 86, 85, 84, 83, 82, 81, 80, 79, 78, 77]'
-
     ans = recommend(user_list)
