@@ -232,7 +232,7 @@ def signin(user: SignInColdRequest):
     # 향후 user.location으로 x,y 받아야함.
     _x, _y = get_xy(user.location)  # _x = 314359, _y = 547462
     _inter = 1000  # 허용 가능한 거리, 임시방편.
-    _input = (_x - _inter, _x + _inter, _y - _inter, _y + _inter)
+    _input = (_x - _inter, _x + _inter, _y - _inter, _y + _inter, "음식아님", "카페&디저트")
 
     """
     user.name 쿼리 날려서 좌표 가져오는 코드
@@ -252,11 +252,15 @@ def signin(user: SignInColdRequest):
     if user.c7: tags += " AND (tag != '양식')"
     if user.c8: tags += " AND (tag != '해산물')"
     if user.c9: tags += " AND (tag != '분식&샐러드')"
-    # 만약 유저가 없는 사람이라면? 거리 내 인기도 기반 Top3 추천.
-    select_sql = f"select rest_code from rest where ((x > ?) AND (x < ?) AND (y > ?) AND (y < ?){tags}) order by cnt DESC"
+    
+    if user.menu == "1":  # 식사인경우
+        select_sql = f"select rest_code from rest where ((x > ?) AND (x < ?) AND (y > ?) AND (y < ?) AND (tag != ?) AND (tag != ?){tags}) order by cnt DESC"
+    else:  # 카페&디저트인 경우
+        select_sql = f"select rest_code from rest where ((x > ?) AND (x < ?) AND (y > ?) AND (y < ?) AND (tag != ?) AND (tag = ?){tags}) order by cnt DESC"
+    
     cursor.execute(select_sql, _input)
     results = cursor.fetchall()
-    top_k = [rest_code[0] for rest_code in results[:3]]
+    top_k = [rest_code[0] for rest_code in results[:30]]
     # print(top_k, 'HI')
 
     print(top_k)
