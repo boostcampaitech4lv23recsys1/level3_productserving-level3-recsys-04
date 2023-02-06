@@ -129,7 +129,11 @@ def signin(user: SignInRequest):
         cursor.execute(select_sql, _input)
         results = cursor.fetchall()
         rest_codes = [rest_code[0] for rest_code in results]
-
+        if len(rest_codes) < 30:  # 식당이 30개보다 적다면 에러메세지
+            return SignInColdResponse(
+                state="start",
+                detail="low data",
+            )
         #     top_k = recommend(user_list[0][1], rest_codes, max_item[0][0])
         # print(top_k)
         sasrec_top_k = sasrec_inference(user_list[0][1], rest_codes, max_item[0][0] - 1)
@@ -175,14 +179,6 @@ def signin(user: SignInRequest):
     all_top_k = sasrec_top_k + rulebase_top_k
     random.shuffle(all_top_k)
     add_top_k(all_top_k)
-    
-    if len(all_top_k) < 1:  # 식당이 30개보다 적다면 에러메세지
-        return SignInColdResponse(
-            state="start",
-            detail="low data",
-        )
-    
-    
     
     return SignInResponse(
         state="start",
