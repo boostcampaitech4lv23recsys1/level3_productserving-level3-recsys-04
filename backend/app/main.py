@@ -150,9 +150,9 @@ def signin(user: SignInRequest):
         for i, model_info in enumerate(model_top_k):
             rest_id, model_name = model_info
             ment = {
-                "sasrec": "최근 방문한 음식점을 고려한 추천입니다.",
-                "multivae": "당신의 숨겨진 취향을 고려한 추천입니다.",
-                "ease": "당신과 유사한 유저들을 고려한 추천입니다.",
+                "sasrec": "님의 최근 방문한 음식점을 고려한 추천입니다.",
+                "multivae": "님의 숨겨진 취향을 고려한 추천입니다.",
+                "ease": "님과 유사한 유저들을 고려한 추천입니다.",
                 "rulebase": "지역 내 음식점 인기도를 고려한 추천입니다.",
             }
             restaurant_1 = get_restaurant(rest_id, model_name, ment[model_name])
