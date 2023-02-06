@@ -242,9 +242,18 @@ def signin(user: SignInColdRequest):
     """
     모델을 이용한 Top3 추출
     """
-
+    tags = ""
+    if user.c1: tags += " AND (tag != '한식')"
+    if user.c2: tags += " AND (tag != '중식')"
+    if user.c3: tags += " AND (tag != '일식')"
+    if user.c4: tags += " AND (tag != '동남아음식')"
+    if user.c5: tags += " AND (tag != '패스트푸드')"
+    if user.c6: tags += " AND (tag != '고기')"
+    if user.c7: tags += " AND (tag != '양식')"
+    if user.c8: tags += " AND (tag != '해산물')"
+    if user.c9: tags += " AND (tag != '분식&샐러드')"
     # 만약 유저가 없는 사람이라면? 거리 내 인기도 기반 Top3 추천.
-    select_sql = "select rest_code from rest where ((x > ?) AND (x < ?) AND (y > ?) AND (y < ?)) order by cnt DESC"
+    select_sql = f"select rest_code from rest where ((x > ?) AND (x < ?) AND (y > ?) AND (y < ?){tags}) order by cnt DESC"
     cursor.execute(select_sql, _input)
     results = cursor.fetchall()
     top_k = [rest_code[0] for rest_code in results[:3]]
