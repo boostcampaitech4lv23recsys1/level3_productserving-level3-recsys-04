@@ -39,6 +39,7 @@ export default function Album() {
   console.log(restaurants)
   console.log(card_num)
   console.log(JSON.parse(window.localStorage.getItem("name")))
+  console.log(restaurants[0].length)
   const positive = (userData) => {
     const requestOptions = {
       method: "POST",
@@ -71,7 +72,6 @@ export default function Album() {
       .then((response) => response.json())
       .then((response) => {
         // validate(response);
-        console.log(response)
       })
       .catch(error => alert(error.message));
   };
@@ -84,20 +84,21 @@ export default function Album() {
 
     negative({
       user_id1: user,
-      rest_id1: restaurants[card_num[0]][card_num[0]]["id"],
+      rest_id1: restaurants[0][card_num[0]]["id"],
       is_positive1: false,
-      model1: restaurants[card_num[0]][card_num[0]]["model"],
+      model1: restaurants[0][card_num[0]]["model"],
       user_id2: user,
-      rest_id2: restaurants[card_num[1]][card_num[1]]["id"],
+      rest_id2: restaurants[1][card_num[1]]["id"],
       is_positive2: false,
-      model2: restaurants[card_num[1]][card_num[1]]["model"],
+      model2: restaurants[1][card_num[1]]["model"],
       user_id3: user,
-      rest_id3: restaurants[card_num[2]][card_num[2]]["id"],
+      rest_id3: restaurants[2][card_num[2]]["id"],
       is_positive3: false,
-      model3: restaurants[card_num[2]][card_num[2]]["model"]
+      model3: restaurants[2][card_num[2]]["model"]
     });
-    
     setCardNum([(card_num[0] + 1) % restaurants[0].length, (card_num[1] + 1) % restaurants[1].length, (card_num[2] + 1) % restaurants[2].length])
+
+
   };
 
 
