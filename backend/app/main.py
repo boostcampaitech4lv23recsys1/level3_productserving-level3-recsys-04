@@ -254,9 +254,9 @@ def signin(user: SignInColdRequest):
     if user.c9: tags += " AND (tag != '분식&샐러드')"
     
     if user.menu == "1":  # 식사인경우
-        select_sql = f"select rest_code from rest where ((x > ?) AND (x < ?) AND (y > ?) AND (y < ?) AND (tag != ?) AND (tag != ?){tags}) order by cnt DESC"
+        select_sql = f"select DISTINCT rest_code from rest where ((x > ?) AND (x < ?) AND (y > ?) AND (y < ?) AND (tag != ?) AND (tag != ?){tags}) order by cnt DESC"
     else:  # 카페&디저트인 경우
-        select_sql = f"select rest_code from rest where ((x > ?) AND (x < ?) AND (y > ?) AND (y < ?) AND (tag != ?) AND (tag = ?){tags}) order by cnt DESC"
+        select_sql = f"select DISTINCT rest_code from rest where ((x > ?) AND (x < ?) AND (y > ?) AND (y < ?) AND (tag != ?) AND (tag = ?){tags}) order by cnt DESC"
     
     cursor.execute(select_sql, _input)
     results = cursor.fetchall()
