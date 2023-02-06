@@ -23,7 +23,7 @@ config = {
     'data_path' : "/opt/ml/input/project/model/data" , # 데이터 경로
 
 
-    'data_type' : 'rand' , #rand or time
+    'data_type' : 'time' , #rand or time
 
     'p_dims': [100, 400],
     'dropout_rate' : 0.5,
@@ -32,7 +32,7 @@ config = {
     'seed' : 22,
     'anneal_cap' : 0.2,
     'total_anneal_steps' : 200000,
-    'save' : '/opt/ml/input/project/model/Multi-VAE/model_1.pt',
+    'save' : '/opt/ml/input/project/model/Multi-VAE/model_2.pt',
     
     'lr' : 0.005,
     'batch_size' : 500,
@@ -444,7 +444,7 @@ if __name__ == "__main__":
     K = 20
     earlystop =0 
     print('train start!!')
-    for epoch in range(1, config.num_epochs + 1):
+    for epoch in tqdm(range(1, config.num_epochs + 1)):
         start = time.time()
 
         train_loss = train(
@@ -477,8 +477,7 @@ if __name__ == "__main__":
 
         
         if recall > best_recall:
-            with open(config.save, 'wb') as f:
-                torch.save(model, f)
+            torch.save(model.state_dict(), config.save)
             best_recall = recall
             earlystop = 0
         else: 

@@ -67,6 +67,8 @@ def recommend(user_seq: list, item_candidate : list, max_item = 41460):
 
     parser.add_argument("--gpu_id", type=str, default="0", help="gpu_id")
 
+    parser.add_argument("--k", type=int, default=20, help="top k recommend")
+
 
     # parser 형태로 argument를 입력받습니다.
     args = parser.parse_args()

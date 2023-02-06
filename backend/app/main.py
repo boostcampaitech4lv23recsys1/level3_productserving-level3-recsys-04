@@ -130,14 +130,12 @@ def signin(user: SignInRequest):
         results = cursor.fetchall()
         rest_codes = [rest_code[0] for rest_code in results]
 
-        #     top_k = recommend(user_list[0][1], rest_codes, max_item[0][0])
-        # print(top_k)
         sasrec_top_k = sasrec_inference(user_list[0][1], rest_codes, max_item[0][0] - 1)
         ease_top_k = ease_inference(user_list[0][0], user_list[0][1], set(rest_codes))
-        # multivae_top_k = multivae_inference(rest_codes=user_list[0][1])
+        multivae_top_k = multivae_inference(rest_codes=user_list[0][1])
     print(sasrec_top_k)
     print(ease_top_k)
-    # print(multivae_top_k)
+    print(multivae_top_k)
     """
     모델 추천 결과 가져오는 코드
     """
@@ -164,8 +162,8 @@ def signin(user: SignInRequest):
 
     sasrec_top_k = [(top_k, "sasrec") for top_k in sasrec_top_k]
     ease_top_k = [(top_k, "ease") for top_k in ease_top_k]
-    # multivae_top_k = [(top_k, "multivae") for top_k in multivae_top_k]
-    all_top_k = sasrec_top_k + ease_top_k
+    multivae_top_k = [(top_k, "multivae") for top_k in multivae_top_k]
+    all_top_k = sasrec_top_k + ease_top_k + multivae_top_k
     random.shuffle(all_top_k)
     add_top_k(all_top_k)
     return SignInResponse(

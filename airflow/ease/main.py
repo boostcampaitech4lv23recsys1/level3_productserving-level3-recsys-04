@@ -3,17 +3,22 @@ import pandas as pd
 from tqdm import tqdm
 import pickle
 import os
+from datetime import date
 
-from ease.model import EASE
-from sasrec.utils import personalizeion
+from model import EASE
+from utils import personalizeion
+
+import mlflow
 
 
 def ease_main():
-    ''' global variables '''
+    '''
+    global variables
+    '''
     ############# Warning... 실행 전 반드시 설정 확인해주세요!! #############
     csv_input_path = 'data/'  # input csv 경로
     csv_output_path = 'output/'  # output csv 저장 경로
-    csv_output_name = '20230202'  # output csv 이름 설정
+    cur_date = str(date.today())  # "2023-02-04"
     pkl_path = '/opt/ml/input/project/backend/app/models/data/'  # pickle 파일 저장&로드 경로
 
     data_type = 'time'  # ['time', 'rand']
@@ -25,91 +30,114 @@ def ease_main():
     try:  # data_type & 이미 저장된 pickle 파일 존재하는지 체크 (bool)
         is_pickle_exist = True if data_type=='time' and os.listdir( pkl_path + 'ease/' ) else False
     except FileNotFoundError:
+        os.mkdir(pkl_path + 'ease')
         is_pickle_exist = False
-    ''''''
 
-
-    ''' load data '''
+    '''
+    load data
+    '''
     train = pd.read_csv(csv_input_path + f'train_{data_type}.csv')
     test = pd.read_csv(csv_input_path + f'test_{data_type}.csv')
-    ''''''
 
-    ''' model train '''
-    model = EASE(k, thres)
-
-    if is_pickle_exist:
-        model.load_X_B_matrix(pkl_path)
-    else:
-        model.fit(train, lambda_)
-        if data_type == 'time':
-            model.save_X_B_matrix(pkl_path)
-    ''''''
-
-    ''' predict '''
-    user_max = model.X.shape[0] - 1
-    items_tot = train['rest_code'].unique()
-    train_gbr = train.groupby('user_code')['rest_code'].apply(set)
-    predict = pd.DataFrame(
-        {
-            "user_code": [],
-            "rest_code": [],
-            "score": [],
-        }
-    )
-
-    for i in tqdm(range( user_max//thres + 1 )):
-        start = i*thres; end = (i+1)*thres
-        end = end if end < user_max else user_max+1
+    with mlflow.start_run():
+        '''
+        model train
+        '''
+        model = EASE(k, thres)
 
         if is_pickle_exist:
-            with open(pkl_path + f'ease/ease-pred-{i}.pkl', 'rb') as f:
-                pred_cur = pickle.load(f)
+            model.load_X_B_matrix(pkl_path)
         else:
-            X_cur = model.X[ start : end ]
-            pred_cur = X_cur.dot(model.B)
-            pred_cur = np.float16(pred_cur)  ## 용량 줄이기
+            model.fit(train, lambda_)
             if data_type == 'time':
-                with open(pkl_path + f'ease/ease-pred-{i}.pkl', 'wb') as f:
-                    pickle.dump(pred_cur, f, pickle.HIGHEST_PROTOCOL)
+                model.save_X_B_matrix(pkl_path)
+
+        '''
+        predict
+        '''
+        user_max = model.X.shape[0] - 1
+        items_tot = train['rest_code'].unique()
+        train_gbr = train.groupby('user_code')['rest_code'].apply(set)
+        predict = pd.DataFrame(
+            {
+                "user_code": [],
+                "rest_code": [],
+                "score": [],
+            }
+        )
+
+        for i in tqdm(range( user_max//thres + 1 )):
+            start = i*thres; end = (i+1)*thres
+            end = end if end < user_max else user_max+1
+
+            if is_pickle_exist:
+                with open(pkl_path + f'ease/ease-pred-{i}.pkl', 'rb') as f:
+                    pred_cur = pickle.load(f)
+            else:
+                X_cur = model.X[ start : end ]
+                pred_cur = X_cur.dot(model.B)
+                pred_cur = np.float16(pred_cur)  ## 용량 줄이기
+                if data_type == 'time':
+                    with open(pkl_path + f'ease/ease-pred-{i}.pkl', 'wb') as f:
+                        pickle.dump(pred_cur, f, pickle.HIGHEST_PROTOCOL)
+            
+            pred_cur = model.predict(start, train_gbr[start:end], items_tot, pred_cur)
+            predict = pd.concat([predict, pred_cur])
+
+        '''
+        preprocess answer & predict
+        '''
+        predict = predict.reset_index(drop=True)
+        predict = predict.drop('score', axis = 1)
+        predict = predict.astype('int')
+
+        predict_user = predict.groupby('user_code')['rest_code'].apply(list)
+        answer_user = test.groupby('user_code')['rest_code'].apply(list)
+
+        predict_user = predict_user.reset_index()
+        predict_user.columns = ['index', 'pred']
+        answer_user = answer_user.reset_index(drop=True)
+
+        # output csv 생성
+        if not os.path.exists(csv_output_path):
+            os.mkdir(csv_output_path)
+        predict_user.to_csv(f'{csv_output_path}ease-{data_type}-top{k}-{cur_date}.csv')
         
-        pred_cur = model.predict(start, train_gbr[start:end], items_tot, pred_cur)
-        predict = pd.concat([predict, pred_cur])
-    ''''''
-    ''' preprocess answer & predict '''
-    predict = predict.reset_index(drop=True)
-    predict = predict.drop('score', axis = 1)
-    predict = predict.astype('int')
 
-    predict_user = predict.groupby('user_code')['rest_code'].apply(list)
-    answer_user = test.groupby('user_code')['rest_code'].apply(list)
+        '''
+        recall@k
+        '''
+        _recall = []
 
-    predict_user = predict_user.reset_index()
-    predict_user.columns = ['index', 'pred']
-    answer_user = answer_user.reset_index(drop=True)
-    ''''''
+        for i, ans in enumerate(answer_user):
+            a = 0
+            for j in ans:
+                if j in predict_user['pred'][i]:
+                    a += 1 
+            _recall.append(a/2)
 
-    # output csv 생성
-    if not os.path.exists(csv_output_path):
-        os.mkdir(csv_output_path)
-    predict_user.to_csv(f'{csv_output_path}ease_{data_type}_top{k}_{csv_output_name}.csv')
-    #################
+        recall = sum(_recall) / len(_recall)
 
-    ''' recall@k '''
-    _recall = []
+        '''
+        personalization score
+        '''
+        per_score = personalizeion(predict_user)
 
-    for i, ans in enumerate(answer_user):
-        a = 0
-        for j in ans:
-            if j in predict_user['pred'][i]:
-                a += 1 
-        _recall.append(a/2)
+        '''
+        mlflow logging
+        '''
+        mlflow.log_params({
+            "ease_lambda": lambda_,
+            "ease_thres": thres,
+            "ease_k": k,
+            "ease_data_type": data_type
+        })
+        mlflow.log_metrics({
+            "ease_recall": recall,
+            "ease_personalization": per_score
+        })
 
-    recall = sum(_recall) / len(_recall)
-    ''''''
-
-    ''' personalization score '''
-    per_score = personalizeion(predict_user)
-    ''''''
+    mlflow.end_run()
 
     return recall, per_score
 

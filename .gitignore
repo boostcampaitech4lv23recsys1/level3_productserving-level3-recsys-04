@@ -6,7 +6,7 @@ google-chrome-stable_current_amd64.deb
 .ipynb_checkpoints
 *.pem
 __pycache__
-.vscode
+.vscode/
 .empty
 .venv
 
@@ -66,6 +66,8 @@ tem.py
 *.npy
 *.pickle
 *.pkl
+*.pt
+*.csv
 airflow/data/
 
 # model

@@ -17,6 +17,9 @@ from trainers import (
     test_score
 )
 
+import mlflow
+
+
 # 0.01687, 25에폭(time)
 def sasrec_main():
     parser = argparse.ArgumentParser()
@@ -60,7 +63,7 @@ def sasrec_main():
     parser.add_argument(
         "--batch_size", type=int, default=256, help="number of batch_size"
     )
-    parser.add_argument("--epochs", type=int, default=5, help="number of epochs") # 200
+    parser.add_argument("--epochs", type=int, default=1, help="number of epochs") # 200
     parser.add_argument("--no_cuda", action="store_true")
     parser.add_argument("--log_freq", type=int, default=1, help="per epoch print res")
     parser.add_argument("--seed", default=42, type=int)
@@ -143,24 +146,43 @@ def sasrec_main():
         train_dataset, shuffle=False, batch_size=args.batch_size * 2
     )
 
-    # S3RecModel 모델을 불러옵니다. (models.py 내 존재)
-    model = S3RecModel(args=args)
-    # 모델을 GPU에 실어요.
-    model = model.to(args.device)
+    '''
+    mlflow run
+    '''
+    with mlflow.start_run():
+        # S3RecModel 모델을 불러옵니다. (models.py 내 존재)
+        model = S3RecModel(args=args)
+        # 모델을 GPU에 실어요.
+        model = model.to(args.device)
 
-    for epoch in range(args.epochs):
-        iteration(args, epoch, train_dataloader, model)
-        if epoch % 5 == 4:
-            scores, pred_list = test_score(args, epoch, test_dataloader, model, test_lines)
-            print("recall_k = ", scores)
+        for epoch in range(args.epochs):
+            iteration(args, epoch, train_dataloader, model)
+            if epoch % 5 == 0:
+                scores, pred_list = test_score(args, epoch, test_dataloader, model, test_lines)
+                mlflow.log_metric("sasrec_recall", scores)
+                print("recall_k = ", scores)
 
-    pred_df = pd.DataFrame(pred_list)
-    pred_df['pred'] = pred_df.apply(lambda x : [x[i] for i in range(0,20)], axis = 1)
-    pred_df = pred_df.reset_index()
-    pred_df = pred_df[['index','pred']]
-    per_score = personalizeion(pred_df)
-    #pred_df.to_csv(f'{args.model_name}_{args.data_type}_test_{args.data_name}.csv', index = False)
-    torch.save(model.state_dict(), args.checkpoint_path)
+        pred_df = pd.DataFrame(pred_list)
+        pred_df['pred'] = pred_df.apply(lambda x : [x[i] for i in range(0,20)], axis = 1)
+        pred_df = pred_df.reset_index()
+        pred_df = pred_df[['index','pred']]
+        per_score = personalizeion(pred_df)
+        #pred_df.to_csv(f'{args.model_name}_{args.data_type}_test_{args.data_name}.csv', index = False)
+        torch.save(model.state_dict(), args.checkpoint_path)
+
+        # mlflow logging
+        mlflow.log_params({
+            "sasrec_data_type": args.data_type,
+            "sasrec_max_seq_length": args.max_seq_length,            
+            "sasrec_batch_size": args.batch_size,
+            "sasrec_hidden_size": args.hidden_size,
+            "sasrec_lr": args.lr,
+            "sasrec_epochs": args.epochs
+        })
+        mlflow.log_metric("sasrec_personalization", per_score)
+        mlflow.pytorch.log_model(model, "sasrec_model")
+    
+    mlflow.end_run()
 
     return scores, per_score
 
