@@ -38,8 +38,9 @@ export default function Album() {
 
   console.log(restaurants)
   console.log(card_num)
-
-  const album = (userData) => {
+  console.log(JSON.parse(window.localStorage.getItem("name")))
+  console.log(restaurants[0].length)
+  const positive = (userData) => {
     const requestOptions = {
       method: "POST",
       headers: {
@@ -56,17 +57,48 @@ export default function Album() {
         console.log(response)
       })
       .catch(error => alert(error.message));
-
-
-
   };
-
+  const negative = (userData) => {
+    const requestOptions = {
+      method: "POST",
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "*",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(userData),
+    };
+    fetch('/api/album/negative', requestOptions)
+      .then((response) => response.json())
+      .then((response) => {
+        // validate(response);
+      })
+      .catch(error => alert(error.message));
+  };
   const handleClick1 = (event) => {
     navigate('/signin');
   };
 
   const test = (event) => {
+    var user = window.localStorage.getItem('link').substring(29, 53)
+
+    negative({
+      user_id1: user,
+      rest_id1: restaurants[0][card_num[0]]["id"],
+      is_positive1: false,
+      model1: restaurants[0][card_num[0]]["model"],
+      user_id2: user,
+      rest_id2: restaurants[1][card_num[1]]["id"],
+      is_positive2: false,
+      model2: restaurants[1][card_num[1]]["model"],
+      user_id3: user,
+      rest_id3: restaurants[2][card_num[2]]["id"],
+      is_positive3: false,
+      model3: restaurants[2][card_num[2]]["model"]
+    });
     setCardNum([(card_num[0] + 1) % restaurants[0].length, (card_num[1] + 1) % restaurants[1].length, (card_num[2] + 1) % restaurants[2].length])
+
+
   };
 
 
@@ -79,7 +111,7 @@ export default function Album() {
     const url = "https://m.place.naver.com/restaurant/" + i + "/home"
     window.open(url, "_blank", "noopener, noreferrer");
     // window.open(url, "_blank", "noopener, noreferrer");
-    album({
+    positive({
       user_id: user,
       rest_id: restaurants[card][card_num[card]]["id"],
       is_positive: true,
@@ -163,7 +195,7 @@ export default function Album() {
                         {restaurants[card][card_num[card]]["tag"]}
                       </Typography>
                       <Typography sx={{ position: "relative", top: 10, fontSize: 18, width: 400 }}>
-                        {restaurants[card][card_num[card]]["ment"]}
+                        {window.localStorage.getItem('name') + restaurants[card][card_num[card]]["ment"]}
                       </Typography>
                     </CardContent>
                     <CardActions>

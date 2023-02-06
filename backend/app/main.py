@@ -77,6 +77,33 @@ def album(data: AlbumRequest):
         model=data.model,
     )
 
+@app.post("/api/album/negative")
+def album(data: AlbumNegativeRequest):
+    
+    cursor.executemany(
+        "insert into negative values (?, ?, ?)",
+        [(data.user_id1, data.rest_id1, data.model1)],
+    )
+    cursor.executemany(
+        "insert into negative values (?, ?, ?)",
+        [(data.user_id2, data.rest_id2, data.model2)],
+    )
+    cursor.executemany(
+        "insert into negative values (?, ?, ?)",
+        [(data.user_id3, data.rest_id3, data.model3)],
+    )
+    select_sql = "select * from negative"
+    cnxn.commit()
+    cursor.execute(select_sql)
+    result = cursor.fetchall()
+    print(result)
+    return AlbumResponse(
+        user_id=data.user_id1,
+        rest_id=data.rest_id1,
+        is_positive=data.is_positive1,
+        model=data.model1,
+    )
+
 
 @app.post("/api/signin")
 def signin(user: SignInRequest):
@@ -104,7 +131,7 @@ def signin(user: SignInRequest):
     _inter = 1000  # 허용 가능한 거리, 임시방편.
 
     _input = (_x - _inter, _x + _inter, _y - _inter, _y + _inter, "음식아님", "카페&디저트")
-
+    
     """
     user.name 쿼리 날려서 좌표 가져오는 코드
     """
@@ -122,20 +149,30 @@ def signin(user: SignInRequest):
 
     else:
         if user.menu == "1":  # 식사인경우
-            select_sql = "select rest_code from rest where ((x > ?) AND (x < ?) AND (y > ?) AND (y < ?) AND (tag != ?) AND (tag != ?))"
+            select_sql = "select DISTINCT rest_code from rest where ((x > ?) AND (x < ?) AND (y > ?) AND (y < ?) AND (tag != ?) AND (tag != ?))"
         else:  # 카페&디저트인 경우
-            select_sql = "select rest_code from rest where ((x > ?) AND (x < ?) AND (y > ?) AND (y < ?) AND (tag != ?) AND (tag = ?))"
+            select_sql = "select DISTINCT rest_code from rest where ((x > ?) AND (x < ?) AND (y > ?) AND (y < ?) AND (tag != ?) AND (tag = ?))"
 
         cursor.execute(select_sql, _input)
         results = cursor.fetchall()
         rest_codes = [rest_code[0] for rest_code in results]
-
+        if len(rest_codes) < 30:  # 식당이 30개보다 적다면 에러메세지
+            return SignInColdResponse(
+                state="start",
+                detail="low data",
+            )
         sasrec_top_k = sasrec_inference(user_list[0][1], rest_codes, max_item[0][0] - 1)
         ease_top_k = ease_inference(user_list[0][0], user_list[0][1], set(rest_codes))
         multivae_top_k = multivae_inference(rest_codes=user_list[0][1])
+        select_sql += " order by cnt DESC"
+        cursor.execute(select_sql, _input)
+        results = cursor.fetchall()
+        rulebase_top_k = [rest_code[0] for rest_code in results[:10]]
     print(sasrec_top_k)
     print(ease_top_k)
     print(multivae_top_k)
+    print(rulebase_top_k)
+    
     """
     모델 추천 결과 가져오는 코드
     """
@@ -147,9 +184,9 @@ def signin(user: SignInRequest):
         for i, model_info in enumerate(model_top_k):
             rest_id, model_name = model_info
             ment = {
-                "sasrec": "최근 방문한 음식점을 고려한 추천입니다.",
-                "multivae": "당신의 숨겨진 취향을 고려한 추천입니다.",
-                "ease": "당신과 유사한 유저들을 고려한 추천입니다.",
+                "sasrec": "님의 최근 방문한 음식점을 고려한 추천입니다.",
+                "multivae": "님의 숨겨진 취향을 고려한 추천입니다.",
+                "ease": "님과 유사한 유저들을 고려한 추천입니다.",
                 "rulebase": "지역 내 음식점 인기도를 고려한 추천입니다.",
             }
             restaurant_1 = get_restaurant(rest_id, model_name, ment[model_name])
@@ -160,12 +197,14 @@ def signin(user: SignInRequest):
             elif i % 3 == 2:
                 cat2.append(restaurant_1)
 
-    sasrec_top_k = [(top_k, "sasrec") for top_k in sasrec_top_k]
+    sasrec_top_k = [(top_k, "sasrec") for top_k in sasrec_top_k]    
+    rulebase_top_k = [(top_k, "rulebase") for top_k in rulebase_top_k]
     ease_top_k = [(top_k, "ease") for top_k in ease_top_k]
     multivae_top_k = [(top_k, "multivae") for top_k in multivae_top_k]
-    all_top_k = sasrec_top_k + ease_top_k + multivae_top_k
+    all_top_k = sasrec_top_k + rulebase_top_k
     random.shuffle(all_top_k)
     add_top_k(all_top_k)
+    
     return SignInResponse(
         state="start",
         detail="not cold start",
@@ -191,7 +230,7 @@ def signin(user: SignInColdRequest):
     # 향후 user.location으로 x,y 받아야함.
     _x, _y = get_xy(user.location)  # _x = 314359, _y = 547462
     _inter = 1000  # 허용 가능한 거리, 임시방편.
-    _input = (_x - _inter, _x + _inter, _y - _inter, _y + _inter)
+    _input = (_x - _inter, _x + _inter, _y - _inter, _y + _inter, "음식아님", "카페&디저트")
 
     """
     user.name 쿼리 날려서 좌표 가져오는 코드
@@ -201,12 +240,25 @@ def signin(user: SignInColdRequest):
     """
     모델을 이용한 Top3 추출
     """
-
-    # 만약 유저가 없는 사람이라면? 거리 내 인기도 기반 Top3 추천.
-    select_sql = "select rest_code from rest where ((x > ?) AND (x < ?) AND (y > ?) AND (y < ?)) order by cnt DESC"
+    tags = ""
+    if user.c1: tags += " AND (tag != '한식')"
+    if user.c2: tags += " AND (tag != '중식')"
+    if user.c3: tags += " AND (tag != '일식')"
+    if user.c4: tags += " AND (tag != '동남아음식')"
+    if user.c5: tags += " AND (tag != '패스트푸드')"
+    if user.c6: tags += " AND (tag != '고기')"
+    if user.c7: tags += " AND (tag != '양식')"
+    if user.c8: tags += " AND (tag != '해산물')"
+    if user.c9: tags += " AND (tag != '분식&샐러드')"
+    
+    if user.menu == "1":  # 식사인경우
+        select_sql = f"select DISTINCT rest_code from rest where ((x > ?) AND (x < ?) AND (y > ?) AND (y < ?) AND (tag != ?) AND (tag != ?){tags}) order by cnt DESC"
+    else:  # 카페&디저트인 경우
+        select_sql = f"select DISTINCT rest_code from rest where ((x > ?) AND (x < ?) AND (y > ?) AND (y < ?) AND (tag != ?) AND (tag = ?){tags}) order by cnt DESC"
+    
     cursor.execute(select_sql, _input)
     results = cursor.fetchall()
-    top_k = [rest_code[0] for rest_code in results[:3]]
+    top_k = [rest_code[0] for rest_code in results[:30]]
     # print(top_k, 'HI')
 
     print(top_k)
@@ -230,6 +282,7 @@ def signin(user: SignInColdRequest):
             name=restaurant,
             img_url=image,
             model="cold start",
+            ment = "지역 내 음식점 인기도를 고려한 추천입니다."
         )
         if i % 3 == 0:
             cat0.append(restaurant_1)
@@ -241,7 +294,7 @@ def signin(user: SignInColdRequest):
     return SignInResponse(
         state="start",
         detail="not cold start",
-        name=user_name,
+        name=str(user_name),
         restaurants0=cat0,  # rec 1
         restaurants1=cat1,  # rec 2
         restaurants2=cat2,  # rec 3
