@@ -38,7 +38,7 @@ export default function Album() {
 
   console.log(restaurants)
   console.log(card_num)
-
+  console.log(JSON.parse(window.localStorage.getItem("name")))
   const positive = (userData) => {
     const requestOptions = {
       method: "POST",
