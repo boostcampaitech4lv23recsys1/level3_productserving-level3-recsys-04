@@ -282,7 +282,7 @@ def signin(user: SignInColdRequest):
             name=restaurant,
             img_url=image,
             model="cold start",
-            ment = "지역 내 음식점 인기도를 고려한 추천입니다."
+            ment = "님의 지역 내 음식점 인기도를 고려한 추천입니다."
         )
         if i % 3 == 0:
             cat0.append(restaurant_1)
