@@ -14,7 +14,7 @@ def recommend(rest_codes, K=20):
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
     model = MultiVAE(p_dims=[100, 400, 41460])
-    model.load_state_dict(torch.load(f'/opt/ml/input/project/backend/app/models/data/multivae-time-{str(date.today())}.pt'))
+    model.load_state_dict(torch.load(f'/opt/ml/input/project/backend/app/models/data/multivae-time-2023-02-06.pt'))
     model.to(device)
     model.eval()
 
