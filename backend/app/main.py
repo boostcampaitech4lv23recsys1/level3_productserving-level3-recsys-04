@@ -187,7 +187,7 @@ def signin(user: SignInRequest):
                 "sasrec": "님의 최근 방문한 음식점을 고려한 추천입니다.",
                 "multivae": "님의 숨겨진 취향을 고려한 추천입니다.",
                 "ease": "님과 유사한 유저들을 고려한 추천입니다.",
-                "rulebase": "지역 내 음식점 인기도를 고려한 추천입니다.",
+                "rulebase": "님의 지역 내 음식점 인기도를 고려한 추천입니다.",
             }
             restaurant_1 = get_restaurant(rest_id, model_name, ment[model_name])
             if i % 3 == 0:
@@ -201,7 +201,7 @@ def signin(user: SignInRequest):
     rulebase_top_k = [(top_k, "rulebase") for top_k in rulebase_top_k]
     ease_top_k = [(top_k, "ease") for top_k in ease_top_k]
     multivae_top_k = [(top_k, "multivae") for top_k in multivae_top_k]
-    all_top_k = sasrec_top_k + rulebase_top_k
+    all_top_k = sasrec_top_k + rulebase_top_k + ease_top_k + multivae_top_k
     random.shuffle(all_top_k)
     add_top_k(all_top_k)
     
