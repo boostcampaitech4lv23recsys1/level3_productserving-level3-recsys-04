@@ -25,6 +25,75 @@
 
 ## 데이터 & 모델
 
+### 폴더 구조
+```bash
+📦level3_productserving-level3-recsys-04
+ ┣ 📂airflow
+ ┃ ┣ 📂dags
+ ┃ ┣ 📂ease
+ ┃ ┣ 📂multi_vae
+ ┃ ┣ 📂sasrec
+ ┃ ┗ 📜batch_modeling.py
+ ┣ 📂backend
+ ┃ ┣ 📂app
+ ┃ ┃ ┣ 📂models
+ ┃ ┃ ┃ ┣ 📂data
+ ┃ ┃ ┃ ┣ 📂ease
+ ┃ ┃ ┃ ┣ 📂multivae
+ ┃ ┃ ┃ ┗ 📂sasrec
+ ┃ ┃ ┣ 📜main.py
+ ┃ ┃ ┣ 📜type.py
+ ┃ ┃ ┣ 📜__init__.py
+ ┃ ┃ ┗ 📜__main__.py
+ ┃ ┣ 📜README.md
+ ┃ ┗ 📜requirements.txt
+ ┣ 📂crawings
+ ┃ ┣ 📂user_csv
+ ┃ ┣ 📂area_csv
+ ┃ ┣ 📜1.Kcrawling_rest_server.ipynb
+ ┃ ┣ 📜2.Kcrwaling_concat.ipynb
+ ┃ ┣ 📜3.Kcrawling_user_review.ipynb
+ ┃ ┣ 📜3.Kcrawling_user_review.py
+ ┃ ┣ 📜3_1.Kcrawling_user_review.py
+ ┃ ┣ 📜4.Kcrawling_user_review_failed.ipynb
+ ┃ ┣ 📜5.Kcrawling_get_rest_info.ipynb
+ ┃ ┣ 📜chromedriver.exe
+ ┃ ┣ 📜Kcsv_concat.ipynb
+ ┃ ┗ 📜requirements.txt
+ ┣ 📂database
+ ┃ ┣ 📜DB_test.py
+ ┃ ┣ 📜HowToUse.ipynb
+ ┃ ┗ 📜HowToUse_local.ipynb
+ ┣ 📂frontend
+ ┃ ┣ 📂public
+ ┃ ┃ ┣ 📂img
+ ┃ ┃ ┗ 📜index.html
+ ┃ ┣ 📂src
+ ┃ ┃ ┣ 📂pages
+ ┃ ┃ ┣ 📜index.js
+ ┃ ┃ ┣ 📜setupProxy.js
+ ┃ ┃ ┗ 📜style.css
+ ┃ ┣ 📜README.md
+ ┣ 📂model
+ ┃ ┣ 📂cos_sim
+ ┃ ┃ ┣ 📜cos_sim.ipynb
+ ┃ ┣ 📂data
+ ┃ ┃ ┣ 📜rest.csv
+ ┃ ┃ ┗ 📜user.csv
+ ┃ ┣ 📂EASE
+ ┃ ┃ ┣ 📜EASE.ipynb
+ ┃ ┃ ┣ 📜main.py
+ ┃ ┃ ┗ 📜model.py
+ ┃ ┣ 📂Multi-VAE
+ ┃ ┃ ┣ 📜multi_vae.py
+ ┃ ┃ ┗ 📜Multi_VAE_&_Multi_DAE.ipynb
+ ┃ ┗ 📂sasrec
+ ┃ ┃ ┣ 📜datasets.py
+ ┃ ┃ ┣  ...
+ ┃ ┃ ┗ 📜utils.py
+ ┣ 📜.gitignore
+ ┗ 📜README.md
+```
 ## 프로젝트 구조
  
 ### 프로젝트 구조
