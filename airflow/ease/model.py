@@ -74,10 +74,9 @@ class EASE:
             watched (_type_): start ~ start+thres 사이 유저들의 음식점 방문 기록 (pd.DataFrame)
             items (_type_): 전체 음식점 code (numpy.ndarray)
             pred (_type_): start ~ start+thres 사이 유저들의 pred 행렬 조각
-            k (_type_): 추천 개수 (int)
 
         Returns:
-            _type_: _description_
+            _type_: pd.DataFrame
         """
         with Pool(cpu_count()) as p:
             user_preds = p.starmap(

@@ -6,6 +6,7 @@ from tqdm import tqdm
 from collections import defaultdict
 import os
 import time
+from datetime import date
 
 import torch
 import torch.nn as nn
@@ -22,6 +23,9 @@ torch.set_printoptions(sci_mode=True)
 config = {
     'data_path' : "/opt/ml/input/project/model/data" , # 데이터 경로
 
+
+    'data_type' : 'time' , #rand or time
+
     'p_dims': [100, 400],
     'dropout_rate' : 0.5,
     'weight_decay' : 0.01,
@@ -29,11 +33,11 @@ config = {
     'seed' : 22,
     'anneal_cap' : 0.2,
     'total_anneal_steps' : 200000,
-    'save' : '/opt/ml/input/project/model/Multi-VAE/model.pt',
+    'save' : '/opt/ml/input/project/model/Multi-VAE/multivae-',
     
     'lr' : 0.005,
     'batch_size' : 500,
-    'num_epochs' : 50,
+    'num_epochs' : 100,
     'num_workers' : 2,
 }
 
@@ -54,8 +58,8 @@ class MakeMatrixDataSet():
     """
     def __init__(self, config):
         self.config = config
-        self.df = pd.read_csv(os.path.join(self.config.data_path, 'MVtrain_time.csv'))
-        self.val = pd.read_csv(os.path.join(self.config.data_path, 'MVtest_time.csv'))
+        self.df = pd.read_csv(os.path.join(self.config.data_path, f'MVtrain_{self.config.data_type}.csv'))
+        self.val = pd.read_csv(os.path.join(self.config.data_path, f'MVtest_{self.config.data_type}.csv'))
         # self.item_encoder, self.item_decoder = self.generate_encoder_decoder('item')
         # self.user_encoder, self.user_decoder = self.generate_encoder_decoder('user')
         self.num_item, self.num_user = sorted(self.df['item_idx'].unique())[-1]+1,sorted(self.df['user_idx'].unique())[-1]+1
@@ -298,20 +302,6 @@ class LossFunc(nn.Module):
         return multinomial
     
 
-def get_ndcg(pred_list, true_list):
-    idcg = sum((1 / np.log2(rank + 2) for rank in range(1, len(pred_list))))
-    dcg = 0
-    for rank, pred in enumerate(pred_list):
-        if pred in true_list:
-            dcg += 1 / np.log2(rank + 2)
-    ndcg = dcg / idcg
-    return ndcg
-
-def get_hit(pred_list, true_list):
-    hit_list = set(true_list) & set(pred_list)
-    hit = len(hit_list) / len(true_list)
-    return hit
-
 def get_recallk(pred_list, true_list, K):
     a = 0
     for pred in pred_list:
@@ -356,10 +346,7 @@ def train(model, criterion, optimizer, data_loader, make_matrix_data_set, config
 
 def evaluate(model, data_loader, user_train, user_valid, make_matrix_data_set, K = 20):
     model.eval()
-
-    # NDCG = 0.0 # NDCG@K
-    # HIT = 0.0 # HIT@K
-    RECALL_K =0.0 #Recall@10
+    RECALL_K =0.0 #Recall@K
 
     with torch.no_grad():
         for users in data_loader:
@@ -373,32 +360,49 @@ def evaluate(model, data_loader, user_train, user_valid, make_matrix_data_set, K
             for user, rec in zip(users, rec_list):
                 uv = user_valid[user.item()]
                 up = rec[-K:].cpu().numpy().tolist()
-                # NDCG += get_ndcg(pred_list = up, true_list = uv)
-                # HIT += get_hit(pred_list = up, true_list = uv)
                 RECALL_K +=get_recallk(pred_list = up, true_list = uv, K = K )
-                
-    # NDCG /= len(data_loader.dataset)
-    # HIT /= len(data_loader.dataset)
+
     RECALL_K /= len(data_loader.dataset)
 
     return RECALL_K
 
+def submission(model, data_loader, user_train, user_valid, make_matrix_data_set, K = 20):
+    model.eval()
+    submission = {}
+
+
+    with torch.no_grad():
+        for users in data_loader:
+            mat = make_matrix_data_set.make_matrix(users)
+            mat = mat.to(device)
+
+            recon_mat = model(mat)
+            recon_mat[mat == 1] = -np.inf
+            rec_list = recon_mat.argsort(dim = 1)
+
+            for user, rec in zip(users, rec_list):
+                uv = user_valid[user.item()]
+                up = rec[-K:].cpu().numpy().tolist()
+
+                submission[user] = up
+
+    return submission
 
 if __name__ == "__main__":
-    print("it's working don't worry ")
+    print("!!! start !!!")
     # 데이터
     #multivae 용 csv 생성
-    file_path = "/opt/ml/input/project/model/data/MVtrain_time.csv"
+    file_path =f"/opt/ml/input/project/model/data/MVtrain_{config.data_type}.csv"
 
     if not os.path.exists(file_path):
-        train_df = pd.read_csv('/opt/ml/input/project/model/data/train_time.csv')
+        train_df = pd.read_csv(f'/opt/ml/input/project/model/data/train_{config.data_type}.csv')
         train_df = train_df.drop(columns='date')
         train_df.columns=['user','item','user_idx','item_idx']
-        train_df.to_csv('/opt/ml/input/project/model/data/MVtrain_time.csv',index=False)
+        train_df.to_csv(f'/opt/ml/input/project/model/data/MVtrain_{config.data_type}.csv',index=False)
 
-        valid_df = pd.read_csv('/opt/ml/input/project/model/data/test_time.csv')
+        valid_df = pd.read_csv(f'/opt/ml/input/project/model/data/test_{config.data_type}.csv')
         valid_df.columns=['user','item','user_idx','item_idx']
-        valid_df.to_csv('/opt/ml/input/project/model/data/MVtest_time.csv',index=False)
+        valid_df.to_csv(f'/opt/ml/input/project/model/data/MVtest_{config.data_type}.csv',index=False)
 
     print('file get success!')
 
@@ -439,9 +443,9 @@ if __name__ == "__main__":
     # hit_list = []
     recall_list = []
     K = 20
-
+    earlystop =0 
     print('train start!!')
-    for epoch in range(1, config.num_epochs + 1):
+    for epoch in tqdm(range(1, config.num_epochs + 1)):
         start = time.time()
 
         train_loss = train(
@@ -453,7 +457,7 @@ if __name__ == "__main__":
             config = config,
             )
         
-        recall= evaluate(
+        recall = evaluate(
             model = model, 
             data_loader = data_loader,
             user_train = user_train,
@@ -472,9 +476,31 @@ if __name__ == "__main__":
         print(f'Epoch: {epoch:3d}| Train loss: {train_loss:.5f} |Recall@{K}: {recall:.5f}|time taken : {time_taken:.1f}')
 
 
+        
         if recall > best_recall:
-            with open(config.save, 'wb') as f:
-                torch.save(model, f)
+            torch.save(model.state_dict(), config.save + config.data_type + '-' + str(date.today()) + '.pt')  # multivae-time-2023-02-04.pt
             best_recall = recall
+            earlystop = 0
+        else: 
+            earlystop +=1
+        
+        if earlystop == 10:
+            break
 
+
+    print('train done!!')
+    # with open('/opt/ml/input/project/model/Multi-VAE/model_time.pt', 'rb') as f:
+    #     model = torch.load(f)
+
+    sub = submission(
+        model = model, 
+        data_loader = data_loader,
+        user_train = user_train,
+        user_valid = user_valid,
+        make_matrix_data_set = make_matrix_data_set,
+        K = K
+        )
+    
+    submission_file = pd.DataFrame.from_dict(sub, orient='index')
+    submission_file.to_csv(f'/opt/ml/input/project/model/Multi-VAE/sub_{config.data_type}.csv', index = False)
     print('!!!!done!!!!')

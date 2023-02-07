@@ -37,7 +37,7 @@ def recommend(user, user_seq, candidate):
 
     ''' load pred matrix '''
     ith_file, user_idx = divmod( user, args.thres )
-    with open(args.data_dir + f'ease/ease-pred-{ith_file}.pickle', 'rb') as f:
+    with open(args.data_dir + f'ease/ease-pred-{ith_file}.pkl', 'rb') as f:
         pred = pickle.load(f)
     pred = pred[user_idx]
     ''''''

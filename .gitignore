@@ -6,7 +6,7 @@ google-chrome-stable_current_amd64.deb
 .ipynb_checkpoints
 *.pem
 __pycache__
-.vscode
+.vscode/
 .empty
 .venv
 
@@ -65,6 +65,10 @@ tem.ipynb
 tem.py
 *.npy
 *.pickle
+*.pkl
+*.pt
+*.csv
+airflow/data/
 
 # model
 output/
@@ -75,3 +79,6 @@ poetry*
 
 # DB
 *.db
+
+# MLflow
+mlruns
