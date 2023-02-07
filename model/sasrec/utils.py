@@ -210,13 +210,10 @@ def personalizeion(pred_list):
     Returns:
         score (int): 해당 추천의 personalizeion score
     """    
-    #pred_list = pd.read_csv('../sasrec/SASRec_time_test_0130.csv')
-
     col = pred_list.columns[1]
     y_lst = []
 
     def fun(x):
-        x = eval(x)
         y_lst.extend(x)
         return x
 
