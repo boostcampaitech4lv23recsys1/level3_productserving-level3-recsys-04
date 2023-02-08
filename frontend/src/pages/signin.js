@@ -28,7 +28,7 @@ export default function SignIn() {
   let [loading, setLoading] = React.useState(false);
   const navigate = useNavigate();
   const validate = async (response) => {
-    if (response["detail"] == "cold start") {
+    if (response["detail"] == "cold start" && menu == "1") {
       //cold start 시에 실행시켜야 하는 항목
       await Swal.fire({
         title: '싫어하는 음식을 선택해주세요.',
@@ -83,13 +83,29 @@ export default function SignIn() {
       })
 
     }
+    else if (response["detail"] == "cold start" && menu == "2") {
+      cold_start({
+        name: link.substring(29, 53),
+        location: location,
+        menu: menu,
+        c1: false,
+        c2: false,
+        c3: false,
+        c4: false,
+        c5: false,
+        c6: false,
+        c7: false,
+        c8: false,
+        c9: false,
+      });
+    }
     else if (response["detail"] == "not cold start") {
       // 콜드스타트 아니고 기존에 실행히시켜야 하던 항목
       window.localStorage.setItem('restaurants0', JSON.stringify(response["restaurants0"]));
       window.localStorage.setItem('restaurants1', JSON.stringify(response["restaurants1"]));
       window.localStorage.setItem('restaurants2', JSON.stringify(response["restaurants2"]));
       window.localStorage.setItem('name', JSON.stringify(response["name"]));
-          
+
       console.log(response);
       window.location = '/album'
     }
