@@ -43,7 +43,7 @@ export default function SignIn() {
         <input type="checkbox" id="c8"  /><label for="c8"></label>
         <input type="checkbox" id="c9"  /><label for="c9"></label>
         `,
-        confirmButtonText: 'confirmar',
+        confirmButtonText: 'confirm',
         preConfirm: () => {
           var c1 = Swal.getPopup().querySelector('#c1').checked
           var c2 = Swal.getPopup().querySelector('#c2').checked
