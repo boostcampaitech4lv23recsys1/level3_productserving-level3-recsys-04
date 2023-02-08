@@ -110,10 +110,10 @@ def multivae_main():
     환경변수 설정
     '''
     config = {
-        'data_path' : "data/" ,  # 데이터 경로
-        # 'data_path' : "/opt/ml/input/project/airflow/data/",
+        'data_path' : 'data/' ,  # 데이터 경로
         'data_type' : 'time' ,  # rand or time
         'save' : '/opt/ml/input/project/backend/app/models/data/multivae',
+        'output_path' : 'output/',
 
         'p_dims': [100, 400],
         'dropout_rate' : 0.5,
@@ -131,22 +131,20 @@ def multivae_main():
     config = Box(config)
     config.device = 'cuda' if torch.cuda.is_available() else 'cpu'
     config.K = 20
-
-    file_path = "data/"
-    # file_path = "/opt/ml/input/project/airflow/data/"
+    # config.data_path = "/opt/ml/input/project/airflow/data/"
 
     '''
     데이터 로드 & 생성
     '''
-    if not os.path.exists(file_path + f'MVtrain_{config.data_type}.csv'):
-        train_df = pd.read_csv(file_path + f'train_{config.data_type}.csv')
+    if not os.path.exists(config.data_path + f'MVtrain_{config.data_type}.csv'):
+        train_df = pd.read_csv(config.data_path + f'train_{config.data_type}.csv')
         train_df = train_df.drop(columns='date')
         train_df.columns = ['user','item','user_idx','item_idx']
-        train_df.to_csv(file_path + f'MVtrain_{config.data_type}.csv', index=False)
+        train_df.to_csv(config.data_path + f'MVtrain_{config.data_type}.csv', index=False)
 
-        valid_df = pd.read_csv(file_path + f'test_{config.data_type}.csv')
+        valid_df = pd.read_csv(config.data_path + f'test_{config.data_type}.csv')
         valid_df.columns = ['user','item','user_idx','item_idx']
-        valid_df.to_csv(file_path + f'MVtest_{config.data_type}.csv', index=False)
+        valid_df.to_csv(config.data_path + f'MVtest_{config.data_type}.csv', index=False)
 
     print('file get success!')
 
@@ -216,7 +214,7 @@ def multivae_main():
             mlflow.log_metric("multivae_recall", recall)
 
             if recall > best_recall:
-                torch.save( model.state_dict(), f'{config.save}-{config.data_type}-{str(date.today())}.pt' )
+                torch.save( model.state_dict(), f'{config.save}-{config.data_type}.pt' )
                 best_recall = recall
                 earlystop = 0
             else: 
@@ -234,7 +232,7 @@ def multivae_main():
             make_matrix_data_set = make_matrix_data_set
         )
         submission_file = pd.DataFrame.from_dict(sub, orient='index')
-        submission_file.to_csv(file_path + f'multivae-{config.data_type}-{str(date.today())}.csv', index = False)  # multivae-time-2023-02-04.csv
+        submission_file.to_csv(config.output_path + f'multivae-{config.data_type}-{str(date.today())}.csv', index = False)  # multivae-time-2023-02-04.csv
 
         print('submission done!!')
 

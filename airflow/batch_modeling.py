@@ -1,17 +1,15 @@
 import pandas as pd
-import numpy as np
-import pandas as pd
 from numpy import random
-import sqlite3
-
-import re
 import random
 from datetime import date
+
+import sqlite3
 
 import warnings
 warnings.filterwarnings('ignore')
 
 seed = 1998
+
 
 def batch():
     """
@@ -20,7 +18,7 @@ def batch():
     data = pd.read_csv('./data/data_all.csv')
 
     """
-    Backend에서 사용하는 reccar_0130 DB 연결하기.
+    Backend에서 사용하는 DB 연결하기.
     """
     cnxn = sqlite3.connect("../backend/reccar_0202.db")
     cursor = cnxn.cursor()
@@ -158,11 +156,11 @@ def batch():
     test_rand = test_rand[['userid', 'rest', 'user_code', 'rest_code']]
     test_time = test_time[['userid', 'rest', 'user_code', 'rest_code']]
 
-    train_rand.to_csv('./data/train_rand.csv', index = False)
-    test_rand.to_csv('./data/test_rand.csv', index = False)
+    # train_rand.to_csv('./data/train_rand.csv', index = False)
+    # test_rand.to_csv('./data/test_rand.csv', index = False)
 
-    train_time.to_csv('./data/train_time.csv', index = False)
-    test_time.to_csv('./data/test_time.csv', index = False)
+    # train_time.to_csv('./data/train_time.csv', index = False)
+    # test_time.to_csv('./data/test_time.csv', index = False)
 
 
     """

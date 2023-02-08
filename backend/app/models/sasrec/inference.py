@@ -1,10 +1,7 @@
 import argparse
 import os
 
-import pandas as pd
-
 import torch
-from torch.utils.data import DataLoader, SequentialSampler
 
 from .models import S3RecModel
 from .utils import set_seed
@@ -25,12 +22,9 @@ def recommend(user_seq: list, item_candidate : list, max_item = 41460):
 
     # 데이터 경로와 네이밍 부분.
     parser.add_argument("--data_dir", default="app/models/data/", type=str) # ./models/data/
-    parser.add_argument("--model_name", default="SASRec_time-0130", type=str)
-    # parser.add_argument("--data_name", default="Ml", type=str)
-    # parser.add_argument("--do_eval", action="store_true")
+    parser.add_argument("--model_name", default="SASRec-time", type=str)
 
     # # 모델 argument(하이퍼 파라미터)
-    # parser.add_argument("--model_name", default="Finetune_full", type=str)
     parser.add_argument(
         "--hidden_size", type=int, default=128, help="hidden size of transformer model"
     )
@@ -62,11 +56,8 @@ def recommend(user_seq: list, item_candidate : list, max_item = 41460):
         "--batch_size", type=int, default=1, help="number of batch_size"
     )
     parser.add_argument("--no_cuda", action="store_true")
-    # parser.add_argument("--log_freq", type=int, default=1, help="per epoch print res")
     parser.add_argument("--seed", default=42, type=int)
-
     parser.add_argument("--gpu_id", type=str, default="0", help="gpu_id")
-
     parser.add_argument("--k", type=int, default=20, help="top k recommend")
 
 
@@ -82,14 +73,9 @@ def recommend(user_seq: list, item_candidate : list, max_item = 41460):
     args.device = torch.device("cuda" if args.cuda_condition else "cpu")
 
     # user_seq = user_seqs['rest_code'][0]  # [2062 2840  875 2841 2867 2855 2846    1 2839 2460 1841 2845 2872 1013]
-    #breakpoint()
-    #user_seq = user_seq[1:-1].split()
-    #user_seq = [int(num) for num in user_seq]
-    user_seq = eval(user_seq)
+    user_seq = eval(user_seq)  # str -> list
 
     ################# item max 값 받아오는 부분 나중에 처리 필요 (일단 임시로 csv 파일로 처리)
-    #rest_info = pd.read_csv(args.data_dir + "rest2.csv")
-    #max_item = int(max(rest_info['rest_code']))
     args.item_size = max_item + 2
     args.mask_id = max_item + 1
     ################################################################
