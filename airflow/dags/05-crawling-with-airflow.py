@@ -5,10 +5,15 @@ from crawling import crawling
 from crawling2 import crawling2
 from crawling3 import crawling3
 
+from pytz import timezone
+from datetime import datetime
+
+
 default_args = {
-    'owner' : 'kyle',
+    # 'owner' : 'kyle',
     'depends_on_past' : False,
-    'start_date' : datetime(2023, 1, 27),
+    # 'start_date' : datetime(cur_time.year, cur_time.month, cur_time.day, cur_time.hour),
+    'start_date' : datetime.now(timezone('Asia/Seoul')),
     'retires' : 1,
     'retry_delay' : timedelta(minutes = 15)
 }
@@ -28,17 +33,14 @@ with DAG(
         python_callable = crawling,
         op_args = ['Jongno', URLS]
     )
-    
     task2 = PythonOperator(
         task_id = 'task2',
         python_callable = crawling2,
         op_args = ['Jongno']
     )
-    
     task3 = PythonOperator(
         task_id = 'task3',
         python_callable = crawling3,
         op_args = ['Jongno']
     )
-    
     task1 >> task2 >> task3

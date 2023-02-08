@@ -35,6 +35,7 @@ class AlbumRequest(BaseModel):
     is_positive: bool
     model: str
 
+
 class AlbumNegativeRequest(BaseModel):
     user_id1: str  # user
     rest_id1: str  # url
@@ -48,6 +49,7 @@ class AlbumNegativeRequest(BaseModel):
     rest_id3: str  # url
     is_positive3: bool
     model3: str
+
 
 class GeneralRequest(BaseModel):
     qeury: str
