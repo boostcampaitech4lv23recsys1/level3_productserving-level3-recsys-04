@@ -27,11 +27,12 @@ def sasrec_main():
     parser = argparse.ArgumentParser()
     
     # 데이터 경로와 네이밍 부분.
-    parser.add_argument("--data_dir", default="../data/", type=str)
-    parser.add_argument("--output_dir", default="/opt/ml/input/project/backend/app/models/data", type=str)
+    parser.add_argument("--data_dir", default="data/", type=str)
+    parser.add_argument("--output_dir", default="output/", type=str)
     parser.add_argument("--data_name", default=str(date.today()), type=str)  # 2023-02-04
-    parser.add_argument("--data_type", default="rand", type=str)
+    parser.add_argument("--data_type", default="time", type=str)
     parser.add_argument("--model_name", default="SASRec", type=str)
+    parser.add_argument("--model_save", default="/opt/ml/input/project/backend/app/models/data/", type=str)
     
 
     # 모델 argument(하이퍼 파라미터)
@@ -100,10 +101,8 @@ def sasrec_main():
     args.device = torch.device("cuda" if args.cuda_condition else "cpu")
 
     # 데이터 파일 불러오는 경로 설정합니다.
-    path = 'data/'
-
-    train = pd.read_csv(path + f'train_{args.data_type}.csv')    
-    test = pd.read_csv(path + f'test_{args.data_type}.csv')
+    train = pd.read_csv(args.data_dir + f'train_{args.data_type}.csv')    
+    test = pd.read_csv(args.data_dir + f'test_{args.data_type}.csv')
    
     
     # 자세한건 get_user_seqs 함수(utils.py) 내에 써놨습니다.
@@ -119,17 +118,12 @@ def sasrec_main():
     args.mask_id = max_item + 1
     
     # save model args, (model_name : Finetune_full, data_name : Ml, output_dir : output/)
-    args_str = f"{args.model_name}_{args.data_type}-{args.data_name}"
+    args_str = f"{args.model_name}-{args.data_type}-{args.data_name}"
     args.log_file = os.path.join(args.output_dir, args_str + ".txt")
     print(str(args))
 
     # user * item 메트릭스.
     args.train_matrix = train_matrix 
-
-    # 모델 기록용 파일 경로 저장합니다.
-    checkpoint = args_str + ".pt"
-    args.checkpoint_path = os.path.join(args.output_dir, checkpoint)
-
     
     # SASRecDataset 클래스를 불러옵니다. (datasets.py 내 존재)
     # user_seq : 유저마다 따로 아이템 리스트 저장. 2차원 배열, => [[1번 유저 item_id 리스트], [2번 유저 item_id 리스트] .. ]
@@ -169,8 +163,8 @@ def sasrec_main():
         pred_df = pred_df.reset_index()
         pred_df = pred_df[['index','pred']]
         per_score = personalizeion(pred_df)
-        #pred_df.to_csv(f'{args.model_name}_{args.data_type}_test_{args.data_name}.csv', index = False)
-        torch.save(model.state_dict(), args.checkpoint_path)
+        pred_df.to_csv(args.output_dir + f'{args.model_name}-{args.data_type}-{args.data_name}.csv', index = False)
+        torch.save(model.state_dict(), os.path.join(args.model_save, f'{args.model_name}-{args.data_type}.pt'))
 
         # mlflow logging
         mlflow.log_params({

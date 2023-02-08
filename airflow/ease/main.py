@@ -102,7 +102,7 @@ def ease_main():
         # output csv 생성
         if not os.path.exists(csv_output_path):
             os.mkdir(csv_output_path)
-        predict_user.to_csv(f'{csv_output_path}ease-{data_type}-top{k}-{cur_date}.csv')
+        predict_user.to_csv(f'{csv_output_path}ease-{data_type}-{cur_date}.csv')
         
 
         '''
