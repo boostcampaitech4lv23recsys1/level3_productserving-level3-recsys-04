@@ -1,18 +1,12 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
-from typing import List, Optional
-from starlette.responses import JSONResponse
+from pydantic import BaseModel
 
 from type import *
 
-from fastapi.param_functions import Depends
 from PIL import Image
-import torch
-
 import sqlite3
 
-# from models.sasrec.inference import recommend
 from models.sasrec.inference import recommend as sasrec_inference
 from models.ease.inference import recommend as ease_inference
 from models.multivae.inference import recommend as multivae_inference
@@ -222,7 +216,6 @@ def signin(user: SignInColdRequest):
     """
     select_sql = f"select max(rest_code) from rest"
     cursor.execute(select_sql)
-    max_item = cursor.fetchall()  # [(41460,)]
 
     """
     user.location으로 쿼리 날려서 좌표 가져오는 코드
@@ -251,7 +244,7 @@ def signin(user: SignInColdRequest):
     if user.c8: tags += " AND (tag != '해산물')"
     if user.c9: tags += " AND (tag != '분식&샐러드')"
     
-    if user.menu == "1":  # 식사인경우
+    if user.menu == "1":  # 식사인 경우
         select_sql = f"select DISTINCT rest_code from rest where ((x > ?) AND (x < ?) AND (y > ?) AND (y < ?) AND (tag != ?) AND (tag != ?){tags}) order by cnt DESC"
     else:  # 카페&디저트인 경우
         select_sql = f"select DISTINCT rest_code from rest where ((x > ?) AND (x < ?) AND (y > ?) AND (y < ?) AND (tag != ?) AND (tag = ?){tags}) order by cnt DESC"
@@ -259,8 +252,6 @@ def signin(user: SignInColdRequest):
     cursor.execute(select_sql, _input)
     results = cursor.fetchall()
     top_k = [rest_code[0] for rest_code in results[:30]]
-    # print(top_k, 'HI')
-
     print(top_k)
 
     """
@@ -355,93 +346,6 @@ def get_xy(location: str):
         return 0, 0
 
 
-def ml_model(user_id):
-    """_summary_
-
-    Args:
-        user_id (_type_):
-    """
-    return
-
-
 class Prediction(BaseModel):
     name: str = "predict_result"
     result: float
-
-
-# @app.get('/predict/{user_id}/{rest_id}', description="해당 유저의 정보를 모델에게 전달하고 예측 결과를 가져옵니다")
-# async def make_prediction(user_id: str, rest_id: str, model = trash_model()):
-#      predict_result = model(user_id, rest_id)
-#      prediction = Prediction(result=predict_result)
-#      return prediction
-
-
-# 모든 식당 정보 가져오는 API
-"""
-@app.get('/restaurants/', description="모든 식당 리스트를 가져옵니다")
-async def get_restaurants() -> List:
-    select_sql = "select * from rest"# where rating = 4.42"
-    cursor.execute(select_sql)
-    result = cursor.fetchall()
-    # _id, _x, _y,_cat,_name,_imgurl = zip(*result)
-    restaurants = result
-    return restaurants
-"""
-
-
-"""
-def get_restaurant_image_by_id(rest_id: str) -> Optional[Restaurant]:
-    rest = Restaurant(id=rest_id)
-    rest.show_image()
-
-
-def get_restaurant_by_id(user_id: str) -> Optional[User]:
-    return next((restaurant for restaurant in restaurants if restaurant.id == user_id), None)
-
-
-class RestaurantUpdate(BaseModel):
-    restaurants: List[User] = Field(default_factory=list)
-
-
-def update_restaurant_by_id(user_id: str, restaurant_update: RestaurantUpdate):
-    existing_restaurant = get_restaurant_by_id(user_id=user_id)
-
-    if not existing_restaurant:
-        return
-    else:
-        updated_restaurant = existing_restaurant.copy()
-        for next_restaurant in restaurant_update.restaurants:
-            updated_restaurant.add_restaurant(next_restaurant)
-
-        return updated_restaurant
-"""
-
-
-"""
-@app.patch('/user/{user_id}', description="새로 리뷰를 등록한 식당을 업데이트합니다")
-async def update_restaurant(user_id: str, restaurant_update: RestaurantUpdate):
-    updated_restaurant = update_restaurant_by_id(user_id=user_id, restaurant_update=restaurant_update)
-
-    if not updated_restaurant:
-        return {"message":"리뷰 정보를 찾을 수 없습니다"}
-    
-    return updated_restaurant
-
-
-class Prediction(User):
-    name: str = 'predict_result'
-
-@app.get('/predict/{user_id}/{rest_id}', description="해당 유저의 정보를 모델에게 전달하고 예측 결과를 가져옵니다")
-async def make_prediction(user_id: str, rest_id: str, model=trash_model):
-    predict_result = model()
-    prediction = Prediction(result=predict_result)
-    return prediction
-
-
-
-class Item(BaseModel):
-    name: str
-
-
-users = ['5c667add298eafd0547442d8', '5c3737d3d764236c17947538']
-"""
