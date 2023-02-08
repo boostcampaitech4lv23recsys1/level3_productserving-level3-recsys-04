@@ -212,11 +212,6 @@ export default function SignIn() {
         location: location,
         menu: menu,
       });
-
-
-      //showAutoClose()
-      // navigate('/album');
-      // window.location = '/album';
     }
     else {
       Swal.fire({
@@ -282,13 +277,8 @@ export default function SignIn() {
               </Select>
             </FormControl>
 
-            {/* <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
-              label="Remember me"
-            /> */}
             <div>
               <Button
-                // type="submit"
                 fullWidth
                 variant="contained"
                 sx={{ mt: 3, mb: 2 }}
