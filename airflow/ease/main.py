@@ -16,11 +16,11 @@ def ease_main():
     global variables
     '''
     ############# Warning... 실행 전 반드시 설정 확인해주세요!! #############
-    csv_input_path = 'data/'  # input csv 경로
+    csv_input_path = '/opt/ml/input/project/airflow/dags/data/'  # input csv 경로
     # csv_input_path = '/opt/ml/input/project/backend/app/models/data/'  # input csv 경로
-    csv_output_path = 'output/'  # output csv 저장 경로
+    csv_output_path = '/opt/ml/input/project/airflow/dags/output/'  # output csv 저장 경로
     cur_date = str(date.today())  # "2023-02-04"
-    pkl_path = '/opt/ml/input/project/backend/app/models/data/'  # pickle 파일 저장&로드 경로
+    pkl_path = '/opt/ml/input/project/airflow/dags/data/'  # pickle 파일 저장&로드 경로
 
     data_type = 'time'  # ['time', 'rand']
     k = 20  # Should be synced with "k" in ease inference.py
