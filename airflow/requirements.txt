@@ -8,7 +8,6 @@ tqdm
 scikit-learn
 beautifulsoup4
 requests
-pytorch-lightning
 selenium
 python-box
 apache-airflow

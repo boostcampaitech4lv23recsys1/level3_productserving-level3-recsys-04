@@ -6,15 +6,15 @@ from crawling2 import crawling2
 from crawling3 import crawling3
 from batch_modeling import batch
 
-from pytz import timezone
+# from pytz import timezone
 from datetime import datetime, timedelta
 
 
 default_args = {
     'owner' : 'kyle',
     'depends_on_past' : False,
-    # 'start_date' : datetime(cur_time.year, cur_time.month, cur_time.day, cur_time.hour),
-    'start_date' : datetime.now(timezone('Asia/Seoul')),
+    'start_date' : datetime(2023, 2, 10),
+    # 'start_date' : datetime.now(timezone('Asia/Seoul')),
     'retires' : 1,
     'retry_delay' : timedelta(minutes = 15)
 }
@@ -49,4 +49,3 @@ with DAG(
         python_callable = batch,
     )
     crawl_1 >> crawl_2 >> crawl_3 >> model_train
-    # model_train
