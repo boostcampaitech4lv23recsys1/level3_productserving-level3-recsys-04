@@ -6,7 +6,7 @@ import random
 import numpy as np
 import pandas as pd
 import torch
-from scipy.sparse import csr_matrix
+from scipy import sparse
 from sklearn.metrics.pairwise import cosine_similarity
 
 
