@@ -6,99 +6,64 @@ from datetime import date
 
 import torch
 from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
-from datasets import SASRecTrainDataset
-from models import S3RecModel
-from utils import (
+from .datasets import SASRecTrainDataset
+from .models import S3RecModel
+from .utils import (
     check_path,
     get_user_seqs,
     set_seed,
     personalizeion,
 )
-from trainers import (
+from .trainers import (
     iteration,
     test_score
 )
 
 import mlflow
 
+from box import Box
+
 
 # 0.01687, 25에폭(time)
 def sasrec_main():
+    print("!1111")
     parser = argparse.ArgumentParser()
-    
-    # 데이터 경로와 네이밍 부분.
-    parser.add_argument("--data_dir", default="data/", type=str)
-    parser.add_argument("--output_dir", default="output/", type=str)
-    parser.add_argument("--data_name", default=str(date.today()), type=str)  # 2023-02-04
-    parser.add_argument("--data_type", default="time", type=str)
-    parser.add_argument("--model_name", default="SASRec", type=str)
-    parser.add_argument("--model_save", default="/opt/ml/input/project/backend/app/models/data/", type=str)
-    
-
-    # 모델 argument(하이퍼 파라미터)
-    parser.add_argument(
-        "--hidden_size", type=int, default=128, help="hidden size of transformer model"
-    )
-    parser.add_argument(
-        "--num_hidden_layers", type=int, default=2, help="number of layers"
-    )
-    parser.add_argument("--num_attention_heads", default=2, type=int)
-    # 활성화 함수. (default gelu => relu 변형)
-    parser.add_argument("--hidden_act", default="gelu", type=str)  # gelu relu
-
-    # dropout하는 prob 기준 값 정하기? (모델 본 사람이 채워줘.)
-    parser.add_argument(
-        "--attention_probs_dropout_prob",
-        type=float,
-        default=0.2,
-        help="attention dropout p",
-    )
-    parser.add_argument(
-        "--hidden_dropout_prob", type=float, default=0.3, help="hidden dropout p"
-    )
-    # 모델 파라미터 initializer 범위 설정
-    parser.add_argument("--initializer_range", type=float, default=0.02)
-    # 최대 시퀀셜 길이 설정
-    parser.add_argument("--max_seq_length", default=150, type=int)
-
-    # train args, 트레이너 하이퍼파라미터
-    parser.add_argument("--lr", type=float, default=0.001, help="learning rate of adam")
-    parser.add_argument(
-        "--batch_size", type=int, default=256, help="number of batch_size"
-    )
-    parser.add_argument("--epochs", type=int, default=1, help="number of epochs") # 200
-    parser.add_argument("--no_cuda", action="store_true")
-    parser.add_argument("--log_freq", type=int, default=1, help="per epoch print res")
-    parser.add_argument("--seed", default=42, type=int)
-
-    # 옵티마이저 관련 하이퍼파라미터
-    parser.add_argument(
-        "--weight_decay", type=float, default=1e-6, help="weight_decay of adam"
-    )
-    parser.add_argument(
-        "--adam_beta1", type=float, default=0.7, help="adam first beta value"
-    )
-    parser.add_argument(
-        "--adam_beta2", type=float, default=0.9999, help="adam second beta value"
-    )
-    parser.add_argument("--gpu_id", type=str, default="0", help="gpu_id")
-
-    # 인코딩을 사용할 것인지 체크.
-    parser.add_argument("--using_encoding", action="store_true")
-
-    # parser 형태로 argument를 입력받습니다.
-    args = parser.parse_args()
-    
+    args = {
+        "data_dir" : "/opt/ml/input/project/airflow/dags/data/",
+        "output_dir" : "/opt/ml/input/project/airflow/dags/output/",
+        "data_name" : str(date.today()),
+        "data_type" : "time",
+        "model_name" : "SASRec",
+        "model_save" : "/opt/ml/input/project/airflow/dags/data/",
+        "hidden_size" : 128,
+        "num_hidden_layers" : 2,
+        "num_attention_heads" : 2,
+        "hidden_act" : "gelu",
+        "attention_probs_dropout_prob" : 0.2,
+        "hidden_dropout_prob" : 0.3,
+        "initializer_range" : 0.02,
+        "max_seq_length" : 150,
+        "lr" : 0.001,
+        "batch_size" : 256,
+        "epochs" : 1,
+        "log_freq" : 1,
+        "seed" : 42,
+        "weight_decay" : 1e-6,
+        "adam_beta1" : 0.7,
+        "adam_beta2" : 0.9999,
+        "gpu_id" : "0",        
+    }
+    args = Box(args)
     # 시드 고정 (utils.py 내 함수 존재)
     set_seed(args.seed)
     # output 폴더가 존재하는지 체크. 존재하지 않는다면 만들어줍니다. (utils.py 내 함수 존재)
     check_path(args.output_dir)
-
+    print("!1112")
     
     # GPU 관련 설정 해줍니다.
     os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu_id
-    args.cuda_condition = torch.cuda.is_available() and not args.no_cuda
-    args.device = torch.device("cuda" if args.cuda_condition else "cpu")
+    args.cuda_condition = torch.cuda.is_available()
+    args.device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
     # 데이터 파일 불러오는 경로 설정합니다.
     train = pd.read_csv(args.data_dir + f'train_{args.data_type}.csv')    
@@ -141,7 +106,7 @@ def sasrec_main():
     test_dataloader = DataLoader(
         train_dataset, shuffle=False, batch_size=args.batch_size * 2
     )
-
+    print("!1113")
     '''
     mlflow run
     '''
@@ -179,7 +144,7 @@ def sasrec_main():
         mlflow.pytorch.log_model(model, "sasrec_model")
     
     mlflow.end_run()
-
+    print("!1115")
     return scores, per_score
 
 

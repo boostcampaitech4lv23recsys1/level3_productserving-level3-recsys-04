@@ -1,5 +1,3 @@
-import json
-import math
 import os
 import random
 
@@ -80,7 +78,6 @@ def generate_rating_matrix_submission(user_seq, num_users, num_items):
 
     # 희소행렬 메트릭스 연산을 도와주는 scipy 내 csr_matrix 함수를 이용해 유저-아이템 행렬 제작합니다.
     rating_matrix = csr_matrix((data, (row, col)), shape=(num_users, num_items))
-
     return rating_matrix
 
 
@@ -88,7 +85,6 @@ def generate_submission_file(data_file, preds):
 
     rating_df = pd.read_csv(data_file)
     users = rating_df["user"].unique()
-
     result = []
 
     for index, items in enumerate(preds):
@@ -173,12 +169,9 @@ def get_test_list(test):
     1, [3, 4, ..]
     ...
     """    
-
     # test id, 해당 유저가 방문한 rest item 정보를 담는 것 제작
     test = test.groupby('user')['item'].unique().to_frame().reset_index()
-
     return test
-
 
 
 def get_user_seqs_long(data_file):
@@ -225,7 +218,6 @@ def get_metric(pred_list, topk=10):
             NDCG += 1.0 / np.log2(rank + 2.0)
             HIT += 1.0
     return HIT / len(pred_list), NDCG / len(pred_list), MRR / len(pred_list)
-
 
 
 def recallk(_list, k = 3):

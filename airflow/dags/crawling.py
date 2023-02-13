@@ -33,8 +33,8 @@ def crawling(area, URLS):
     # 실행 전에 ./area_csv/ 폴더 안에 해당 구 폴더 생성하세요.
     # ex) ./area_csv/Jongno/
 
-    driver = webdriver.Chrome(executable_path='/opt/ml/airflow/dags/chromedriver', options=chrome_options)
-    path = f'./area_csv/{area}/'
+    driver = webdriver.Chrome(executable_path='/opt/ml/input/project/airflow/dags/chromedriver', options=chrome_options)
+    path = f'/opt/ml/input/project/airflow/dags/area_csv/{area}/'
     # num : 1부터 시작해서 하나씩 알아서 늘어남
     for num, URL in enumerate(URLS, start=1):
         print(num)
@@ -44,7 +44,7 @@ def crawling(area, URLS):
                 driver.quit()
                 restaurants_list = pd.DataFrame()
                 
-                driver = webdriver.Chrome(executable_path='/opt/ml/airflow/dags/chromedriver', options=chrome_options)
+                driver = webdriver.Chrome(executable_path='/opt/ml/input/project/airflow/dags/chromedriver', options=chrome_options)
                 driver.get(URL)
 
                 driver.switch_to.frame('searchIframe') #iframe 으로 이동하기 위한 코드

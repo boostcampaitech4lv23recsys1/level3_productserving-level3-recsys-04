@@ -70,6 +70,8 @@ tem.py
 *.csv
 airflow/data/
 
+# logs
+
 # model
 output/
 
@@ -82,3 +84,9 @@ poetry*
 
 # MLflow
 mlruns
+
+# airflow
+airflow/logs/
+airflow-webserver.pid
+airflow.cfg
+webserver_config.py

@@ -8,7 +8,7 @@ def crawling2(area):
 
     num = 40
 
-    path = f'./area_csv/{area}/'
+    path = f'/opt/ml/input/project/airflow/dags/area_csv/{area}/'
     lsts = []
 
     for i in range(1, num):

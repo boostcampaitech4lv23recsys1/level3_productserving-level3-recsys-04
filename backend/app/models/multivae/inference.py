@@ -1,7 +1,6 @@
 import numpy as np
 import torch
 from .model import MultiVAE
-from datetime import date
 
 
 def recommend(rest_codes, K=20):

@@ -1,0 +1,14 @@
+uvicorn
+fastapi
+pillow
+torch
+pandas
+scipy
+tqdm
+scikit-learn
+beautifulsoup4
+requests
+selenium
+python-box
+apache-airflow
+mlflow

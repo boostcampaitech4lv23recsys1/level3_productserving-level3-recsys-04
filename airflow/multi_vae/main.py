@@ -110,10 +110,10 @@ def multivae_main():
     환경변수 설정
     '''
     config = {
-        'data_path' : 'data/' ,  # 데이터 경로
+        'data_path' : '/opt/ml/input/project/backend/app/models/data/multivae' ,  # 데이터 경로
         'data_type' : 'time' ,  # rand or time
         'save' : '/opt/ml/input/project/backend/app/models/data/multivae',
-        'output_path' : 'output/',
+        'output_path' : '/opt/ml/input/project/airflow/dags/output',
 
         'p_dims': [100, 400],
         'dropout_rate' : 0.5,

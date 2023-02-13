@@ -4,7 +4,7 @@ import torch.nn as nn
 from tqdm import tqdm
 from torch.optim import Adam
 
-from utils import recallk
+from .utils import recallk
 
 
 def cross_entropy(seq_out, pos_ids, neg_ids, model):
