@@ -53,7 +53,6 @@ export default function Album() {
     fetch('/api/album', requestOptions)
       .then((response) => response.json())
       .then((response) => {
-        // validate(response);
         console.log(response)
       })
       .catch(error => alert(error.message));
@@ -70,16 +69,13 @@ export default function Album() {
     };
     fetch('/api/album/negative', requestOptions)
       .then((response) => response.json())
-      .then((response) => {
-        // validate(response);
-      })
       .catch(error => alert(error.message));
   };
   const handleClick1 = (event) => {
     navigate('/signin');
   };
 
-  const test = (event) => {
+  const handleClick2 = (event) => {
     var user = window.localStorage.getItem('link').substring(29, 53)
 
     negative({
@@ -110,7 +106,6 @@ export default function Album() {
     const i = restaurants[card][card_num[card]]["id"]
     const url = "https://m.place.naver.com/restaurant/" + i + "/home"
     window.open(url, "_blank", "noopener, noreferrer");
-    // window.open(url, "_blank", "noopener, noreferrer");
     positive({
       user_id: user,
       rest_id: restaurants[card][card_num[card]]["id"],
@@ -156,7 +151,6 @@ export default function Album() {
             bgcolor: 'background.paper',
             pt: 8,
             pb: 6,
-            // backgroundColor: "black"
           }}
 
         >
@@ -173,7 +167,6 @@ export default function Album() {
                     sx={{
                       height: '100%',
                       display: 'flex',
-                      // flexDirection: 'column',
                     }}
                   >
 
@@ -200,7 +193,6 @@ export default function Album() {
                     </CardContent>
                     <CardActions>
                       <Button id={card} type="submit" size="small" onClick={handleClick4} sx={{ position: "relative", bottom: -90, width: 100, left: -130 }}>식당 링크 열기</Button>
-                      {/* <Button id={card} type="submit" size="small" onClick={handleClick5}>다른 결과 보기</Button> */}
                     </CardActions>
                   </Card>
                 </Grid>
@@ -212,7 +204,6 @@ export default function Album() {
               spacing={2}
               justifyContent="none"
             >
-              {/* <Button variant="contained">더보기</Button> */}
 
             </Stack>
           </Container>
@@ -234,7 +225,7 @@ export default function Album() {
           >
             <Button variant="outlined" onClick={handleClick1} sx={{ position: "relative", top: -200, height: 50, right: 300 }}>
               처음 화면으로</Button>
-            <Button variant="outlined" onClick={test} sx={{ position: "relative", top: -200, height: 50, left: 300 }}>
+            <Button variant="outlined" onClick={handleClick2} sx={{ position: "relative", top: -200, height: 50, left: 300 }}>
               다른 결과 보기</Button>
           </Box>
         </Container>
