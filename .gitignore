@@ -53,6 +53,9 @@ yarn-error.log*
 
 # Database
 database/ssl
+database/rest_csv
+database/user_csv
+
 
 # data
 area_csv

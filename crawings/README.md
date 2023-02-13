@@ -1,3 +1,33 @@
+# 구조도
+
+```bash
+📦crawings
+ ┣ 📂area_csv
+ ┃ ┣ 📂GangJin
+ ┃ ┃ ┣ 📜rest_concat_GangJin.csv
+ ┃ ┣ 📂KongDong
+ ┃ ┃ ┗ 📜rest_concat_KongDong.csv
+ ┃ ┗ 📂...(이하 26개 지역들)
+ ┣ 📂user_csv
+ ┃ ┣ 📂Gangnam
+ ┃ ┃ ┗ 📜user_concat_Gangnam.csv
+ ┃ ┗ 📂KongDong
+ ┃ ┃ ┣ 📜user_concat_KongDong.csv
+ ┃ ┗ 📂...(이하 26개 지역들)
+ ┣ 📜1.Kcrawling_rest_server.ipynb
+ ┣ 📜2.Kcrwaling_concat.ipynb
+ ┣ 📜3.Kcrawling_user_review.ipynb
+ ┣ 📜4.Kcrawling_user_review_failed.ipynb
+ ┣ 📜5.Kcrawling_get_rest_info.ipynb
+ ┣ 📜Kcsv_concat.ipynb
+ ┗ 📜requirements.txt
+```
+## area_csv
+식당 정보를 저장해놓은 csv입니다. 구 별로 폴더가 나눠져 있으며 파일을 업로드하진 않았습니다.
+
+## user_csv
+유저의 식당 방문 기록을 저장해놓은 csv입니다. 구 별로 폴더가 나눠져 있으며 파일을 업로드하진 않았습니다.
+
 ## 1.Kcrawling_rest_server.ipynb
 네이버 지도에서 음식점을 검색한 화면에서 음식점이름, 음식점 종류, 리뷰개수, 마이플레이스 링크를 가져옵니다.
 ## 2.Kcrwaling_concat.ipynb
