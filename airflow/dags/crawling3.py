@@ -27,10 +27,10 @@ def crawling3(area):
     chrome_options.add_argument('window-size= 1920,1080')
     chrome_options.add_argument('--kiosk')
 
-    driver = webdriver.Chrome(executable_path='/opt/ml/airflow/dags/chromedriver', chrome_options=chrome_options)
+    driver = webdriver.Chrome(executable_path='/opt/ml/input/project/airflow/dags/chromedriver', chrome_options=chrome_options)
     
-    data = pd.read_csv(f'./area_csv/{area}/rest_concat.csv')
-    
+    data = pd.read_csv(f'/opt/ml/input/project/airflow/dags/area_csv/{area}/rest_concat.csv')
+    path = f'/opt/ml/input/project/airflow/dags/user_csv/{area}/'
     current_status = 0
     start = 0
     end = len(data)
@@ -40,7 +40,7 @@ def crawling3(area):
     
     for _url in tqdm(url_list[start:end]):
         try:
-            driver = webdriver.Chrome(executable_path='/opt/ml/airflow/dags/chromedriver', chrome_options=chrome_options)
+            driver = webdriver.Chrome(executable_path='/opt/ml/input/project/airflow/dags/chromedriver', chrome_options=chrome_options)
             action = ActionChains(driver)
             print(_url)
             URL = f"https://m.place.naver.com/restaurant/{_url}/review/visitor"
@@ -72,7 +72,7 @@ def crawling3(area):
                 if count >= 60: flag = True; break
             print("click 2/2 complete")
             if flag:
-                with open(f"./user_csv/{area}/notsaved_{start}.txt", "a") as file:
+                with open(path + f"notsaved_{start}.txt", "a") as file:
                     file.write(f"{str(current_status)}\n")
                     file.close()
                 current_status += 1
@@ -87,12 +87,12 @@ def crawling3(area):
             userlink2 = pd.DataFrame({'link' : link_list, 'user' : user_list}, dtype = str)
             userlink2['rest'] = _url
             userlink = pd.concat([userlink, userlink2], axis = 0, sort=False)
-            userlink.to_csv(f'./user_csv/{area}/user_{start}.csv', index=False)#river_behind500
-            with open(f"./user_csv/{area}/log.txt", "w") as file:
+            userlink.to_csv(path + f'user_{start}.csv', index=False)#river_behind500
+            with open(path + f"log.txt", "w") as file:
                 file.writelines(str(current_status))
             current_status += 1
         except:
-            with open(f"./user_csv/{area}/notsaved_{start}.txt", "a") as file:
+            with open(path + f"notsaved_{start}.txt", "a") as file:
                 file.write(f"{str(current_status)}\n")
                 file.close()
             current_status += 1

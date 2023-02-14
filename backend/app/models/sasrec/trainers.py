@@ -1,6 +1,5 @@
 import numpy as np
 import torch
-from tqdm import tqdm
 
 
 def trainers(args, _input, model, item_candidate):
@@ -48,11 +47,7 @@ def trainers(args, _input, model, item_candidate):
 
     rating_pred = rating_pred.cpu().data.numpy()
 
-    # TOP 12 index 추출
-    
-    ind = np.argpartition(rating_pred, -12)[-12:]
+    # TOP k index 추출
+    ind = np.argpartition(rating_pred, -args.k)[-args.k:]
     item_candidate = np.array(item_candidate)
-    #breakpoint()
     return item_candidate[ind] # index로 rest_code로 변환해주기.
-
-    

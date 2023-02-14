@@ -1,11 +1,11 @@
 # !pip install python-box
-import math
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
 from collections import defaultdict
 import os
 import time
+from datetime import date
 
 import torch
 import torch.nn as nn
@@ -21,9 +21,7 @@ torch.set_printoptions(sci_mode=True)
 
 config = {
     'data_path' : "/opt/ml/input/project/model/data" , # 데이터 경로
-
-
-    'data_type' : 'rand' , #rand or time
+    'data_type' : 'time' , #rand or time
 
     'p_dims': [100, 400],
     'dropout_rate' : 0.5,
@@ -32,7 +30,7 @@ config = {
     'seed' : 22,
     'anneal_cap' : 0.2,
     'total_anneal_steps' : 200000,
-    'save' : '/opt/ml/input/project/model/Multi-VAE/model_1.pt',
+    'save' : '/opt/ml/input/project/model/Multi-VAE/multivae-',
     
     'lr' : 0.005,
     'batch_size' : 500,
@@ -41,13 +39,7 @@ config = {
 }
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
-
 config = Box(config)
-
-
-
-
-
 
 
 # 데이터셋
@@ -59,34 +51,9 @@ class MakeMatrixDataSet():
         self.config = config
         self.df = pd.read_csv(os.path.join(self.config.data_path, f'MVtrain_{self.config.data_type}.csv'))
         self.val = pd.read_csv(os.path.join(self.config.data_path, f'MVtest_{self.config.data_type}.csv'))
-        # self.item_encoder, self.item_decoder = self.generate_encoder_decoder('item')
-        # self.user_encoder, self.user_decoder = self.generate_encoder_decoder('user')
         self.num_item, self.num_user = sorted(self.df['item_idx'].unique())[-1]+1,sorted(self.df['user_idx'].unique())[-1]+1
-
-        # self.df['item_idx'] = self.df['item'].apply(lambda x : self.item_encoder[x])
-        # self.df['user_idx'] = self.df['user'].apply(lambda x : self.user_encoder[x])
-
         self.user_train, self.user_valid = self.generate_sequence_data()
 
-    # def generate_encoder_decoder(self, col : str) -> dict:
-    #     """
-    #     encoder, decoder 생성
-
-    #     Args:
-    #         col (str): 생성할 columns 명
-    #     Returns:
-    #         dict: 생성된 user encoder, decoder
-    #     """
-
-    #     encoder = {}
-    #     decoder = {}
-    #     ids = self.df[col].unique()
-
-    #     for idx, _id in enumerate(ids):
-    #         encoder[_id] = idx
-    #         decoder[idx] = _id
-
-    #     return encoder, decoder
     
     def generate_sequence_data(self) -> dict:
         """
@@ -109,7 +76,6 @@ class MakeMatrixDataSet():
 
             user_total = users[user]
             val_total = v_users[user]
-            # valid = np.random.choice(user_total, size = self.config.valid_samples, replace = False).tolist()
             valid = list(set(val_total))
             train = list(set(user_total))
 
@@ -150,7 +116,6 @@ class AEDataSet(Dataset):
 
 # 모델
 class MultiVAE(nn.Module):
-
     def __init__(self, p_dims, dropout_rate = 0.5):
         super(MultiVAE, self).__init__()
         self.p_dims = p_dims
@@ -167,6 +132,7 @@ class MultiVAE(nn.Module):
         self.drop = nn.Dropout(dropout_rate)
         self.init_weights()
     
+
     def forward(self, input, loss = False):
         mu, logvar = self.encode(input)
         z = self.reparameterize(mu, logvar)
@@ -176,6 +142,7 @@ class MultiVAE(nn.Module):
         else:
             return h
     
+
     def encode(self, input):
         h = F.normalize(input)
         h = self.drop(h)
@@ -189,6 +156,7 @@ class MultiVAE(nn.Module):
                 logvar = h[:, self.q_dims[-1]:]
         return mu, logvar
 
+
     def reparameterize(self, mu, logvar):
         if self.training:
             std = torch.exp(0.5 * logvar)
@@ -197,6 +165,7 @@ class MultiVAE(nn.Module):
         else:
             return mu
     
+
     def decode(self, z):
         h = z
         for i, layer in enumerate(self.p_layers):
@@ -204,6 +173,7 @@ class MultiVAE(nn.Module):
             if i != len(self.p_layers) - 1:
                 h = F.tanh(h)
         return h
+
 
     def init_weights(self):
         for layer in self.q_layers:
@@ -229,50 +199,13 @@ class MultiVAE(nn.Module):
             layer.bias.data.normal_(0.0, 0.001)
 
 
-class MultiDAE(nn.Module):
-    
-    def __init__(self, p_dims, dropout_rate = 0.5):
-        super(MultiDAE, self).__init__()
-        self.p_dims = p_dims
-        self.q_dims = p_dims[::-1]
-
-        self.dims = self.q_dims + self.p_dims[1:]
-        self.layers = nn.ModuleList([nn.Linear(d_in, d_out) for
-            d_in, d_out in zip(self.dims[:-1], self.dims[1:])])
-        self.drop = nn.Dropout(dropout_rate)
-        
-        self.init_weights()
-    
-    def forward(self, input):
-        h = F.normalize(input)
-        h = self.drop(h)
-
-        for i, layer in enumerate(self.layers):
-            h = layer(h)
-            if i != len(self.layers) - 1:
-                h = F.tanh(h)
-        return h
-
-    def init_weights(self):
-        for layer in self.layers:
-            # Xavier Initialization for weights
-            size = layer.weight.size()
-            fan_out = size[0]
-            fan_in = size[1]
-            std = np.sqrt(2.0/(fan_in + fan_out))
-            layer.weight.data.normal_(0.0, std)
-
-            # Normal Initialization for Biases
-            layer.bias.data.normal_(0.0, 0.001)
-
-
 # 학습함수
 class LossFunc(nn.Module):
-
     def __init__(self, loss_type = 'Multinomial', model_type = None):
         super(LossFunc, self).__init__()
         self.loss_type = loss_type
         self.model_type = model_type
+
 
     def forward(self, recon_x = None, x = None, mu = None, logvar = None, anneal = None):
         if self.loss_type == 'Gaussian':
@@ -285,16 +218,18 @@ class LossFunc(nn.Module):
         if self.model_type == 'VAE':
             KLD = -0.5 * torch.mean(torch.sum(1 + logvar - mu.pow(2) - logvar.exp(), dim=1))
             loss = loss + anneal * KLD
-        
         return loss
+
 
     def Gaussian(self, recon_x, x):
         gaussian = F.mse_loss(recon_x, x)
         return gaussian
 
+
     def Logistic(self, recon_x, x):
         logistic = F.binary_cross_entropy(recon_x.sigmoid(), x, reduction='none').sum(1).mean()
         return logistic
+
 
     def Multinomial(self, recon_x, x):
         multinomial = -torch.mean(torch.sum(F.log_softmax(recon_x, 1) * x, -1))
@@ -309,8 +244,8 @@ def get_recallk(pred_list, true_list, K):
     recall = a / len(true_list)
     return recall
 
-# 학습함수 - train
 
+# 학습함수 - train
 def train(model, criterion, optimizer, data_loader, make_matrix_data_set, config):
     global update_count
     model.train()
@@ -341,11 +276,11 @@ def train(model, criterion, optimizer, data_loader, make_matrix_data_set, config
 
     return loss_val
 
-# 학습함수 - evaluate
 
+# 학습함수 - evaluate
 def evaluate(model, data_loader, user_train, user_valid, make_matrix_data_set, K = 20):
     model.eval()
-    RECALL_K =0.0 #Recall@K
+    RECALL_K =0.0  # Recall@K
 
     with torch.no_grad():
         for users in data_loader:
@@ -362,13 +297,12 @@ def evaluate(model, data_loader, user_train, user_valid, make_matrix_data_set, K
                 RECALL_K +=get_recallk(pred_list = up, true_list = uv, K = K )
 
     RECALL_K /= len(data_loader.dataset)
-
     return RECALL_K
+
 
 def submission(model, data_loader, user_train, user_valid, make_matrix_data_set, K = 20):
     model.eval()
     submission = {}
-
 
     with torch.no_grad():
         for users in data_loader:
@@ -387,10 +321,10 @@ def submission(model, data_loader, user_train, user_valid, make_matrix_data_set,
 
     return submission
 
+
 if __name__ == "__main__":
     print("!!! start !!!")
-    # 데이터
-    #multivae 용 csv 생성
+    # multivae 용 csv 생성
     file_path =f"/opt/ml/input/project/model/data/MVtrain_{config.data_type}.csv"
 
     if not os.path.exists(file_path):
@@ -423,8 +357,6 @@ if __name__ == "__main__":
     )
 
     loss_dict = {}
-    # ndcg_dict = {}
-    # hit_dict = {}
     recall_dict = {}
 
     model = MultiVAE(
@@ -438,13 +370,11 @@ if __name__ == "__main__":
     best_recall = 0
     update_count = 1
     loss_list = []
-    # ndcg_list = []
-    # hit_list = []
     recall_list = []
     K = 20
     earlystop =0 
     print('train start!!')
-    for epoch in range(1, config.num_epochs + 1):
+    for epoch in tqdm(range(1, config.num_epochs + 1)):
         start = time.time()
 
         train_loss = train(
@@ -466,19 +396,14 @@ if __name__ == "__main__":
             )
 
         loss_list.append(train_loss)
-        # ndcg_list.append(ndcg)
-        # hit_list.append(hit)
         recall_list.append(recall)
         end = time.time()
         time_taken = end - start
 
         print(f'Epoch: {epoch:3d}| Train loss: {train_loss:.5f} |Recall@{K}: {recall:.5f}|time taken : {time_taken:.1f}')
 
-
-        
         if recall > best_recall:
-            with open(config.save, 'wb') as f:
-                torch.save(model, f)
+            torch.save(model.state_dict(), config.save + config.data_type + '-' + str(date.today()) + '.pt')  # multivae-time-2023-02-04.pt
             best_recall = recall
             earlystop = 0
         else: 
@@ -487,10 +412,7 @@ if __name__ == "__main__":
         if earlystop == 10:
             break
 
-
     print('train done!!')
-    # with open('/opt/ml/input/project/model/Multi-VAE/model_time.pt', 'rb') as f:
-    #     model = torch.load(f)
 
     sub = submission(
         model = model, 
@@ -499,7 +421,7 @@ if __name__ == "__main__":
         user_valid = user_valid,
         make_matrix_data_set = make_matrix_data_set,
         K = K
-        )
+    )
     
     submission_file = pd.DataFrame.from_dict(sub, orient='index')
     submission_file.to_csv(f'/opt/ml/input/project/model/Multi-VAE/sub_{config.data_type}.csv', index = False)

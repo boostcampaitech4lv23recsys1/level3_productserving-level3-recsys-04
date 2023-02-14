@@ -9,6 +9,7 @@ import torch
 from scipy.sparse import csr_matrix
 from sklearn.metrics.pairwise import cosine_similarity
 
+
 def set_seed(seed):
     random.seed(seed)
     os.environ["PYTHONHASHSEED"] = str(seed)
@@ -184,7 +185,6 @@ def get_metric(pred_list, topk=10):
     return HIT / len(pred_list), NDCG / len(pred_list), MRR / len(pred_list)
 
 
-
 def recallk(actual, predicted, k = 3):
     """ label과 prediction 사이의 recall 평가 함수 
     Args:
@@ -201,7 +201,6 @@ def recallk(actual, predicted, k = 3):
     return recall_k
 
 
-
 def personalizeion(pred_list):
     """ personalizeion score 뽑아주는 함수. 
     Args:
@@ -216,7 +215,7 @@ def personalizeion(pred_list):
     y_lst = []
 
     def fun(x):
-        x = eval(x)
+        # x = eval(x)
         y_lst.extend(x)
         return x
 
@@ -231,17 +230,21 @@ def personalizeion(pred_list):
 
     x_array = x_array.T.reshape(-1)
     dat_array = np.ones(x_array.shape[0])
-    matrix = sparse.csr_matrix((dat_array, (x_array, y_array)), shape = (pred_list.shape[0],y_array.max()+1), dtype=int)
+    matrix = csr_matrix((dat_array, (x_array, y_array)), shape = (pred_list.shape[0],y_array.max()+1), dtype=int)
 
 
     _sum = 0
 
-    for i in (range(0, 39)):
+    thres = 10000
+    i_end = matrix.shape[0]//thres + 1
+
+    for i in (range(0, i_end)):
         #print(i)
-        idx = i * 10000
-        a = cosine_similarity(matrix[idx:idx + 10000], matrix[idx:idx + 10000])
+        idx = i * thres
+        
+        a = cosine_similarity(matrix[idx:idx + thres], matrix[idx:idx + thres])
         a = np.triu(a, k = 1)
         _sum += a.sum()
 
-    cnt = (pred_list.shape[0] / 10000) * (10000 * 10000 - 10000) // 2
+    cnt = (pred_list.shape[0] / thres) * (thres * thres - thres) // 2
     return _sum / cnt

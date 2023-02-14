@@ -17,6 +17,7 @@ from trainers import (
     test_score
 )
 
+
 # 0.01687, 25에폭(time)
 def main():
     parser = argparse.ArgumentParser()
@@ -25,7 +26,7 @@ def main():
     parser.add_argument("--data_dir", default="../data/", type=str)
     parser.add_argument("--output_dir", default="output/", type=str)
     parser.add_argument("--data_name", default="0130", type=str)
-    parser.add_argument("--data_type", default="time", type=str)
+    parser.add_argument("--data_type", default="rand", type=str)
     parser.add_argument("--model_name", default="SASRec", type=str)
     
 
@@ -60,7 +61,7 @@ def main():
     parser.add_argument(
         "--batch_size", type=int, default=256, help="number of batch_size"
     )
-    parser.add_argument("--epochs", type=int, default=25, help="number of epochs") # 200
+    parser.add_argument("--epochs", type=int, default=5, help="number of epochs") # 200
     parser.add_argument("--no_cuda", action="store_true")
     parser.add_argument("--log_freq", type=int, default=1, help="per epoch print res")
     parser.add_argument("--seed", default=42, type=int)
@@ -158,8 +159,8 @@ def main():
     pred_df['pred'] = pred_df.apply(lambda x : [x[i] for i in range(0,20)], axis = 1)
     pred_df = pred_df.reset_index()
     pred_df = pred_df[['index','pred']]
-    #pred_df.to_csv(f'{args.model_name}_{args.data_type}_test_{args.data_name}.csv', index = False)
-    
+    pred_df.to_csv(f'{args.model_name}_{args.data_type}_test_{args.data_name}.csv', index = False)
+    print(personalizeion(pred_df))
     
     torch.save(model.state_dict(), args.checkpoint_path)
     

@@ -38,8 +38,9 @@ export default function Album() {
 
   console.log(restaurants)
   console.log(card_num)
-
-  const album = (userData) => {
+  console.log(JSON.parse(window.localStorage.getItem("name")))
+  console.log(restaurants[0].length)
+  const positive = (userData) => {
     const requestOptions = {
       method: "POST",
       headers: {
@@ -52,21 +53,48 @@ export default function Album() {
     fetch('/api/album', requestOptions)
       .then((response) => response.json())
       .then((response) => {
-        // validate(response);
         console.log(response)
       })
       .catch(error => alert(error.message));
-
-
-
   };
-
+  const negative = (userData) => {
+    const requestOptions = {
+      method: "POST",
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "*",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(userData),
+    };
+    fetch('/api/album/negative', requestOptions)
+      .then((response) => response.json())
+      .catch(error => alert(error.message));
+  };
   const handleClick1 = (event) => {
     navigate('/signin');
   };
 
-  const test = (event) => {
-    setCardNum([card_num[0] + 1, card_num[1] + 1, card_num[2] + 1])
+  const handleClick2 = (event) => {
+    var user = window.localStorage.getItem('link').substring(29, 53)
+
+    negative({
+      user_id1: user,
+      rest_id1: restaurants[0][card_num[0]]["id"],
+      is_positive1: false,
+      model1: restaurants[0][card_num[0]]["model"],
+      user_id2: user,
+      rest_id2: restaurants[1][card_num[1]]["id"],
+      is_positive2: false,
+      model2: restaurants[1][card_num[1]]["model"],
+      user_id3: user,
+      rest_id3: restaurants[2][card_num[2]]["id"],
+      is_positive3: false,
+      model3: restaurants[2][card_num[2]]["model"]
+    });
+    setCardNum([(card_num[0] + 1) % restaurants[0].length, (card_num[1] + 1) % restaurants[1].length, (card_num[2] + 1) % restaurants[2].length])
+
+
   };
 
 
@@ -78,8 +106,7 @@ export default function Album() {
     const i = restaurants[card][card_num[card]]["id"]
     const url = "https://m.place.naver.com/restaurant/" + i + "/home"
     window.open(url, "_blank", "noopener, noreferrer");
-    // window.open(url, "_blank", "noopener, noreferrer");
-    album({
+    positive({
       user_id: user,
       rest_id: restaurants[card][card_num[card]]["id"],
       is_positive: true,
@@ -125,11 +152,12 @@ export default function Album() {
             pt: 8,
             pb: 6,
           }}
+
         >
 
           <Container maxWidth="md">
-            <Typography variant="h4" color="inherit" noWrap>
-              {window.localStorage.getItem('name')}님의 추천 목록          </Typography>
+            <Typography variant="h4" color="inherit" noWrap sx={{ marginBottom: 2 }}>
+              {window.localStorage.getItem('name')}님의 추천 목록         </Typography>
 
             <Grid container spacing={3}>
               {/* cards의 card 가 하나씩 들어가는 반복문 */}
@@ -139,7 +167,6 @@ export default function Album() {
                     sx={{
                       height: '100%',
                       display: 'flex',
-                      // flexDirection: 'column',
                     }}
                   >
 
@@ -153,20 +180,19 @@ export default function Album() {
                       image={restaurants[card][card_num[card]]["img_url"]}
                       alt="random"
                     />
-                    <CardContent sx={{ position: "relative", objectFit: "contain", left: -100, width: 1000 }}>
+                    <CardContent sx={{ position: "relative", objectFit: "contain", left: -100, width: 700 }}>
                       <Typography gutterBottom variant="h5" component="h2">
                         {restaurants[card][card_num[card]]["name"]}
                       </Typography>
                       <Typography>
                         {restaurants[card][card_num[card]]["tag"]}
                       </Typography>
-                      <Typography>
-                        제발되라제발되라제발되라제발되라제발되라제발되라제발되라제발되라제발되라제발되라
+                      <Typography sx={{ position: "relative", top: 10, fontSize: 18, width: 400 }}>
+                        {window.localStorage.getItem('name') + restaurants[card][card_num[card]]["ment"]}
                       </Typography>
                     </CardContent>
                     <CardActions>
-                      <Button id={card} type="submit" size="small" onClick={handleClick4} sx={{ position: "relative", bottom: -90, width: 100 }}>식당 링크 열기</Button>
-                      {/* <Button id={card} type="submit" size="small" onClick={handleClick5}>다른 결과 보기</Button> */}
+                      <Button id={card} type="submit" size="small" onClick={handleClick4} sx={{ position: "relative", bottom: -90, width: 100, left: -130 }}>식당 링크 열기</Button>
                     </CardActions>
                   </Card>
                 </Grid>
@@ -178,7 +204,6 @@ export default function Album() {
               spacing={2}
               justifyContent="none"
             >
-              {/* <Button variant="contained">더보기</Button> */}
 
             </Stack>
           </Container>
@@ -198,9 +223,9 @@ export default function Album() {
               pb: 6,
             }}
           >
-            <Button variant="outlined" onClick={handleClick1}>
+            <Button variant="outlined" onClick={handleClick1} sx={{ position: "relative", top: -200, height: 50, right: 300 }}>
               처음 화면으로</Button>
-            <Button variant="outlined" onClick={test}>
+            <Button variant="outlined" onClick={handleClick2} sx={{ position: "relative", top: -200, height: 50, left: 300 }}>
               다른 결과 보기</Button>
           </Box>
         </Container>
@@ -208,6 +233,6 @@ export default function Album() {
 
       </main>
 
-    </ThemeProvider>
+    </ThemeProvider >
   );
 }

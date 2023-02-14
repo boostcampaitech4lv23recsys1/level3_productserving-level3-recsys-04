@@ -28,7 +28,7 @@ export default function SignIn() {
   let [loading, setLoading] = React.useState(false);
   const navigate = useNavigate();
   const validate = async (response) => {
-    if (response["detail"] == "cold start") {
+    if (response["detail"] == "cold start" && menu == "1") {
       //cold start 시에 실행시켜야 하는 항목
       await Swal.fire({
         title: '싫어하는 음식을 선택해주세요.',
@@ -43,7 +43,7 @@ export default function SignIn() {
         <input type="checkbox" id="c8"  /><label for="c8"></label>
         <input type="checkbox" id="c9"  /><label for="c9"></label>
         `,
-        confirmButtonText: 'confirmar',
+        confirmButtonText: 'confirm',
         preConfirm: () => {
           var c1 = Swal.getPopup().querySelector('#c1').checked
           var c2 = Swal.getPopup().querySelector('#c2').checked
@@ -83,27 +83,51 @@ export default function SignIn() {
       })
 
     }
+    else if (response["detail"] == "cold start" && menu == "2") {
+      cold_start({
+        name: link.substring(29, 53),
+        location: location,
+        menu: menu,
+        c1: false,
+        c2: false,
+        c3: false,
+        c4: false,
+        c5: false,
+        c6: false,
+        c7: false,
+        c8: false,
+        c9: false,
+      });
+    }
     else if (response["detail"] == "not cold start") {
       // 콜드스타트 아니고 기존에 실행히시켜야 하던 항목
-      await window.localStorage.setItem('restaurants0', JSON.stringify(response["restaurants0"]));
-      await window.localStorage.setItem('restaurants1', JSON.stringify(response["restaurants1"]));
-      await window.localStorage.setItem('restaurants2', JSON.stringify(response["restaurants2"]));
-      await window.localStorage.setItem('name', JSON.stringify(response["name"]));
+      window.localStorage.setItem('restaurants0', JSON.stringify(response["restaurants0"]));
+      window.localStorage.setItem('restaurants1', JSON.stringify(response["restaurants1"]));
+      window.localStorage.setItem('restaurants2', JSON.stringify(response["restaurants2"]));
+      window.localStorage.setItem('name', JSON.stringify(response["name"]));
 
-      await console.log(response);
+      console.log(response);
+      window.location = '/album'
     }
-    let timeoutId;
-
-    Swal.fire({
-      title: '로딩 중입니다',
-      text: '잠시만 기다려주세요',
-      icon: 'info',
-      timer: 565555555,
-      showConfirmButton: false,
-      showCancelButton: true,
-      cancelButtonText: 'Cancel'
-    })
-    window.location = '/album'
+    if (response["detail"] == "low data") {
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: '인근에 음식점이 충분하지 않습니다',
+      })
+    }
+    else {
+      let timeoutId;
+      Swal.fire({
+        title: '로딩 중입니다',
+        text: '잠시만 기다려주세요',
+        icon: 'info',
+        timer: 565555555,
+        showConfirmButton: false,
+        showCancelButton: true,
+        cancelButtonText: 'Cancel'
+      })
+    }
   };
 
 
@@ -155,7 +179,7 @@ export default function SignIn() {
       width: 800,
       html: `
       <div>
-        <h1>렉카메추 사용 방법!</h1>
+        <h1>머글끼니 사용 방법!</h1>
         <h2>1.
         <a href="https://naver.com">네이버 </a>로그인 후</h2>
         <h2>2.
@@ -188,11 +212,6 @@ export default function SignIn() {
         location: location,
         menu: menu,
       });
-
-
-      //showAutoClose()
-      // navigate('/album');
-      // window.location = '/album';
     }
     else {
       Swal.fire({
@@ -218,7 +237,7 @@ export default function SignIn() {
           }}
         >
           <Typography component="h1" variant="h5">
-            네이버 맛집 추천
+            머글끼니
           </Typography>
           <Box component="form" noValidate sx={{ mt: 1 }}>
             <TextField
@@ -238,7 +257,7 @@ export default function SignIn() {
               required
               fullWidth
               id="location"
-              label="추천을 원하는 주소"
+              label="추천을 원하는 장소 ex) 강남역, 신촌역 등"
               name="location"
               onChange={(e) => {
                 setLocation(e.target.value);
@@ -258,13 +277,8 @@ export default function SignIn() {
               </Select>
             </FormControl>
 
-            {/* <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
-              label="Remember me"
-            /> */}
             <div>
               <Button
-                // type="submit"
                 fullWidth
                 variant="contained"
                 sx={{ mt: 3, mb: 2 }}

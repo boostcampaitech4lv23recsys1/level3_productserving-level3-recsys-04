@@ -11,8 +11,9 @@ class RateRequest(BaseModel):
 class SignInRequest(BaseModel):
     name: str
     location: str
-    menu : str  # 1 : 식사, 2 : 카페/디저트
-    
+    menu: str  # 1 : 식사, 2 : 카페/디저트
+
+
 class SignInColdRequest(BaseModel):
     name: str
     location: str
@@ -35,6 +36,21 @@ class AlbumRequest(BaseModel):
     model: str
 
 
+class AlbumNegativeRequest(BaseModel):
+    user_id1: str  # user
+    rest_id1: str  # url
+    is_positive1: bool
+    model1: str
+    user_id2: str  # user
+    rest_id2: str  # url
+    is_positive2: bool
+    model2: str
+    user_id3: str  # user
+    rest_id3: str  # url
+    is_positive3: bool
+    model3: str
+
+
 class GeneralRequest(BaseModel):
     qeury: str
     detail: str
@@ -53,6 +69,7 @@ class Restaurant(BaseModel):
     name: str
     img_url: str
     model: str
+    ment: str
 
 
 class SignInResponse(BaseModel):

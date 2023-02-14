@@ -6,7 +6,7 @@ google-chrome-stable_current_amd64.deb
 .ipynb_checkpoints
 *.pem
 __pycache__
-.vscode
+.vscode/
 .empty
 .venv
 
@@ -53,6 +53,9 @@ yarn-error.log*
 
 # Database
 database/ssl
+database/rest_csv
+database/user_csv
+
 
 # data
 area_csv
@@ -65,7 +68,12 @@ tem.ipynb
 tem.py
 *.npy
 *.pickle
+*.pkl
+*.pt
+*.csv
 airflow/data/
+
+# logs
 
 # model
 output/
@@ -76,3 +84,12 @@ poetry*
 
 # DB
 *.db
+
+# MLflow
+mlruns
+
+# airflow
+airflow/logs/
+airflow-webserver.pid
+airflow.cfg
+webserver_config.py
