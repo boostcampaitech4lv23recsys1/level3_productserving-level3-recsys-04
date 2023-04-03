@@ -2,7 +2,7 @@
 # **머글꺼니**
 
 > **머글꺼니** : 오늘은 어떤 음식을 머글꺼니
-> 최종 발표 [구글 슬라이드]() 및 [PDF]() & [Youtube](https://youtu.be/oGTYx6Fa5j4)
+> 최종 발표 [구글 슬라이드](https://docs.google.com/presentation/d/1LzMaXzlGS6LU0P8DhYBDtIHtQy2xCXFV12woF-199yg/edit?usp=sharing)  & [Youtube](https://youtu.be/oGTYx6Fa5j4)
 
 <br/>
 
